@@ -1,0 +1,13 @@
+apps:
+    script: /home/rodri6000/applications/nsi_tecnologia/app.js
+    name: nsi_tecnologia
+    max_memory_restart: 256M
+    exec_mode: fork
+    ignore_watch: '["[\/\]\./", "node_modules"]'
+    watch: false
+    log_date_format: 'YYYY-MM-DD HH:mm Z'
+    out_file: /home/rodri6000/applications/nsi_tecnologia/stdout.log
+    error_file: /home/rodri6000/applications/nsi_tecnologia/stdout.log
+    pid_file: /home/rodri6000/applications/nsi_tecnologia/pid.pid
+    interpreter: /usr/nodejs/node-v22.2.0/bin/node
+    env: { NODE_ENV: production, PORT: '61910' }

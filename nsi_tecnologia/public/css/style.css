@@ -1,0 +1,457 @@
+/* ================================
+🔄 RESET & BASE
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+
+/* ================================
+📐 LAYOUT GERAL
+================================ */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+  padding: 40px;
+}
+
+
+/* ================================
+📂 SIDEBAR
+================================ */
+.sidebar {
+  width: 220px;
+  background-color: #0077cc;
+  color: white;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.sidebar h2 {
+  font-size: 22px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.sidebar nav a.btn {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-weight: bold;
+  text-align: left;
+  padding: 10px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar nav a.btn:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+
+/* ================================
+📁 MENU COLAPSÁVEL
+================================ */
+.menu-group {
+  margin-bottom: 10px;
+}
+
+.submenu-produto {
+  display: none;
+  margin-left: 20px;
+}
+
+.btn-sub {
+  display: block;
+  font-size: 0.95em;
+  color: #ccc;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-sub:hover {
+  color: #fff;
+  background-color: rgba(255,255,255,0.1);
+}
+
+
+/* ================================
+🧭 TIPOGRAFIA
+================================ */
+h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #0077cc;
+  text-align: center;
+}
+
+p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+
+/* ================================
+🔘 BOTÕES GERAIS
+================================ */
+.btn,
+.btn-azul,
+.btn-vermelho {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-azul {
+  background-color: #0077cc;
+}
+.btn-azul:hover {
+  background-color: #005fa3;
+}
+
+.btn-vermelho {
+  background-color: #cc3300;
+}
+.btn-vermelho:hover {
+  background-color: #a62800;
+}
+
+
+/* ================================
+🧑‍💻 LOGIN
+================================ */
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.login-container label {
+  display: block;
+  margin: 10px 0 5px;
+  text-align: left;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-container .btn {
+  width: auto;
+  padding: 12px 30px;
+  background-color: #0077cc;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+/* ================================
+✅ DASHBOARD
+================================ */
+.dashboard {
+  max-width: 600px;
+  margin: 60px auto;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.dashboard .btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+
+/* ================================
+📊 TABELAS
+================================ */
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+table th, table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+table th {
+  background-color: #0077cc;
+  color: white;
+  font-weight: bold;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+
+/* ================================
+📱 RESPONSIVIDADE
+================================ */
+@media (max-width: 600px) {
+  .dashboard,
+  .login-container {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  p {
+    font-size: 16px;
+  }
+
+  .btn-group {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .btn,
+  .btn-azul,
+  .btn-vermelho {
+    width: 100%;
+    justify-content: center;
+  }
+
+  table {
+    font-size: 14px;
+    min-width: 600px;
+  }
+}
+
+
+/* ================================
+⚠️ MENSAGENS DE FEEDBACK
+================================ */
+.erro {
+  color: red;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.sucesso {
+  color: green;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+
+/* ================================
+🧩 MODAL DE CONFIRMAÇÃO
+================================ */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-conteudo {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-conteudo p {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+
+/* ================================
+🧾 FORMULÁRIOS
+================================ */
+form.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+form.form-grid .campo {
+  display: flex;
+  flex-direction: column;
+}
+
+form.form-grid label {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+form.form-grid input,
+form.form-grid select,
+form.form-grid textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+form.form-grid textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+@media (max-width: 768px) {
+  form.form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* detalhes produtos*/
+
+.detalhes-produto {
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #ffffff; /* fundo claro */
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.detalhes-produto table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detalhes-produto th {
+  text-align: left;
+  padding: 10px;
+  background-color: #f0f0f0; /* cabeçalho com contraste */
+  width: 30%;
+  color: #333;
+}
+
+.detalhes-produto td {
+  padding: 10px;
+  background-color: #fafafa; /* células com leve contraste */
+  color: #222;
+}
+
+.botoes-voltar {
+  max-width: 700px;
+  margin: 30px auto 0;
+  text-align: left;
+}
+
+/*Logo*/
+
+.sidebar-logo {
+  text-align: center;
+  padding: 10px 10px;
+}
+
+.sidebar-logo img {
+  max-width: 120px;
+  height: auto;
+}
+
+/*Logo tela de Lgin*/
+
+.logo-login {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo-login img {
+  max-width: 160px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* botao tela confirmar ordem de servico*/
+
+.btn-verde {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  width: 56px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-verde:hover {
+  background-color: #218838;
+}
+
+.btn-voltar {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.btn-voltar:hover {
+  background-color: #e0e0e0;
+  color: #000;
+}

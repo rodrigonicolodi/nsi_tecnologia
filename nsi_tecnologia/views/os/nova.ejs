@@ -1,0 +1,79 @@
+<% layout = 'layout' %>
+<% titulo = 'Nova Ordem de Serviço' %>
+
+<div class="container">
+  <h2>Nova Ordem de Serviço</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <form id="form-os" action="/os/nova" method="POST" class="form-grid">
+    <div class="campo">
+      <label for="solicitante_id">Solicitante</label>
+      <select id="solicitante_id" name="solicitante_id" required>
+        <% pessoas.forEach(p => { %>
+          <option value="<%= p.id %>"><%= p.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="responsavel_id">Responsável Técnico</label>
+      <select id="responsavel_id" name="responsavel_id" required>
+        <% pessoas.forEach(p => { %>
+          <option value="<%= p.id %>"><%= p.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="tipo_servico">Tipo de Serviço</label>
+      <input type="text" id="tipo_servico" name="tipo_servico" required>
+    </div>
+
+    <div class="campo">
+      <label for="prioridade">Prioridade</label>
+      <select id="prioridade" name="prioridade">
+        <option value="baixa">Baixa</option>
+        <option value="media">Média</option>
+        <option value="alta">Alta</option>
+        <option value="critica">Crítica</option>
+      </select>
+    </div>
+
+    <div class="campo" style="grid-column: 1 / -1;">
+      <label for="problema_informado">Problema Informado</label>
+      <textarea id="problema_informado" name="problema_informado" rows="3"></textarea>
+    </div>
+
+    <div class="campo">
+      <label for="valor_servico">Valor do Serviço</label>
+      <input type="number" step="0.01" id="valor_servico" name="valor_servico">
+    </div>
+
+    <div class="campo">
+      <label for="desconto">Desconto</label>
+      <input type="number" step="0.01" id="desconto" name="desconto">
+    </div>
+
+    <div class="campo">
+      <label for="acrescimos">Acréscimos</label>
+      <input type="number" step="0.01" id="acrescimos" name="acrescimos">
+    </div>
+
+    <div class="campo" style="grid-column: 1 / -1; text-align: center;">
+      <button type="submit" id="btn-salvar" class="btn btn-azul">
+        <i class="fas fa-save"></i> Salvar OS
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('form-os').addEventListener('submit', function () {
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+  });
+</script>

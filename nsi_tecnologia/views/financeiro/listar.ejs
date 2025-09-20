@@ -1,0 +1,138 @@
+<% layout = 'layout' %>
+<% titulo = 'Lançamentos Financeiros' %>
+
+<div class="container">
+  <h2>Lançamentos Financeiros</h2>
+
+  <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <a href="/financeiro/novo" class="btn btn-azul">
+      <i class="fas fa-plus-circle"></i> Novo Lançamento
+    </a>
+  </div>
+
+  <!-- 🔍 Filtros -->
+<!-- 🔍 Filtros -->
+<form method="GET" action="/financeiro" class="form-filtros" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px;">
+  <div class="campo">
+    <label for="busca">Buscar</label>
+    <input type="text" name="busca" id="busca" placeholder="Descrição ou pessoa" value="<%= busca %>" class="input-busca">
+  </div>
+
+  <div class="campo">
+    <label for="tipo">Tipo</label>
+    <select name="tipo" id="tipo">
+      <option value="">Todos</option>
+      <option value="receber" <%= tipo === 'receber' ? 'selected' : '' %>>Receber</option>
+      <option value="pagar" <%= tipo === 'pagar' ? 'selected' : '' %>>Pagar</option>
+    </select>
+  </div>
+
+  <div class="campo">
+    <label for="status">Status</label>
+    <select name="status" id="status">
+      <option value="">Todos</option>
+      <option value="pendente" <%= status === 'pendente' ? 'selected' : '' %>>Pendente</option>
+      <option value="pago" <%= status === 'pago' ? 'selected' : '' %>>Pago</option>
+      <option value="cancelado" <%= status === 'cancelado' ? 'selected' : '' %>>Cancelado</option>
+    </select>
+  </div>
+
+  <div class="campo">
+    <button type="submit" class="btn btn-azul">
+      <i class="fas fa-filter"></i> Filtrar
+    </button>
+  </div>
+</form>
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+  <% if (sucesso) { %>
+    <p class="sucesso"><%= sucesso %></p>
+  <% } %>
+
+  <div class="table-wrapper">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Pessoa</th>
+          <th>Caixa</th>
+          <th>Valor</th>
+          <th>Vencimento</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (lancamentos || []).forEach(l => { %>
+          <tr>
+            <td><%= l.tipo || '-' %></td>
+            <td><%= l.pessoa_nome || '-' %></td>
+            <td><%= l.caixa_nome || '-' %></td>
+            <td>R$ <%= !isNaN(parseFloat(l.valor)) ? parseFloat(l.valor).toFixed(2) : '0.00' %></td>
+            <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString() : '-' %></td>
+            <td><%= l.status || '-' %></td>
+            <td class="acoes">
+              <a href="/financeiro/exibir/<%= l.id %>" class="btn btn-acao btn-azul" title="Exibir">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="/financeiro/editar/<%= l.id %>" class="btn btn-acao btn-azul" title="Editar">
+                <i class="fas fa-edit"></i>
+              </a>
+              <button type="button" class="btn btn-acao btn-vermelho" data-id="<%= l.id %>" title="Excluir">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (lancamentos.length === 0) { %>
+          <tr>
+            <td colspan="7">Nenhum lançamento encontrado.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 📄 Paginação -->
+  <% if (totalPaginas > 1) { %>
+    <div class="paginacao">
+      <% for (let i = 1; i <= totalPaginas; i++) { %>
+        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca) %>&tipo=<%= encodeURIComponent(tipo) %>&status=<%= encodeURIComponent(status) %>"
+           class="btn-pagina <%= pagina === i ? 'ativo' : '' %>">
+          <%= i %>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+
+<!-- 🔔 Modal de confirmação (opcional) -->
+<div id="modal-confirmacao" class="modal">
+  <div class="modal-conteudo">
+    <p>Tem certeza que deseja excluir este lançamento?</p>
+    <form id="form-confirmar" method="POST">
+      <button type="submit" class="btn btn-azul">Confirmar</button>
+      <button type="button" class="btn btn-vermelho" onclick="fecharModal()">Cancelar</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modal-confirmacao');
+    const formConfirmar = document.getElementById('form-confirmar');
+
+    document.querySelectorAll('.btn-vermelho[data-id]').forEach(botao => {
+      botao.addEventListener('click', () => {
+        const id = botao.getAttribute('data-id');
+        formConfirmar.setAttribute('action', `/financeiro/excluir/${id}`);
+        modal.style.display = 'flex';
+      });
+    });
+
+    window.fecharModal = function () {
+      modal.style.display = 'none';
+    };
+  });
+</script>

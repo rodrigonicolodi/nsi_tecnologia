@@ -1,0 +1,158 @@
+<% layout = 'layout' %>
+<% titulo = 'Editar Pessoa' %>
+
+<div class="container">
+  <h2>Editar Pessoa</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+  <% if (sucesso) { %>
+    <p class="sucesso"><%= sucesso %></p>
+  <% } %>
+
+  <form method="POST" action="/pessoas/editar/<%= pessoa.id %>" class="form-grid">
+    <div class="campo">
+      <label for="tipo"><strong>Tipo:</strong></label>
+      <select name="tipo" id="tipo">
+        <option value="cliente" <%= pessoa.tipo === 'cliente' ? 'selected' : '' %>>Cliente</option>
+        <option value="tecnico" <%= pessoa.tipo === 'tecnico' ? 'selected' : '' %>>Técnico</option>
+        <option value="fornecedor" <%= pessoa.tipo === 'fornecedor' ? 'selected' : '' %>>Fornecedor</option>
+        <option value="interno" <%= pessoa.tipo === 'interno' ? 'selected' : '' %>>Interno</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="nome"><strong>Nome:</strong></label>
+      <input type="text" name="nome" id="nome" value="<%= pessoa.nome %>" required>
+    </div>
+
+    <div class="campo">
+      <label><strong>Razão Social:</strong></label>
+      <input type="text" name="razao_social" value="<%= pessoa.razao_social %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Nome Fantasia:</strong></label>
+      <input type="text" name="nome_fantasia" value="<%= pessoa.nome_fantasia %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>CPF / CNPJ:</strong></label>
+      <input type="text" name="documento" value="<%= pessoa.documento %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>RG / IE:</strong></label>
+      <input type="text" name="rg_ie" value="<%= pessoa.rg_ie %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Data de Nascimento:</strong></label>
+      <input type="date" name="data_nascimento" value="<%= pessoa.data_nascimento %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Sexo:</strong></label>
+      <select name="sexo">
+        <option value="masculino" <%= pessoa.sexo === 'masculino' ? 'selected' : '' %>>Masculino</option>
+        <option value="feminino" <%= pessoa.sexo === 'feminino' ? 'selected' : '' %>>Feminino</option>
+        <option value="outro" <%= pessoa.sexo === 'outro' ? 'selected' : '' %>>Outro</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label><strong>Estado Civil:</strong></label>
+      <input type="text" name="estado_civil" value="<%= pessoa.estado_civil %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Profissão:</strong></label>
+      <input type="text" name="profissao" value="<%= pessoa.profissao %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Email:</strong></label>
+      <input type="email" name="email" value="<%= pessoa.email %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Telefone:</strong></label>
+      <input type="text" name="telefone" value="<%= pessoa.telefone %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Celular:</strong></label>
+      <input type="text" name="celular" value="<%= pessoa.celular %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>WhatsApp:</strong></label>
+      <input type="text" name="whatsapp" value="<%= pessoa.whatsapp %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>CEP:</strong></label>
+      <input type="text" name="cep" value="<%= pessoa.cep %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Endereço:</strong></label>
+      <input type="text" name="endereco" value="<%= pessoa.endereco %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Número:</strong></label>
+      <input type="text" name="numero" value="<%= pessoa.numero %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Complemento:</strong></label>
+      <input type="text" name="complemento" value="<%= pessoa.complemento %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Bairro:</strong></label>
+      <input type="text" name="bairro" value="<%= pessoa.bairro %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Cidade:</strong></label>
+      <input type="text" name="cidade" value="<%= pessoa.cidade %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>UF:</strong></label>
+      <input type="text" name="uf" maxlength="2" value="<%= pessoa.uf %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>País:</strong></label>
+      <input type="text" name="pais" value="<%= pessoa.pais %>">
+    </div>
+
+    <div class="campo">
+      <label><strong>Contato Responsável:</strong></label>
+      <input type="text" name="contato_responsavel" value="<%= pessoa.contato_responsavel %>">
+    </div>
+
+    <div class="campo" style="grid-column: span 2;">
+      <label><strong>Observações:</strong></label>
+      <textarea name="observacoes"><%= pessoa.observacoes %></textarea>
+    </div>
+
+    <div class="campo">
+      <label><strong>Status:</strong></label>
+      <select name="status">
+        <option value="ativo" <%= pessoa.status === 'ativo' ? 'selected' : '' %>>Ativo</option>
+        <option value="inativo" <%= pessoa.status === 'inativo' ? 'selected' : '' %>>Inativo</option>
+      </select>
+    </div>
+
+    <div class="campo" style="grid-column: span 2; text-align: center;">
+      <button type="submit" class="btn-azul">
+        <i class="fas fa-save"></i> Salvar Alterações
+      </button>
+    </div>
+  </form>
+</div>

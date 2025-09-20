@@ -1,0 +1,16 @@
+<% layout = 'layout' %>
+<% titulo = 'Painel Administrativo' %>
+
+<div class="dashboard">
+  <h2>Bem-vindo, <%= usuario.nome %>!</h2>
+  <p>Nível de acesso: <%= usuario.nivel %></p>
+
+  <div class="btn-group">
+    <a href="/usuarios" class="btn-azul">
+      <i class="fas fa-users"></i> Gerenciar Usuários
+    </a>
+    <a href="/logout" class="btn-vermelho">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </a>
+  </div>
+</div>

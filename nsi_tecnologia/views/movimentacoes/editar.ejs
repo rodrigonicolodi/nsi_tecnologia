@@ -1,0 +1,46 @@
+<% layout = 'layout' %>
+<% titulo = 'Editar Movimentação' %>
+
+<div class="container">
+  <h2>Editar Movimentação</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <form method="POST" action="/movimentacoes/editar/<%= movimentacao.id %>" class="formulario">
+    <label>Produto:</label>
+    <select name="produto_id" required>
+      <% produtos.forEach(p => { %>
+        <option value="<%= p.id %>" <%= p.id === movimentacao.produto_id ? 'selected' : '' %>><%= p.nome %></option>
+      <% }) %>
+    </select>
+
+    <label>Tipo:</label>
+    <select name="tipo" required>
+      <option value="entrada" <%= movimentacao.tipo === 'entrada' ? 'selected' : '' %>>Entrada</option>
+      <option value="saida" <%= movimentacao.tipo === 'saida' ? 'selected' : '' %>>Saída</option>
+    </select>
+
+    <label>Quantidade:</label>
+    <input type="number" name="quantidade" value="<%= movimentacao.quantidade %>" required>
+
+    <label>Pessoa:</label>
+    <select name="pessoa_id">
+      <option value="">-- Nenhuma --</option>
+      <% pessoas.forEach(p => { %>
+        <option value="<%= p.id %>" <%= p.id === movimentacao.pessoa_id ? 'selected' : '' %>><%= p.nome %></option>
+      <% }) %>
+    </select>
+
+    <label>Observação:</label>
+    <textarea name="observacao"><%= movimentacao.observacao %></textarea>
+
+    <button type="submit" class="btn btn-azul">
+      <i class="fas fa-save"></i> Salvar Alterações
+    </button>
+    <a href="/movimentacoes" class="btn btn-cinza">
+      <i class="fas fa-arrow-left"></i> Cancelar
+    </a>
+  </form>
+</div>

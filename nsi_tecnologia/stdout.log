@@ -1,0 +1,648 @@
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-15 21:39 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-15 21:39 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-15 21:39 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-15 21:39 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-15 21:39 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-15 21:39 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-15 21:39 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-15 21:39 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-15 21:39 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-15 21:39 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-15 21:39 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-15 21:39 -03:00: }
+2025-09-16 02:47 -03:00: Warning: connect.session() MemoryStore is not
+2025-09-16 02:47 -03:00: designed for a production environment, as it will leak
+2025-09-16 02:47 -03:00: memory, and will not scale past a single process.
+2025-09-16 02:47 -03:00: (node:1843702) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+2025-09-16 02:47 -03:00: (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-09-16 02:47 -03:00: ✅ Servidor rodando na porta 61910
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 01:21 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-17 01:21 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-17 01:21 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-17 01:21 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-17 01:21 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-17 01:21 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-17 01:21 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-17 01:21 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-17 01:21 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-17 01:21 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-17 01:21 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-17 01:21 -03:00: }
+2025-09-17 07:43 -03:00: Warning: connect.session() MemoryStore is not
+2025-09-17 07:43 -03:00: designed for a production environment, as it will leak
+2025-09-17 07:43 -03:00: memory, and will not scale past a single process.
+2025-09-17 07:43 -03:00: (node:1456595) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+2025-09-17 07:43 -03:00: (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-09-17 07:43 -03:00: ✅ Servidor rodando na porta 61910
+2025-09-17 07:58 -03:00: Warning: connect.session() MemoryStore is not
+2025-09-17 07:58 -03:00: designed for a production environment, as it will leak
+2025-09-17 07:58 -03:00: memory, and will not scale past a single process.
+2025-09-17 07:58 -03:00: (node:1490037) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+2025-09-17 07:58 -03:00: (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-09-17 07:58 -03:00: ✅ Servidor rodando na porta 61910
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:22 -03:00: Error: /home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node: invalid ELF header
+2025-09-18 08:22 -03:00:     at Module._extensions..node (node:internal/modules/cjs/loader:1544:18)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32)
+2025-09-18 08:22 -03:00:     at Module._load (node:internal/modules/cjs/loader:1065:12)
+2025-09-18 08:22 -03:00:     at Module.require (node:internal/modules/cjs/loader:1271:19)
+2025-09-18 08:22 -03:00:     at Hook._require.Module.require (/home/rodri6000/bin/lib/node_modules/require-in-the-middle/index.js:80:39)
+2025-09-18 08:22 -03:00:     at require (node:internal/modules/helpers:123:16)
+2025-09-18 08:22 -03:00:     at Object.<anonymous> (/home/rodri6000/applications/nsi_tecnologia/node_modules/bcrypt/bcrypt.js:6:16)
+2025-09-18 08:22 -03:00:     at Module._compile (node:internal/modules/cjs/loader:1434:14)
+2025-09-18 08:22 -03:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1518:10)
+2025-09-18 08:22 -03:00:     at Module.load (node:internal/modules/cjs/loader:1249:32) {
+2025-09-18 08:22 -03:00:   code: 'ERR_DLOPEN_FAILED'
+2025-09-18 08:22 -03:00: }
+2025-09-18 08:30 -03:00: Warning: connect.session() MemoryStore is not
+2025-09-18 08:30 -03:00: designed for a production environment, as it will leak
+2025-09-18 08:30 -03:00: memory, and will not scale past a single process.
+2025-09-18 08:30 -03:00: (node:630616) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+2025-09-18 08:30 -03:00: (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-09-18 08:30 -03:00: ✅ Servidor rodando na porta 61910

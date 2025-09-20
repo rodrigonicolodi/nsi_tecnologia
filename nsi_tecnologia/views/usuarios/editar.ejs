@@ -1,0 +1,48 @@
+<% layout = 'layout' %>
+<% titulo = 'Editar Usuário' %>
+
+<div class="container">
+  <div class="card">
+    <h2>Editar Usuário</h2>
+
+    <form method="POST" action="/usuarios/<%= usuario.id %>/editar">
+      <div class="form-group">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" value="<%= usuario.nome %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="<%= usuario.email %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="nivel">Nível:</label>
+        <select id="nivel" name="nivel" required>
+          <option value="admin" <%= usuario.nivel === 'admin' ? 'selected' : '' %>>Admin</option>
+          <option value="comum" <%= usuario.nivel === 'comum' ? 'selected' : '' %>>Comum</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status:</label>
+        <select id="status" name="status" required>
+          <option value="ativo" <%= usuario.status === 'ativo' ? 'selected' : '' %>>Ativo</option>
+          <option value="inativo" <%= usuario.status === 'inativo' ? 'selected' : '' %>>Inativo</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Nova Senha:</label>
+        <input type="password" id="senha" name="senha" placeholder="Deixe em branco para manter a atual">
+      </div>
+
+      <button type="submit" class="btn-azul">
+        <i class="fas fa-save"></i> Salvar Alterações
+      </button>
+      <a href="/usuarios" class="btn-roxo" style="margin-left: 10px;">
+        <i class="fas fa-arrow-left"></i> Voltar
+      </a>
+    </form>
+  </div>
+</div>

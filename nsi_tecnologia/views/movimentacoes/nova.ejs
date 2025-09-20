@@ -1,0 +1,61 @@
+<% layout = 'layout' %>
+<% titulo = 'Nova Movimentação' %>
+
+<div class="container">
+  <h2>Nova Movimentação</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <form method="POST" action="/movimentacoes" class="form-grid" style="grid-template-columns: 1fr;">
+    <div class="campo">
+      <label for="tipo">Tipo</label>
+      <select name="tipo" id="tipo" required>
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="produto_id">Produto</label>
+      <select name="produto_id" id="produto_id" required>
+        <% produtos.forEach(p => { %>
+          <option value="<%= p.id %>"><%= p.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="pessoa_id">Pessoa</label>
+      <select name="pessoa_id" id="pessoa_id" required>
+        <% pessoas.forEach(p => { %>
+          <option value="<%= p.id %>"><%= p.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="quantidade">Quantidade</label>
+      <input type="number" name="quantidade" id="quantidade" required min="1">
+    </div>
+
+    <div class="campo" style="grid-column: 1 / -1; text-align: center;">
+      <button type="submit" class="btn-azul" id="btn-salvar">
+        <i class="fas fa-save"></i> Salvar Movimentação
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const botao = document.getElementById('btn-salvar');
+
+    form.addEventListener('submit', function () {
+      botao.disabled = true;
+      botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    });
+  });
+</script>

@@ -1,0 +1,54 @@
+<% layout = 'layout' %>
+<% titulo = 'Logs de Auditoria' %>
+
+<div class="container">
+  <div class="card">
+    <h2>Logs de Auditoria</h2>
+
+    <form method="GET" action="/usuarios/auditoria" class="form-inline" style="margin-bottom: 20px;">
+      <input type="text" name="admin" placeholder="Admin" value="<%= filtros.admin || '' %>">
+      
+      <select name="acao">
+        <option value="">Todas as Ações</option>
+        <option value="editar" <%= filtros.acao === 'editar' ? 'selected' : '' %>>Editar</option>
+        <option value="excluir" <%= filtros.acao === 'excluir' ? 'selected' : '' %>>Excluir</option>
+      </select>
+      
+      <input type="date" name="de" value="<%= filtros.de || '' %>">
+      <input type="date" name="ate" value="<%= filtros.ate || '' %>">
+      
+      <button type="submit" class="btn-azul">
+        <i class="fas fa-filter"></i> Filtrar
+      </button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Admin</th>
+          <th>Ação</th>
+          <th>Alvo</th>
+          <th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (logs.length === 0) { %>
+          <tr>
+            <td colspan="5">Nenhum registro encontrado.</td>
+          </tr>
+        <% } else { %>
+          <% logs.forEach(log => { %>
+            <tr>
+              <td><%= new Date(log.data).toLocaleString('pt-BR') %></td>
+              <td><%= log.admin_nome %></td>
+              <td><%= log.acao %></td>
+              <td><%= log.alvo_id %></td>
+              <td><%= log.descricao %></td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>

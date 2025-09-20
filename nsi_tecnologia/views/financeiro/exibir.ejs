@@ -1,0 +1,31 @@
+<% layout = 'layout' %>
+<% titulo = 'Detalhes do Lançamento Financeiro' %>
+
+<div class="container">
+  <h2><%= titulo %></h2>
+
+  <div class="dados-box">
+    <p><strong>Tipo:</strong> <%= lancamento.tipo || '—' %></p>
+    <p><strong>Pessoa:</strong> <%= lancamento.pessoa_nome || '—' %></p>
+    <p><strong>Caixa:</strong> <%= lancamento.caixa_nome || '—' %></p>
+    <p><strong>Valor:</strong> R$ <%= !isNaN(parseFloat(lancamento.valor)) ? parseFloat(lancamento.valor).toFixed(2) : '0,00' %></p>
+    <p><strong>Vencimento:</strong> <%= lancamento.vencimento ? new Date(lancamento.vencimento).toLocaleDateString() : '—' %></p>
+    <p><strong>Status:</strong> <%= lancamento.status || '—' %></p>
+    <p><strong>Descrição:</strong> <%= lancamento.descricao || '—' %></p>
+
+    <% if (lancamento.ordem_servico_id) { %>
+      <p><strong>Vinculado à OS:</strong>
+        <a href="/ordens/exibir/<%= lancamento.ordem_servico_id %>">OS #<%= lancamento.ordem_servico_id %></a>
+      </p>
+    <% } %>
+  </div>
+
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
+    <a href="/financeiro" class="btn btn-cinza btn-voltar">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+    <a href="/financeiro/editar/<%= lancamento.id %>" class="btn btn-azul">
+      <i class="fas fa-edit"></i> Editar
+    </a>
+  </div>
+</div>

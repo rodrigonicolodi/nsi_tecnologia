@@ -1,0 +1,21 @@
+<% layout = 'layout' %>
+<% titulo = 'Detalhes da Movimentação' %>
+
+<div class="container">
+  <h2><%= titulo %></h2>
+
+  <div class="card">
+    <p><strong>Data:</strong> <%= movimentacao.data ? new Date(movimentacao.data).toLocaleDateString() : '—' %></p>
+    <p><strong>Tipo:</strong> <%= movimentacao.tipo || '—' %></p>
+    <p><strong>Produto:</strong> <%= movimentacao.produto_nome || '—' %></p>
+    <p><strong>Quantidade:</strong> <%= typeof movimentacao.quantidade === 'number' ? movimentacao.quantidade : '0' %></p>
+    <p><strong>Pessoa:</strong> <%= movimentacao.pessoa_nome || '—' %></p>
+    <p><strong>Observação:</strong> <%= movimentacao.observacao || '—' %></p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <a href="/movimentacoes" class="btn btn-cinza btn-voltar">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+  </div>
+</div>

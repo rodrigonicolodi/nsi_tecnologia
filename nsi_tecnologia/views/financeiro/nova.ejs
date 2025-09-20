@@ -1,0 +1,91 @@
+<% layout = 'layout' %>
+<% titulo = 'Novo Lançamento Financeiro' %>
+
+<div class="container">
+  <h2>Cadastro Financeiro</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+  <% if (sucesso) { %>
+    <p class="sucesso"><%= sucesso %></p>
+  <% } %>
+
+  <form method="POST" action="/financeiro/novo" class="form-grid">
+    <div class="campo">
+      <label>Tipo:</label>
+      <select name="tipo" required>
+        <option value="receber">Receber</option>
+        <option value="pagar">Pagar</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Pessoa:</label>
+      <select name="pessoa_id" required>
+        <% if (pessoas.length > 0) { %>
+          <% pessoas.forEach(p => { %>
+            <option value="<%= p.id %>"><%= p.nome %></option>
+          <% }) %>
+        <% } else { %>
+          <option disabled selected>⚠ Nenhuma pessoa disponível</option>
+        <% } %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Caixa:</label>
+      <select name="caixa_id" required>
+        <% if (caixas.length > 0) { %>
+          <% caixas.forEach(c => { %>
+            <option value="<%= c.id %>"><%= c.nome %></option>
+          <% }) %>
+        <% } else { %>
+          <option disabled selected>⚠ Nenhum caixa disponível</option>
+        <% } %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Valor:</label>
+      <input type="number" step="0.01" name="valor" required>
+    </div>
+
+    <div class="campo">
+      <label>Vencimento:</label>
+      <input type="date" name="vencimento" required>
+    </div>
+
+    <div class="campo">
+      <label>Status:</label>
+      <select name="status">
+        <option value="pendente">Pendente</option>
+        <option value="pago">Pago</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+    </div>
+
+    <div class="campo" style="grid-column: span 2;">
+      <label>Descrição:</label>
+      <textarea name="descricao" rows="3"></textarea>
+    </div>
+
+    <div class="campo">
+      <button type="submit" class="btn btn-azul" id="btn-salvar-financeiro">
+        <i class="fas fa-save"></i> Salvar Lançamento
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const botao = document.getElementById('btn-salvar-financeiro');
+
+    form.addEventListener('submit', function () {
+      botao.disabled = true;
+      botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    });
+  });
+</script>

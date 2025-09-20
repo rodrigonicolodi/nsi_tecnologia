@@ -1,0 +1,36 @@
+<% layout = 'layout' %>
+<% titulo = 'Dados da Pessoa' %>
+
+<div class="container">
+  <h2>Dados da Pessoa</h2>
+
+<a href="/pessoas" class="btn-acao btn-azul">
+  <i class="fas fa-arrow-left"></i>
+</a>
+
+  <div class="dados-box">
+    <p><strong>Tipo:</strong> <%= pessoa.tipo %></p>
+    <p><strong>Nome:</strong> <%= pessoa.nome %></p>
+    <p><strong>Razão Social:</strong> <%= pessoa.razao_social %></p>
+    <p><strong>Nome Fantasia:</strong> <%= pessoa.nome_fantasia %></p>
+    <p><strong>Documento:</strong> <%= pessoa.documento %></p>
+    <p><strong>RG / IE:</strong> <%= pessoa.rg_ie %></p>
+    <p><strong>Data de Nascimento:</strong> <%= pessoa.data_nascimento %></p>
+    <p><strong>Sexo:</strong> <%= pessoa.sexo %></p>
+    <p><strong>Estado Civil:</strong> <%= pessoa.estado_civil %></p>
+    <p><strong>Profissão:</strong> <%= pessoa.profissao %></p>
+    <p><strong>Email:</strong> <%= pessoa.email %></p>
+    <p><strong>Telefone:</strong> <%= pessoa.telefone %></p>
+    <p><strong>Celular:</strong> <%= pessoa.celular %></p>
+    <p><strong>WhatsApp:</strong> <%= pessoa.whatsapp %></p>
+    <p><strong>CEP:</strong> <%= pessoa.cep %></p>
+    <p><strong>Endereço:</strong> <%= pessoa.endereco %>, <%= pessoa.numero %> - <%= pessoa.complemento %></p>
+    <p><strong>Bairro:</strong> <%= pessoa.bairro %></p>
+    <p><strong>Cidade:</strong> <%= pessoa.cidade %> / <%= pessoa.uf %></p>
+    <p><strong>País:</strong> <%= pessoa.pais %></p>
+    <p><strong>Contato Responsável:</strong> <%= pessoa.contato_responsavel %></p>
+    <p><strong>Observações:</strong> <%= pessoa.observacoes %></p>
+    <p><strong>Status:</strong> <%= pessoa.status %></p>
+    <p><strong>Data de Cadastro:</strong> <%= pessoa.data_cadastro.toLocaleString() %></p>
+  </div>
+</div>

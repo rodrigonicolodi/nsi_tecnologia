@@ -1,0 +1,129 @@
+<% layout = 'layout' %>
+<% titulo = 'Ordens de Serviço' %>
+
+<div class="container">
+  <h2>Ordens de Serviço</h2>
+
+  <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <a href="/os/nova" class="btn btn-azul">
+      <i class="fas fa-plus-circle"></i> Nova OS
+    </a>
+  </div>
+
+  <!-- 🔍 Filtros e busca -->
+  <form method="GET" action="/os/listar" class="filtros">
+    <input type="text" name="busca" placeholder="Buscar por tipo ou cliente" value="<%= busca %>" class="input-busca">
+
+    <select name="status">
+      <option value="">Todos os status</option>
+      <option value="aberta" <%= status === 'aberta' ? 'selected' : '' %>>Aberta</option>
+      <option value="concluida" <%= status === 'concluida' ? 'selected' : '' %>>Concluída</option>
+    </select>
+
+    <select name="prioridade">
+      <option value="">Todas as prioridades</option>
+      <option value="baixa" <%= prioridade === 'baixa' ? 'selected' : '' %>>Baixa</option>
+      <option value="media" <%= prioridade === 'media' ? 'selected' : '' %>>Média</option>
+      <option value="alta" <%= prioridade === 'alta' ? 'selected' : '' %>>Alta</option>
+      <option value="critica" <%= prioridade === 'critica' ? 'selected' : '' %>>Crítica</option>
+    </select>
+
+    <button type="submit" class="btn btn-azul">
+      <i class="fas fa-filter"></i> Filtrar
+    </button>
+  </form>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+  <% if (sucesso) { %>
+    <p class="sucesso"><%= sucesso %></p>
+  <% } %>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Solicitante</th>
+          <th>Técnico</th>
+          <th>Tipo</th>
+          <th>Prioridade</th>
+          <th>Status</th>
+          <th>Valor Total</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (ordens || []).forEach(os => { %>
+          <tr>
+            <td><%= os.id %></td>
+            <td><%= os.solicitante %></td>
+            <td><%= os.responsavel %></td>
+            <td><%= os.tipo_servico %></td>
+            <td><%= os.prioridade %></td>
+            <td>
+              <span class="status <%= os.status === 'concluida' ? 'verde' : 'laranja' %>">
+                <%= os.status %>
+              </span>
+            </td>
+            <td>R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></td>
+            <td>
+              <a href="/os/editar/<%= os.id %>" class="btn btn-acao btn-azul" title="Editar OS">
+                <i class="fas fa-edit"></i>
+              </a>
+              <% if (os.status !== 'concluida') { %>
+                <button type="button" class="btn btn-acao btn-verde" data-id="<%= os.id %>" title="Finalizar OS">
+                  <i class="fas fa-check"></i>
+                </button>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 📄 Paginação -->
+  <% if (totalPaginas > 1) { %>
+    <div class="paginacao">
+      <% for (let i = 1; i <= totalPaginas; i++) { %>
+        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca) %>&status=<%= encodeURIComponent(status) %>&prioridade=<%= encodeURIComponent(prioridade) %>"
+           class="btn-pagina <%= pagina === i ? 'ativo' : '' %>">
+          <%= i %>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+
+<!-- 🔔 Modal de confirmação -->
+<div id="modal-confirmacao" class="modal">
+  <div class="modal-conteudo">
+    <p>Tem certeza que deseja finalizar esta OS?</p>
+    <form id="form-confirmar" method="POST">
+      <button type="submit" class="btn btn-azul">Confirmar</button>
+      <button type="button" class="btn btn-vermelho" onclick="fecharModal()">Cancelar</button>
+    </form>
+  </div>
+</div>
+
+<!-- 🧠 Script para controle do modal -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modal-confirmacao');
+    const formConfirmar = document.getElementById('form-confirmar');
+
+    document.querySelectorAll('.btn-verde[data-id]').forEach(botao => {
+      botao.addEventListener('click', () => {
+        const id = botao.getAttribute('data-id');
+        formConfirmar.setAttribute('action', `/os/finalizar/${id}`);
+        modal.style.display = 'flex';
+      });
+    });
+
+    window.fecharModal = function () {
+      modal.style.display = 'none';
+    };
+  });
+</script>

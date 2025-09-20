@@ -1,0 +1,68 @@
+<% layout = 'layout' %>
+<% titulo = 'Relatório Financeiro por Período' %>
+
+<div class="container">
+  <h2><%= titulo %></h2>
+
+  <form method="GET" action="/financeiro/relatorio" class="filtros">
+    <label>Início:</label>
+    <input type="date" name="inicio" value="<%= inicio || '' %>" required>
+
+    <label>Fim:</label>
+    <input type="date" name="fim" value="<%= fim || '' %>" required>
+
+    <label>Status:</label>
+    <select name="status">
+      <option value="">Todos</option>
+      <option value="pendente" <%= status === 'pendente' ? 'selected' : '' %>>Pendente</option>
+      <option value="pago" <%= status === 'pago' ? 'selected' : '' %>>Pago</option>
+      <option value="cancelado" <%= status === 'cancelado' ? 'selected' : '' %>>Cancelado</option>
+    </select>
+
+    <button type="submit" class="btn btn-azul">
+      <i class="fas fa-search"></i> Gerar Relatório
+    </button>
+  </form>
+
+  <% if (lancamentos && lancamentos.length > 0) { %>
+    <div class="table-wrapper" style="margin-top: 20px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Pessoa</th>
+            <th>Caixa</th>
+            <th>Valor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% lancamentos.forEach(l => { %>
+            <tr>
+              <td><%= l.data_formatada %></td>
+              <td><%= l.tipo %></td>
+              <td><%= l.pessoa_nome %></td>
+              <td><%= l.caixa_nome %></td>
+              <td>R$ <%= l.valor.toFixed(2) %></td>
+              <td><%= l.status %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <p><strong>Total a Receber:</strong> R$ <%= totalReceber.toFixed(2) %></p>
+      <p><strong>Total a Pagar:</strong> R$ <%= totalPagar.toFixed(2) %></p>
+    </div>
+  <% } else { %>
+    <p style="margin-top: 20px;">Nenhum lançamento encontrado no período.</p>
+  <% } %>
+
+  <div style="margin-top: 30px;">
+    <a href="/financeiro" class="btn btn-cinza">
+      <i class="fas fa-arrow-left"></i> Voltar para lançamentos
+    </a>
+  </div>
+</div>

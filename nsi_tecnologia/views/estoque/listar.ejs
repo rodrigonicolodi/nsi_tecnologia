@@ -1,0 +1,120 @@
+<% layout = 'layout' %>
+<% titulo = 'Estoque de Produtos' %>
+
+<div class="container">
+  <h2>Estoque de Produtos</h2>
+
+<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+  <a href="/estoque/novo" class="btn btn-azul">
+    <i class="fas fa-box-open"></i> Novo Produto
+  </a>
+</div>
+
+  <!-- 🔍 Filtros e busca -->
+  <form method="GET" action="/estoque" class="filtros">
+    <input type="text" name="busca" placeholder="Buscar por nome" value="<%= busca %>" class="input-busca">
+
+    <select name="categoria">
+      <option value="">Todas as categorias</option>
+      <option value="eletronico" <%= categoria === 'eletronico' ? 'selected' : '' %>>Eletrônico</option>
+      <option value="ferramenta" <%= categoria === 'ferramenta' ? 'selected' : '' %>>Ferramenta</option>
+    </select>
+
+    <select name="status">
+      <option value="">Todos os status</option>
+      <option value="ativo" <%= status === 'ativo' ? 'selected' : '' %>>Ativo</option>
+      <option value="inativo" <%= status === 'inativo' ? 'selected' : '' %>>Inativo</option>
+    </select>
+
+    <button type="submit" class="btn btn-azul">
+      <i class="fas fa-filter"></i> Filtrar
+    </button>
+  </form>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+  <% if (sucesso) { %>
+    <p class="sucesso"><%= sucesso %></p>
+  <% } %>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Código</th>
+          <th>Categoria</th>
+          <th>Estoque</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (produtos || []).forEach(p => { %>
+          <tr>
+            <td><%= p.nome %></td>
+            <td><%= p.codigo %></td>
+            <td><%= p.categoria %></td>
+            <td><%= p.estoque_atual %></td>
+            <td><%= p.status %></td>
+            <td>
+              <a href="/estoque/exibir/<%= p.id %>" class="btn btn-acao btn-azul" title="Exibir">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="/estoque/editar/<%= p.id %>" class="btn btn-acao btn-azul" title="Editar">
+                <i class="fas fa-edit"></i>
+              </a>
+              <button type="button" class="btn btn-acao btn-vermelho" data-id="<%= p.id %>" title="Excluir">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 📄 Paginação -->
+  <% if (totalPaginas > 1) { %>
+    <div class="paginacao">
+      <% for (let i = 1; i <= totalPaginas; i++) { %>
+        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca) %>&categoria=<%= encodeURIComponent(categoria) %>&status=<%= encodeURIComponent(status) %>"
+           class="btn-pagina <%= pagina === i ? 'ativo' : '' %>">
+          <%= i %>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</div>
+
+<!-- 🔔 Modal de confirmação -->
+<div id="modal-confirmacao" class="modal">
+  <div class="modal-conteudo">
+    <p>Tem certeza que deseja excluir este produto?</p>
+    <form id="form-confirmar" method="POST">
+      <button type="submit" class="btn btn-azul">Confirmar</button>
+      <button type="button" class="btn btn-vermelho" onclick="fecharModal()">Cancelar</button>
+    </form>
+  </div>
+</div>
+
+<!-- 🧠 Script para controle do modal -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modal-confirmacao');
+    const formConfirmar = document.getElementById('form-confirmar');
+
+    document.querySelectorAll('.btn-vermelho[data-id]').forEach(botao => {
+      botao.addEventListener('click', () => {
+        const id = botao.getAttribute('data-id');
+        formConfirmar.setAttribute('action', `/estoque/excluir/${id}`);
+        modal.style.display = 'flex';
+      });
+    });
+
+    window.fecharModal = function () {
+      modal.style.display = 'none';
+    };
+  });
+</script>

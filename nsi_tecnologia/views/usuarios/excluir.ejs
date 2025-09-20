@@ -1,0 +1,23 @@
+<% layout = 'layout' %>
+<% titulo = 'Excluir Usuário' %>
+
+<div class="container">
+  <div class="card card-vermelho">
+    <h2>Confirmar Exclusão</h2>
+    <p>Tem certeza que deseja excluir o usuário abaixo?</p>
+
+    <ul>
+      <li><strong>Nome:</strong> <%= usuario.nome %></li>
+      <li><strong>Email:</strong> <%= usuario.email %></li>
+    </ul>
+
+    <form method="POST" action="/usuarios/<%= usuario.id %>/excluir">
+      <button type="submit" class="btn-vermelho">
+        <i class="fas fa-trash-alt"></i> Confirmar Exclusão
+      </button>
+      <a href="/usuarios" class="btn-roxo" style="margin-left: 10px;">
+        <i class="fas fa-arrow-left"></i> Cancelar
+      </a>
+    </form>
+  </div>
+</div>

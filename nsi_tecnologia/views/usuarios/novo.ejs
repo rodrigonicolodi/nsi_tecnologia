@@ -1,0 +1,57 @@
+<% layout = 'layout' %>
+<% titulo = 'Novo Usuário' %>
+
+<div class="container">
+  <div class="card">
+    <h2>Cadastrar Novo Usuário</h2>
+
+    <% if (erro) { %>
+      <p class="alert erro"><%= erro %></p>
+    <% } %>
+
+    <% if (sucesso) { %>
+      <p class="alert sucesso"><%= sucesso %></p>
+
+      <a href="/usuarios" class="btn-azul" style="margin-top: 10px; display: inline-block;">
+        <i class="fas fa-arrow-left"></i> Voltar para a lista de usuários
+      </a>
+    <% } %>
+
+    <form method="POST" action="/usuarios/novo">
+      <div class="form-group">
+        <label>Nome:</label>
+        <input type="text" name="nome" required>
+      </div>
+
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Senha:</label>
+        <input type="password" name="senha" required>
+      </div>
+
+      <div class="form-group">
+        <label>Nível:</label>
+        <select name="nivel" required>
+          <option value="admin">Admin</option>
+          <option value="comum">Comum</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Ativo:</label>
+        <select name="ativo">
+          <option value="1">Sim</option>
+          <option value="0">Não</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn-roxo">
+        <i class="fas fa-save"></i> Cadastrar
+      </button>
+    </form>
+  </div>
+</div>

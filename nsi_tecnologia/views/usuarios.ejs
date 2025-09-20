@@ -1,0 +1,61 @@
+<% layout = 'layout' %>
+<% titulo = 'Gerenciar Usuários' %>
+
+<div class="container">
+  <div class="card">
+    <h2>Lista de Usuários</h2>
+
+    <% if (erro) { %><p class="alert erro"><%= erro %></p><% } %>
+
+    <!-- Botões de ação -->
+    <div style="margin-bottom: 20px;">
+      <a href="/usuarios/novo" class="btn-azul">
+        <i class="fas fa-user-plus"></i> Novo Usuário
+      </a>
+
+      <a href="/usuarios/auditoria" class="btn-roxo" style="margin-left: 10px;">
+        <i class="fas fa-clipboard-list"></i> Ver Auditoria
+      </a>
+    </div>
+
+    <!-- Formulário de busca -->
+    <form method="GET" action="/usuarios" class="form-busca" style="margin-bottom: 20px; display: flex; gap: 10px;">
+      <input type="text" name="busca" placeholder="Buscar por nome ou e-mail" value="<%= busca || '' %>" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc;" />
+      <button type="submit" class="btn-azul">
+        <i class="fas fa-search"></i> Buscar
+      </button>
+    </form>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Nível</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% usuarios.forEach(usuario => { %>
+            <tr>
+              <td><%= usuario.nome %></td>
+              <td><%= usuario.email %></td>
+              <td><%= usuario.nivel || '—' %></td>
+              <td><%= usuario.status %></td>
+              <td>
+                <a href="/usuarios/<%= usuario.id %>/editar" class="btn-azul btn-acao" title="Editar">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="/usuarios/<%= usuario.id %>/excluir" class="btn-vermelho btn-acao" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">
+                  <i class="fas fa-trash-alt"></i>
+                </a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
