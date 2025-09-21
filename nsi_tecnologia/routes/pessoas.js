@@ -66,12 +66,17 @@ router.get('/', async (req, res) => {
       erro: null,
       sucesso: null
     });
-  } catch (err) {
-    console.error('Erro ao buscar pessoas:', err);
+  } catch (erro) {
+    console.error('Erro ao listar pessoas:', erro);
     res.render('pessoas/listar', {
       titulo: 'Lista de Pessoas',
       pessoas: [],
-      erro: 'Erro ao carregar lista.',
+      busca: '',
+      tipo: '',
+      status: '',
+      pagina: 1,
+      totalPaginas: 1,
+      erro: 'Não foi possível carregar a lista de pessoas.',
       sucesso: null
     });
   }
@@ -105,8 +110,8 @@ router.get('/editar/:id', async (req, res) => {
       erro: null,
       sucesso: null
     });
-  } catch (err) {
-    console.error('Erro ao buscar pessoa:', err);
+  } catch (erro) {
+    console.error('Erro ao buscar pessoa:', erro);
     res.redirect('/pessoas');
   }
 });
@@ -128,8 +133,8 @@ router.get('/exibir/:id', async (req, res) => {
       titulo: 'Dados da Pessoa',
       pessoa
     });
-  } catch (err) {
-    console.error('Erro ao exibir pessoa:', err);
+  } catch (erro) {
+    console.error('Erro ao exibir pessoa:', erro);
     res.redirect('/pessoas');
   }
 });
@@ -162,8 +167,8 @@ router.post('/novo', async (req, res) => {
       ]
     );
     res.redirect('/pessoas');
-  } catch (err) {
-    console.error('Erro ao cadastrar pessoa:', err);
+  } catch (erro) {
+    console.error('Erro ao cadastrar pessoa:', erro);
     res.render('pessoas/novo', {
       titulo: 'Nova Pessoa',
       erro: 'Erro ao salvar. Verifique os dados.',
@@ -202,8 +207,8 @@ router.post('/editar/:id', async (req, res) => {
     );
 
     res.redirect('/pessoas');
-  } catch (err) {
-    console.error('Erro ao atualizar pessoa:', err);
+  } catch (erro) {
+    console.error('Erro ao atualizar pessoa:', erro);
     res.render('pessoas/editar', {
       titulo: 'Editar Pessoa',
       pessoa: req.body,
@@ -218,16 +223,16 @@ router.post('/excluir/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
+    const [vinculos] = await db.query('SELECT COUNT(*) AS total FROM financeiro WHERE pessoa_id = ?', [id]);
+    if (vinculos[0].total > 0) {
+      return res.redirect('/pessoas?erro=vinculada');
+    }
+
     await db.query('DELETE FROM pessoas WHERE id = ?', [id]);
     res.redirect('/pessoas');
-  } catch (err) {
-    console.error('Erro ao excluir pessoa:', err);
-    res.render('pessoas/listar', {
-      titulo: 'Lista de Pessoas',
-      pessoas: [],
-      erro: 'Erro ao excluir pessoa.',
-      sucesso: null
-    });
+  } catch (erro) {
+    console.error('Erro ao excluir pessoa:', erro);
+    res.redirect('/pessoas?erro=exclusao');
   }
 });
 

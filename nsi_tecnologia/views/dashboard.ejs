@@ -5,10 +5,19 @@
   <h2>Bem-vindo, <%= usuario.nome %>!</h2>
   <p>Nível de acesso: <%= usuario.nivel %></p>
 
-  <div class="btn-group">
+  <div class="btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
     <a href="/usuarios" class="btn-azul">
       <i class="fas fa-users"></i> Gerenciar Usuários
     </a>
+
+    <a href="/caixas" class="btn-azul">
+      <i class="fas fa-cash-register"></i> Gerenciar Caixas
+    </a>
+
+    <a href="/caixas/resumo" class="btn btn-azul">
+      <i class="fas fa-chart-bar"></i> Resumo de Caixas
+    </a>
+
     <a href="/logout" class="btn-vermelho">
       <i class="fas fa-sign-out-alt"></i> Sair
     </a>

@@ -1,0 +1,22 @@
+<% layout = 'layout' %>
+<% titulo = 'Ajustar Saldo do Caixa' %>
+
+<div class="container">
+  <h2>Ajustar Saldo do Caixa</h2>
+
+  <form action="/caixas/ajustar/<%= caixa_id %>" method="POST" class="formulario">
+    <div class="campo">
+      <label for="valor">Valor do Ajuste</label>
+      <input type="number" step="0.01" name="valor" id="valor" required>
+    </div>
+
+    <div class="campo">
+      <label for="motivo">Motivo</label>
+      <textarea name="motivo" id="motivo" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-laranja">
+      <i class="fas fa-balance-scale"></i> Ajustar
+    </button>
+  </form>
+</div>

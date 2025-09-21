@@ -1,0 +1,37 @@
+<% layout = 'layout' %>
+<% titulo = 'Resumo de Caixas' %>
+
+<div class="container">
+  <h2>Resumo de Caixas</h2>
+
+  <table class="tabela">
+    <thead>
+      <tr>
+        <th>Caixa</th>
+        <th>Valor Inicial</th>
+        <th>Ajustes</th>
+        <th>Recebido</th>
+        <th>Pago</th>
+        <th>Saldo Final</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% dados.forEach(c => { 
+        const inicial = parseFloat(c.valor_inicial || 0);
+        const ajustes = parseFloat(c.total_ajustes || 0);
+        const recebido = parseFloat(c.total_receber || 0);
+        const pago = parseFloat(c.total_pagar || 0);
+        const saldo = inicial + ajustes + recebido - pago;
+      %>
+        <tr>
+          <td><%= c.nome %></td>
+          <td>R$ <%= inicial.toFixed(2) %></td>
+          <td>R$ <%= ajustes.toFixed(2) %></td>
+          <td>R$ <%= recebido.toFixed(2) %></td>
+          <td>R$ <%= pago.toFixed(2) %></td>
+          <td><strong>R$ <%= saldo.toFixed(2) %></strong></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

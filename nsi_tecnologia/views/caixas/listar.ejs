@@ -1,0 +1,34 @@
+<table class="tabela">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Status</th>
+      <th>Valor Inicial</th>
+      <% if (usuario.nivel === 'admin') { %><th>Ações</th><% } %>
+    </tr>
+  </thead>
+  <tbody>
+    <% caixas.forEach(c => { %>
+      <tr>
+        <td><%= c.nome %></td>
+        <td><%= c.ativo ? 'Ativo' : 'Inativo' %></td>
+        <td>R$ <%= parseFloat(c.valor_inicial || 0).toFixed(2) %></td>
+        <% if (usuario.nivel === 'admin') { %>
+        <td>
+          <a href="/caixas/editar/<%= c.id %>" class="btn btn-acao btn-azul" title="Editar">
+            <i class="fas fa-edit"></i>
+          </a>
+          <a href="/caixas/ajustar/<%= c.id %>" class="btn btn-acao btn-laranja" title="Ajustar Saldo">
+            <i class="fas fa-balance-scale"></i>
+          </a>
+          <form action="/caixas/excluir/<%= c.id %>" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-acao btn-vermelho" title="Excluir" onclick="return confirm('Excluir este caixa?')">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </form>
+        </td>
+        <% } %>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

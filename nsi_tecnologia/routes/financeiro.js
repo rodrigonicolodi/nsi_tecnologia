@@ -38,6 +38,7 @@ router.get('/', async (req, res) => {
 
   try {
     const [lancamentos] = await db.query(sql, params);
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true'); // ✅ ADICIONADO
 
     const countParams = [...params.slice(0, params.length - 2)];
     const countSql = `
@@ -57,6 +58,7 @@ router.get('/', async (req, res) => {
     res.render('financeiro/listar', {
       titulo: 'Lançamentos Financeiros',
       lancamentos,
+      caixas, // ✅ ADICIONADO
       busca,
       tipo,
       status,
@@ -70,6 +72,7 @@ router.get('/', async (req, res) => {
     res.render('financeiro/listar', {
       titulo: 'Lançamentos Financeiros',
       lancamentos: [],
+      caixas: [], // ✅ ADICIONADO para evitar erro na view
       busca,
       tipo,
       status,
@@ -140,22 +143,28 @@ router.post('/novo', async (req, res) => {
 // ✏️ Formulário de edição
 router.get('/editar/:id', async (req, res) => {
   const { id } = req.params;
-  const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
-  const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
-  const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
 
-  if (!lancamento) {
-    return res.redirect('/financeiro?erro=Lançamento não encontrado');
+  try {
+    const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
+    const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+    if (!lancamento) {
+      return res.redirect('/financeiro?erro=Lançamento não encontrado');
+    }
+
+    res.render('financeiro/editar', {
+      titulo: 'Editar Lançamento Financeiro',
+      lancamento,
+      pessoas,
+      caixas,
+      erro: null,
+      sucesso: null
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar edição:', erro);
+    res.redirect('/financeiro?erro=Erro ao carregar lançamento para edição.');
   }
-
-  res.render('financeiro/editar', {
-    titulo: 'Editar Lançamento Financeiro',
-    lancamento,
-    pessoas,
-    caixas,
-    erro: null,
-    sucesso: null
-  });
 });
 
 // 💾 Salvar edição (✅ AJUSTADO)
@@ -196,22 +205,27 @@ router.post('/editar/:id', async (req, res) => {
 router.get('/exibir/:id', async (req, res) => {
   const { id } = req.params;
 
-  const [[lancamento]] = await db.query(`
-    SELECT f.*, p.nome AS pessoa_nome, c.nome AS caixa_nome
-    FROM financeiro f
-    LEFT JOIN pessoas p ON f.pessoa_id = p.id
-    LEFT JOIN caixas c ON f.caixa_id = c.id
-    WHERE f.id = ?
-  `, [id]);
+  try {
+    const [[lancamento]] = await db.query(`
+      SELECT f.*, p.nome AS pessoa_nome, c.nome AS caixa_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c ON f.caixa_id = c.id
+      WHERE f.id = ?
+    `, [id]);
 
-  if (!lancamento) {
-    return res.redirect('/financeiro?erro=Lançamento não encontrado');
+    if (!lancamento) {
+      return res.redirect('/financeiro?erro=Lançamento não encontrado');
+    }
+
+    res.render('financeiro/exibir', {
+      titulo: 'Detalhes do Lançamento',
+      lancamento
+    });
+  } catch (erro) {
+    console.error('Erro ao exibir lançamento:', erro);
+    res.redirect('/financeiro?erro=Erro ao exibir lançamento.');
   }
-
-  res.render('financeiro/exibir', {
-    titulo: 'Detalhes do Lançamento',
-    lancamento
-  });
 });
 
 // 🗑️ Excluir lançamento
@@ -223,6 +237,28 @@ router.post('/excluir/:id', async (req, res) => {
     res.redirect('/financeiro?sucesso=Lançamento excluído com sucesso!');
   } catch (erro) {
     res.redirect('/financeiro?erro=Erro ao excluir lançamento.');
+  }
+});
+
+//Quitar lancamento
+
+// 💳 Quitar lançamento financeiro
+router.post('/quitar/:id', async (req, res) => {
+  const id = req.params.id;
+  const { caixa_quitacao_id } = req.body;
+
+  try {
+    await db.query(`
+      UPDATE financeiro
+      SET status = 'pago',
+          caixa_quitacao_id = ?
+      WHERE id = ?
+    `, [caixa_quitacao_id, id]);
+
+    res.redirect('/financeiro?sucesso=Lançamento quitado com sucesso!');
+  } catch (erro) {
+    console.error('Erro ao quitar lançamento:', erro);
+    res.redirect('/financeiro?erro=Erro ao quitar lançamento.');
   }
 });
 

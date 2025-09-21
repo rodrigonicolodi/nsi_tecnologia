@@ -4,11 +4,15 @@
 <div class="container">
   <h2>Lançamentos Financeiros</h2>
 
-  <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-    <a href="/financeiro/novo" class="btn btn-azul">
-      <i class="fas fa-plus-circle"></i> Novo Lançamento
-    </a>
-  </div>
+<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+  <a href="/financeiro/novo" class="btn btn-azul">
+    <i class="fas fa-plus-circle"></i> Novo Lançamento
+  </a>
+
+  <a href="/caixas/consulta" class="btn btn-azul">
+    <i class="fas fa-search"></i> Consulta de Caixas
+  </a>
+</div>
 
   <!-- 🔍 Filtros -->
 <!-- 🔍 Filtros -->
@@ -73,16 +77,31 @@
             <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString() : '-' %></td>
             <td><%= l.status || '-' %></td>
             <td class="acoes">
-              <a href="/financeiro/exibir/<%= l.id %>" class="btn btn-acao btn-azul" title="Exibir">
-                <i class="fas fa-eye"></i>
-              </a>
-              <a href="/financeiro/editar/<%= l.id %>" class="btn btn-acao btn-azul" title="Editar">
-                <i class="fas fa-edit"></i>
-              </a>
-              <button type="button" class="btn btn-acao btn-vermelho" data-id="<%= l.id %>" title="Excluir">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </td>
+  <a href="/financeiro/exibir/<%= l.id %>" class="btn btn-acao btn-azul" title="Exibir">
+    <i class="fas fa-eye"></i>
+  </a>
+  <a href="/financeiro/editar/<%= l.id %>" class="btn btn-acao btn-azul" title="Editar">
+    <i class="fas fa-edit"></i>
+  </a>
+  <button type="button" class="btn btn-acao btn-vermelho" data-id="<%= l.id %>" title="Excluir">
+    <i class="fas fa-trash-alt"></i>
+  </button>
+
+  <% if (l.status === 'pendente') { %>
+    <form action="/financeiro/quitar/<%= l.id %>" method="POST" style="margin-top: 5px;">
+      <select name="caixa_quitacao_id" class="input-pequeno" required>
+        <% caixas.forEach(c => { %>
+          <option value="<%= c.id %>"><%= c.nome %></option>
+        <% }) %>
+      </select>
+      <button type="submit" class="btn btn-acao btn-verde" title="Quitar">
+        <i class="fas fa-check-circle"></i>
+      </button>
+    </form>
+  <% } else { %>
+    <span class="status-quitado">Quitado</span>
+  <% } %>
+</td>
           </tr>
         <% }) %>
         <% if (lancamentos.length === 0) { %>

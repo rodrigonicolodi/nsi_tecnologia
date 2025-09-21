@@ -1,0 +1,25 @@
+<% layout = 'layout' %>
+<% titulo = 'Consulta de Caixas' %>
+
+<div class="container">
+  <h2>Consulta de Caixas</h2>
+
+  <table class="tabela">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Status</th>
+        <th>Valor Inicial</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% caixas.forEach(c => { %>
+        <tr>
+          <td><%= c.nome %></td>
+          <td><%= c.ativo ? 'Ativo' : 'Inativo' %></td>
+          <td>R$ <%= parseFloat(c.valor_inicial || 0).toFixed(2) %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

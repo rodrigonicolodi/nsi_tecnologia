@@ -1,0 +1,29 @@
+<% layout = 'layout' %>
+<% titulo = 'Editar Caixa' %>
+
+<div class="container">
+  <h2>Editar Caixa</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <form action="/caixas/editar/<%= caixa.id %>" method="POST" class="formulario">
+    <div class="campo">
+      <label for="nome">Nome</label>
+      <input type="text" name="nome" id="nome" value="<%= caixa.nome %>" required>
+    </div>
+
+    <div class="campo">
+      <label for="ativo">Ativo</label>
+      <select name="ativo" id="ativo">
+        <option value="true" <%= caixa.ativo ? 'selected' : '' %>>Sim</option>
+        <option value="false" <%= !caixa.ativo ? 'selected' : '' %>>Não</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-azul">
+      <i class="fas fa-save"></i> Salvar
+    </button>
+  </form>
+</div>
