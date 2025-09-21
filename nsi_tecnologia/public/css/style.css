@@ -455,3 +455,25 @@ form.form-grid textarea {
   background-color: #e0e0e0;
   color: #000;
 }
+
+/*Impressao de cupon*/
+body.cupom {
+  width: 80mm;
+  margin: 0;
+  padding-left: 10mm; /* 👈 margem interna à esquerda */
+  padding-right: 2mm;
+  font-family: monospace;
+  overflow: hidden !important;
+  height: auto !important;
+  box-sizing: border-box;
+}
+
+body.cupom .espaco {
+  margin-bottom: 5px;
+  font-size: 11px;                  /* ideal para impressora térmica */
+  line-height: 1.4;                 /* melhora legibilidade */
+  word-break: break-word;           /* quebra palavras longas */
+  white-space: pre-wrap;            /* respeita quebras de linha */
+  overflow-wrap: break-word;        /* quebra se passar do limite */
+  max-width: 65mm;                  /* garante que não ultrapasse a área útil */
+}

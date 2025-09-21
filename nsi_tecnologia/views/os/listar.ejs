@@ -69,7 +69,10 @@
             </td>
             <td>R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></td>
             <td>
-              <a href="/os/editar/<%= os.id %>" class="btn btn-acao btn-azul" title="Editar OS">
+              <a href="/os/exibir/<%= os.id %>" class="btn btn-acao btn-azul" title="Exibir OS">
+                <i class="fas fa-eye"></i>
+              </a>
+                     <a href="/os/editar/<%= os.id %>" class="btn btn-acao btn-azul" title="Editar OS">
                 <i class="fas fa-edit"></i>
               </a>
               <% if (os.status !== 'concluida') { %>

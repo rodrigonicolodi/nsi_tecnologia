@@ -275,5 +275,53 @@ module.exports = {
       console.error('Erro ao finalizar OS e gerar financeiro:', err);
       res.status(500).send('Erro ao finalizar OS');
     }
+  },
+
+   // 👁️ Exibir OS
+  exibirOS: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const [[os]] = await db.query(`
+        SELECT os.*, s.nome AS solicitante_nome, r.nome AS responsavel_nome
+        FROM ordens_servico os
+        JOIN pessoas s ON os.solicitante_id = s.id
+        JOIN pessoas r ON os.responsavel_id = r.id
+        WHERE os.id = ?
+      `, [id]);
+
+      if (!os) return res.redirect('/os/listar?erro=OS não encontrada');
+
+      res.render('os/exibir', {
+        titulo: 'Detalhes da Ordem de Serviço',
+        os
+      });
+    } catch (err) {
+      console.error('Erro ao exibir OS:', err);
+      res.redirect('/os/listar?erro=Erro ao exibir OS');
+    }
+  },
+
+  // 🖨️ Imprimir OS
+  imprimirOS: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const [[os]] = await db.query(`
+        SELECT os.*, s.nome AS cliente_nome
+        FROM ordens_servico os
+        JOIN pessoas s ON os.solicitante_id = s.id
+        WHERE os.id = ?
+      `, [id]);
+
+      if (!os) return res.redirect('/os/listar?erro=OS não encontrada');
+
+      res.render('os/imprimir', {
+      layout: false, // 👈 ESSENCIAL para remover o layout padrão
+      titulo: 'Impressão de OS',
+      os
+      });
+    } catch (err) {
+      console.error('Erro ao preparar impressão da OS:', err);
+      res.redirect('/os/listar?erro=Erro ao preparar impressão');
+    }
   }
 };

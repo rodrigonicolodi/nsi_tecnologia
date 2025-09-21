@@ -1,0 +1,27 @@
+<% layout = 'layout' %>
+<% titulo = 'Detalhes da OS' %>
+
+<div class="container">
+  <h2>Ordem de Serviço Nº <%= os.numero_os || os.id %></h2>
+
+  <div class="dados-os">
+    <p><strong>Cliente:</strong> <%= os.solicitante_nome %></p>
+    <p><strong>Técnico:</strong> <%= os.responsavel_nome %></p>
+    <p><strong>Data de abertura:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></p>
+    <p><strong>Tipo de serviço:</strong> <%= os.tipo_servico %></p>
+    <p><strong>Prioridade:</strong> <%= os.prioridade %></p>
+    <p><strong>Status:</strong> <%= os.status %></p>
+    <p><strong>Problema informado:</strong> <%= os.problema_informado %></p>
+    <p><strong>Valor dos Serviços:</strong> R$ <%= parseFloat(os.valor_servico || 0).toFixed(2) %></p>
+    <p><strong>Desconto:</strong> R$ <%= parseFloat(os.desconto || 0).toFixed(2) %></p>
+    <p><strong>Valor dos Produtos:</strong> R$ <%= parseFloat(os.acrescimos || 0).toFixed(2) %></p>
+    <p><strong>Valor Total:</strong> R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></p>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <a href="/os/imprimir/<%= os.id %>" target="_blank" class="btn btn-azul">
+      <i class="fas fa-print"></i> Imprimir OS
+    </a>
+    <a href="/os/listar" class="btn btn-azul">← Voltar</a>
+  </div>
+</div>

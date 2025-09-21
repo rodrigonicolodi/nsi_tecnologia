@@ -16,4 +16,11 @@ router.post('/atualizar/:id', osController.atualizarOS); // ← ajustado aqui
 // Finalização de OS
 router.post('/finalizar/:id', osController.finalizarOS);
 
+// Imprimeir Os
+router.get('/exibir/:id', osController.exibirOS);
+router.get('/imprimir/:id', osController.imprimirOS);
+
+// Exibir
+router.get('/exibir/:id', osController.exibirOS);
+
 module.exports = router;

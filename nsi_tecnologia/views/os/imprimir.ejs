@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Impressão OS <%= os.numero_os || os.id %></title>
+  <style>
+    @page {
+      size: 70mm auto;
+      margin: 0;
+    }
+
+    body {
+      width: 75mm;
+      margin: 0;
+      padding-left: 10mm;
+      padding-right: 2mm;
+      font-family: monospace;
+      overflow: hidden !important;
+      height: auto !important;
+      box-sizing: border-box;
+    }
+
+    .linha {
+      border-top: 1px dashed #000;
+      margin: 10px 0;
+    }
+
+    .centro {
+      text-align: center;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .espaco {
+      margin-bottom: 5px;
+      font-size: 11px;
+      line-height: 1.4;
+      word-break: break-word;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      max-width: 65mm;
+    }
+  </style>
+</head>
+<body onload="window.print()">
+  <div class="centro bold">ORDEM DE SERVIÇO</div>
+  <div class="centro">Nº <%= os.numero_os || os.id %></div>
+  <div class="linha"></div>
+
+  <div class="espaco">Cliente: <%= os.cliente_nome || 'N/D' %></div>
+  <div class="espaco">Data: <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
+
+  <div class="espaco">Serviço:</div>
+  <div class="espaco">
+    <%- (os.descricao_servico || os.tipo_servico || 'N/D')
+      .replace(/\r?\n/g, '<br>') %>
+  </div>
+
+  <div class="espaco">Problema informado:</div>
+  <div class="espaco">
+    <%- (os.problema_informado || 'N/D')
+      .replace(/\r?\n/g, '<br>') %>
+  </div>
+
+  <div class="espaco">Status: <%= os.status || 'N/D' %></div>
+  <div class="linha"></div>
+
+  <div class="espaco">Valor: R$ <%= parseFloat(os.valor_servico || os.valor || 0).toFixed(2) %></div>
+  <div class="espaco">Desconto: R$ <%= parseFloat(os.desconto || 0).toFixed(2) %></div>
+  <div class="espaco">Acréscimos: R$ <%= parseFloat(os.acrescimos || 0).toFixed(2) %></div>
+  <div class="bold espaco">Total: R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></div>
+
+  <div class="linha"></div>
+  <div class="centro">Obrigado pela preferência!</div>
+</body>
+</html>

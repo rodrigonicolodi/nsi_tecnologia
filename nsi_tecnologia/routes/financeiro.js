@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
            p.nome AS pessoa_nome, c.nome AS caixa_nome
     FROM financeiro f
     LEFT JOIN pessoas p ON f.pessoa_id = p.id
-    LEFT JOIN caixas c ON f.caixa_id = c.id
+    LEFT JOIN caixas c ON f.caixa_quitacao_id = c.id
     WHERE 1 = 1
   `;
   const params = [];
@@ -111,14 +111,41 @@ router.get('/novo', async (req, res) => {
 
 // 💾 Salvar novo lançamento
 router.post('/novo', async (req, res) => {
-  const { tipo, pessoa_id, caixa_id, valor, vencimento, status, descricao } = req.body;
+  const {
+    tipo,
+    pessoa_id,
+    caixa_quitacao_id,
+    valor,
+    vencimento,
+    status,
+    descricao
+  } = req.body;
 
   try {
+    // Validação básica
+    if (!tipo || !pessoa_id || !caixa_quitacao_id || !valor || !vencimento) {
+      const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
+      const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+      return res.render('financeiro/nova', {
+        titulo: 'Novo Lançamento Financeiro',
+        erro: 'Todos os campos obrigatórios devem ser preenchidos.',
+        sucesso: null,
+        pessoas,
+        caixas
+      });
+    }
+
+    // Conversão segura de valor
+    const valorConvertido = parseFloat(valor);
+    const valorFinal = isNaN(valorConvertido) ? 0 : valorConvertido;
+
+    // Inserção no banco
     await db.query('INSERT INTO financeiro SET ?', {
       tipo,
       pessoa_id,
-      caixa_id,
-      valor: parseFloat(valor) || 0,
+      caixa_quitacao_id: parseInt(caixa_quitacao_id),
+      valor: valorFinal,
       vencimento,
       status,
       descricao
@@ -141,29 +168,63 @@ router.post('/novo', async (req, res) => {
 });
 
 // ✏️ Formulário de edição
-router.get('/editar/:id', async (req, res) => {
+router.post('/editar/:id', async (req, res) => {
   const { id } = req.params;
+  const {
+    tipo,
+    pessoa_id,
+    caixa_quitacao_id,
+    valor,
+    vencimento,
+    status,
+    descricao
+  } = req.body;
 
   try {
+    // Validação básica
+    if (!tipo || !pessoa_id || !caixa_quitacao_id || !valor || !vencimento) {
+      const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
+      const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
+      const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+      return res.render('financeiro/editar', {
+        titulo: 'Editar Lançamento Financeiro',
+        erro: 'Todos os campos obrigatórios devem ser preenchidos.',
+        sucesso: null,
+        lancamento,
+        pessoas,
+        caixas
+      });
+    }
+
+    const valorConvertido = parseFloat(valor);
+    const valorFinal = isNaN(valorConvertido) ? 0 : valorConvertido;
+
+    await db.query('UPDATE financeiro SET ? WHERE id = ?', [{
+      tipo,
+      pessoa_id,
+      caixa_quitacao_id: parseInt(caixa_quitacao_id),
+      valor: valorFinal,
+      vencimento,
+      status,
+      descricao
+    }, id]);
+
+    res.redirect('/financeiro?sucesso=Lançamento atualizado com sucesso!');
+  } catch (erro) {
+    console.error('Erro ao atualizar lançamento:', erro);
     const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
     const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
     const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
 
-    if (!lancamento) {
-      return res.redirect('/financeiro?erro=Lançamento não encontrado');
-    }
-
     res.render('financeiro/editar', {
       titulo: 'Editar Lançamento Financeiro',
+      erro: 'Erro ao atualizar lançamento.',
+      sucesso: null,
       lancamento,
       pessoas,
-      caixas,
-      erro: null,
-      sucesso: null
+      caixas
     });
-  } catch (erro) {
-    console.error('Erro ao carregar edição:', erro);
-    res.redirect('/financeiro?erro=Erro ao carregar lançamento para edição.');
   }
 });
 
@@ -282,7 +343,7 @@ router.get('/relatorio', async (req, res) => {
       SELECT f.*, p.nome AS pessoa_nome, c.nome AS caixa_nome
       FROM financeiro f
       LEFT JOIN pessoas p ON f.pessoa_id = p.id
-      LEFT JOIN caixas c ON f.caixa_id = c.id
+      LEFT JOIN caixas c ON f.caixa_quitacao_id = c.id
       WHERE f.vencimento BETWEEN ? AND ?
       ORDER BY f.vencimento ASC
     `, [inicio, fim]);

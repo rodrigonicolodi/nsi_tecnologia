@@ -15,8 +15,9 @@
     </div>
 
     <div class="campo">
-        <label for="valor_inicial">Valor Inicial</label>
-        <input type="number" step="0.01" name="valor_inicial" id="valor_inicial" value="<%= caixa?.valor_inicial || 0 %>">
+      <label for="valor_inicial">Valor Inicial</label>
+      <input type="number" step="0.01" name="valor_inicial" id="valor_inicial" value="0.00" required>
+      <small class="dica">Você pode ajustar esse valor depois na tela de ajustes.</small>
     </div>
 
     <button type="submit" class="btn btn-azul">

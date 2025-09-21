@@ -4,12 +4,19 @@
 <div class="container">
   <h2>Consulta de Caixas</h2>
 
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
   <table class="tabela">
     <thead>
       <tr>
         <th>Nome</th>
         <th>Status</th>
         <th>Valor Inicial</th>
+        <th>Recebido</th>
+        <th>Pago</th>
+        <th>Saldo Atual</th>
       </tr>
     </thead>
     <tbody>
@@ -18,8 +25,16 @@
           <td><%= c.nome %></td>
           <td><%= c.ativo ? 'Ativo' : 'Inativo' %></td>
           <td>R$ <%= parseFloat(c.valor_inicial || 0).toFixed(2) %></td>
+          <td>R$ <%= parseFloat(c.recebido || 0).toFixed(2) %></td>
+          <td>R$ <%= parseFloat(c.pago || 0).toFixed(2) %></td>
+          <td><strong>R$ <%= parseFloat(c.saldo_atual || 0).toFixed(2) %></strong></td>
         </tr>
       <% }) %>
+      <% if (caixas.length === 0) { %>
+        <tr>
+          <td colspan="6">Nenhum caixa encontrado.</td>
+        </tr>
+      <% } %>
     </tbody>
   </table>
 </div>
