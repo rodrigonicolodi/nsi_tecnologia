@@ -27,9 +27,14 @@ body {
   padding: 40px;
 }
 
+.container h2 {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
 
 /* ================================
-📂 SIDEBAR
+📂 SIDEBAR & LOGO
 ================================ */
 .sidebar {
   width: 220px;
@@ -62,6 +67,16 @@ body {
   background-color: rgba(255,255,255,0.2);
 }
 
+.sidebar-logo {
+  text-align: center;
+  padding: 10px;
+}
+
+.sidebar-logo img {
+  max-width: 120px;
+  height: auto;
+}
+
 
 /* ================================
 📁 MENU COLAPSÁVEL
@@ -89,7 +104,6 @@ body {
   color: #fff;
   background-color: rgba(255,255,255,0.1);
 }
-
 
 /* ================================
 🧭 TIPOGRAFIA
@@ -128,6 +142,7 @@ p {
 .btn-azul {
   background-color: #0077cc;
 }
+
 .btn-azul:hover {
   background-color: #005fa3;
 }
@@ -135,8 +150,44 @@ p {
 .btn-vermelho {
   background-color: #cc3300;
 }
+
 .btn-vermelho:hover {
   background-color: #a62800;
+}
+
+.btn-verde {
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  width: 56px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-verde:hover {
+  background-color: #218838;
+}
+
+.btn-voltar {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.btn-voltar:hover {
+  background-color: #e0e0e0;
+  color: #000;
 }
 
 
@@ -180,6 +231,18 @@ p {
   transition: background-color 0.3s ease;
 }
 
+.logo-login {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo-login img {
+  max-width: 160px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
 
 /* ================================
 ✅ DASHBOARD
@@ -200,7 +263,6 @@ p {
   gap: 20px;
   flex-wrap: wrap;
 }
-
 
 /* ================================
 📊 TABELAS
@@ -268,6 +330,17 @@ table tr:nth-child(even) {
   table {
     font-size: 14px;
     min-width: 600px;
+  }
+
+  #graficoValoresCaixas {
+    max-width: 100%;
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  form.form-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -351,162 +424,8 @@ form.form-grid textarea {
   min-height: 80px;
 }
 
-@media (max-width: 768px) {
-  form.form-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
-/* detalhes produtos*/
-
-.detalhes-produto {
-  max-width: 700px;
-  margin: 0 auto;
-  background-color: #ffffff; /* fundo claro */
-  border-radius: 6px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
-.detalhes-produto table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.detalhes-produto th {
-  text-align: left;
-  padding: 10px;
-  background-color: #f0f0f0; /* cabeçalho com contraste */
-  width: 30%;
-  color: #333;
-}
-
-.detalhes-produto td {
-  padding: 10px;
-  background-color: #fafafa; /* células com leve contraste */
-  color: #222;
-}
-
-.botoes-voltar {
-  max-width: 700px;
-  margin: 30px auto 0;
-  text-align: left;
-}
-
-/*Logo*/
-
-.sidebar-logo {
-  text-align: center;
-  padding: 10px 10px;
-}
-
-.sidebar-logo img {
-  max-width: 120px;
-  height: auto;
-}
-
-/*Logo tela de Lgin*/
-
-.logo-login {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.logo-login img {
-  max-width: 160px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-}
-
-/* botao tela confirmar ordem de servico*/
-
-.btn-verde {
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  width: 56px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-verde:hover {
-  background-color: #218838;
-}
-
-.btn-voltar {
-  background-color: #f0f0f0;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.2s ease;
-}
-
-.btn-voltar:hover {
-  background-color: #e0e0e0;
-  color: #000;
-}
-
-/*Impressao de cupon*/
-body.cupom {
-  width: 80mm;
-  margin: 0;
-  padding-left: 10mm; /* 👈 margem interna à esquerda */
-  padding-right: 2mm;
-  font-family: monospace;
-  overflow: hidden !important;
-  height: auto !important;
-  box-sizing: border-box;
-}
-
-body.cupom .espaco {
-  margin-bottom: 5px;
-  font-size: 11px;                  /* ideal para impressora térmica */
-  line-height: 1.4;                 /* melhora legibilidade */
-  word-break: break-word;           /* quebra palavras longas */
-  white-space: pre-wrap;            /* respeita quebras de linha */
-  overflow-wrap: break-word;        /* quebra se passar do limite */
-  max-width: 65mm;                  /* garante que não ultrapasse a área útil */
-}
-
-/*Grafico Caiixas*/
-@media (max-width: 600px) {
-  #graficoValoresCaixas {
-    max-width: 100%;
-    max-height: 300px;
-  }
-}
-
-/*Formulario coluna unica*/
-.form-coluna {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 600px;
-   /* alinhado à esquerda */
-  margin-left: 0;
-}
-
-/*Titulso e Formularios unico ajustados a esquerda*/
-.form-coluna .campo {
-  display: flex;
-  flex-direction: column;
-}
-
-.container h2 {
-  text-align: left;
-  margin-bottom: 20px;
-}
-
+/* FORMULÁRIO EM COLUNA ÚNICA */
 .form-coluna {
   display: flex;
   flex-direction: column;
@@ -514,6 +433,11 @@ body.cupom .espaco {
   max-width: 700px;
   margin-left: 0;
   padding: 20px 0;
+}
+
+.form-coluna .campo {
+  display: flex;
+  flex-direction: column;
 }
 
 .form-coluna .campo label {
@@ -538,4 +462,67 @@ body.cupom .espaco {
 .form-coluna .campo textarea:focus {
   border-color: #007bff;
   outline: none;
+}
+
+
+/* ================================
+📦 DETALHES DE PRODUTO
+================================ */
+.detalhes-produto {
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.detalhes-produto table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detalhes-produto th {
+  text-align: left;
+  padding: 10px;
+  background-color: #f0f0f0;
+  width: 30%;
+  color: #333;
+}
+
+.detalhes-produto td {
+  padding: 10px;
+  background-color: #fafafa;
+  color: #222;
+}
+
+.botoes-voltar {
+  max-width: 700px;
+  margin: 30px auto 0;
+  text-align: left;
+}
+
+
+/* ================================
+🖨️ IMPRESSÃO DE CUPOM
+================================ */
+body.cupom {
+  width: 80mm;
+  margin: 0;
+  padding-left: 10mm;
+  padding-right: 2mm;
+  font-family: monospace;
+  overflow: hidden !important;
+  height: auto !important;
+  box-sizing: border-box;
+}
+
+body.cupom .espaco {
+  margin-bottom: 5px;
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  max-width: 65mm;
 }
