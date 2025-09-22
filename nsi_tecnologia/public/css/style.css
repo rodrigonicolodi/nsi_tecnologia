@@ -477,3 +477,65 @@ body.cupom .espaco {
   overflow-wrap: break-word;        /* quebra se passar do limite */
   max-width: 65mm;                  /* garante que não ultrapasse a área útil */
 }
+
+/*Grafico Caiixas*/
+@media (max-width: 600px) {
+  #graficoValoresCaixas {
+    max-width: 100%;
+    max-height: 300px;
+  }
+}
+
+/*Formulario coluna unica*/
+.form-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+   /* alinhado à esquerda */
+  margin-left: 0;
+}
+
+/*Titulso e Formularios unico ajustados a esquerda*/
+.form-coluna .campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.container h2 {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.form-coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 700px;
+  margin-left: 0;
+  padding: 20px 0;
+}
+
+.form-coluna .campo label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-coluna .campo input,
+.form-coluna .campo select,
+.form-coluna .campo textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 15px;
+  background-color: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.form-coluna .campo input:focus,
+.form-coluna .campo select:focus,
+.form-coluna .campo textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}

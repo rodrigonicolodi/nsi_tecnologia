@@ -64,6 +64,24 @@ router.get('/novo', (req, res) => {
   });
 });
 
+router.post('/novo', async (req, res) => {
+  const { nome, valor_inicial, ativo } = req.body;
+
+  try {
+    await db.query(
+      'INSERT INTO caixas (nome, valor_inicial, ativo) VALUES (?, ?, ?)',
+      [nome, valor_inicial, ativo === 'true']
+    );
+    res.redirect('/caixas');
+  } catch (erro) {
+    console.error('Erro ao criar novo caixa:', erro);
+    res.render('caixas/nova', {
+      erro: 'Erro ao salvar novo caixa.',
+      usuario: req.session.usuario || {}
+    });
+  }
+});
+
 // Rota para editar caixa (editar.ejs)
 router.get('/editar/:id', async (req, res) => {
   const { id } = req.params;
@@ -80,6 +98,26 @@ router.get('/editar/:id', async (req, res) => {
   } catch (erro) {
     console.error('Erro ao carregar caixa para edição:', erro);
     res.redirect('/caixas');
+  }
+});
+
+router.post('/editar/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nome, valor_inicial, ativo } = req.body;
+
+  try {
+    await db.query(
+      'UPDATE caixas SET nome = ?, valor_inicial = ?, ativo = ? WHERE id = ?',
+      [nome, valor_inicial, ativo === 'true', id]
+    );
+    res.redirect('/caixas');
+  } catch (erro) {
+    console.error('Erro ao salvar edição do caixa:', erro);
+    res.render('caixas/editar', {
+      caixa: { id, nome, valor_inicial, ativo },
+      erro: 'Erro ao salvar alterações.',
+      usuario: req.session.usuario || {}
+    });
   }
 });
 
@@ -101,6 +139,26 @@ router.post('/excluir/:id', async (req, res) => {
   } catch (erro) {
     console.error('Erro ao excluir caixa:', erro);
     res.redirect('/caixas');
+  }
+});
+
+// Rota para exibir o resumo dos caixas cadastrados
+router.get('/resumo', async (req, res) => {
+  try {
+    const [caixas] = await db.query('SELECT nome, valor_inicial, ativo FROM caixas ORDER BY nome');
+
+    res.render('caixas/resumo', {
+      caixas,
+      usuario: req.session.usuario || {},
+      erro: null
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar resumo de caixas:', erro);
+    res.render('caixas/resumo', {
+      caixas: [],
+      usuario: req.session.usuario || {},
+      erro: 'Erro ao carregar dados.'
+    });
   }
 });
 

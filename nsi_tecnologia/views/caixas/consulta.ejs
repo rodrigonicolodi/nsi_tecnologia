@@ -1,12 +1,48 @@
 <% layout = 'layout' %>
 <% titulo = 'Consulta de Caixas' %>
 
+<style>
+  #graficoValoresCaixas {
+    max-width: 500px;
+    max-height: 500px;
+    margin: 0 auto;
+  }
+</style>
+
 <div class="container">
-  <h2>Consulta de Caixas</h2>
+  <h2 style="text-align: center;">Consulta de Caixas</h2>
 
   <% if (erro) { %>
     <p class="erro"><%= erro %></p>
   <% } %>
+
+  <% 
+    let somaInicial = 0;
+    let somaRecebido = 0;
+    let somaPago = 0;
+    let somaSaldo = 0;
+
+    const caixasFormatados = caixas.map(c => {
+      const inicial = parseFloat(c.valor_inicial || 0);
+      const recebido = parseFloat(c.recebido || 0);
+      const pago = parseFloat(c.pago || 0);
+      const saldo = parseFloat(c.saldo_atual || 0);
+
+      somaInicial += inicial;
+      somaRecebido += recebido;
+      somaPago += pago;
+      somaSaldo += saldo;
+
+      return {
+        nome: c.nome,
+        ativo: c.ativo,
+        inicial,
+        recebido,
+        pago,
+        saldo
+      };
+    });
+  %>
 
   <table class="tabela">
     <thead>
@@ -20,21 +56,86 @@
       </tr>
     </thead>
     <tbody>
-      <% caixas.forEach(c => { %>
-        <tr>
-          <td><%= c.nome %></td>
-          <td><%= c.ativo ? 'Ativo' : 'Inativo' %></td>
-          <td>R$ <%= parseFloat(c.valor_inicial || 0).toFixed(2) %></td>
-          <td>R$ <%= parseFloat(c.recebido || 0).toFixed(2) %></td>
-          <td>R$ <%= parseFloat(c.pago || 0).toFixed(2) %></td>
-          <td><strong>R$ <%= parseFloat(c.saldo_atual || 0).toFixed(2) %></strong></td>
-        </tr>
-      <% }) %>
-      <% if (caixas.length === 0) { %>
+      <% if (caixasFormatados.length > 0) { %>
+        <% caixasFormatados.forEach(c => { %>
+          <tr>
+            <td><%= c.nome %></td>
+            <td><%= c.ativo ? 'Ativo' : 'Inativo' %></td>
+            <td>R$ <%= c.inicial.toFixed(2) %></td>
+            <td>R$ <%= c.recebido.toFixed(2) %></td>
+            <td>R$ <%= c.pago.toFixed(2) %></td>
+            <td><strong>R$ <%= c.saldo.toFixed(2) %></strong></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
         <tr>
           <td colspan="6">Nenhum caixa encontrado.</td>
         </tr>
       <% } %>
     </tbody>
+    <tfoot>
+      <tr>
+        <th colspan="2">Total Geral</th>
+        <th>R$ <%= somaInicial.toFixed(2) %></th>
+        <th>R$ <%= somaRecebido.toFixed(2) %></th>
+        <th>R$ <%= somaPago.toFixed(2) %></th>
+        <th><strong>R$ <%= somaSaldo.toFixed(2) %></strong></th>
+      </tr>
+    </tfoot>
   </table>
+
+  <% if (caixasFormatados.length > 0) { %>
+    <h3 style="text-align: center; margin-top: 40px;">Distribuição dos Valores por Caixa</h3>
+    <canvas
+      id="graficoValoresCaixas"
+      data-labels='<%= JSON.stringify(caixasFormatados.map(c => c.nome)) %>'
+      data-valores='<%= JSON.stringify(caixasFormatados.map(c => c.saldo)) %>'
+    ></canvas>
+  <% } %>
 </div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const canvas = document.getElementById("graficoValoresCaixas");
+    if (!canvas) return;
+
+    const labels = JSON.parse(canvas.getAttribute("data-labels"));
+    const valores = JSON.parse(canvas.getAttribute("data-valores"));
+    const ctx = canvas.getContext("2d");
+
+    new Chart(ctx, {
+      type: "pie",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Saldo Atual",
+          data: valores,
+          backgroundColor: [
+            "rgba(54, 162, 235, 0.6)",
+            "rgba(255, 99, 132, 0.6)",
+            "rgba(255, 206, 86, 0.6)",
+            "rgba(75, 192, 192, 0.6)",
+            "rgba(153, 102, 255, 0.6)",
+            "rgba(255, 159, 64, 0.6)"
+          ],
+          borderColor: "rgba(255, 255, 255, 1)",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const valor = context.raw.toFixed(2);
+                return `${context.label}: R$ ${valor}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+</script>
