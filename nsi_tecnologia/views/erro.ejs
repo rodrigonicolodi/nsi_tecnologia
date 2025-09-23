@@ -1,0 +1,13 @@
+<% layout = 'layout' %>
+<% titulo = 'Erro no Sistema' %>
+
+<div class="container">
+  <h2><%= titulo %></h2>
+  <div class="alerta alerta-erro">
+    <i class="fas fa-exclamation-triangle"></i>
+    <%= mensagem || 'Ocorreu um erro inesperado.' %>
+  </div>
+  <a href="/" class="btn btn-cinza">
+    <i class="fas fa-arrow-left"></i> Voltar ao início
+  </a>
+</div>

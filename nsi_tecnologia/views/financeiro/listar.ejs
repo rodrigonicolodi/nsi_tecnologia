@@ -64,6 +64,7 @@
           <th>Valor</th>
           <th>Vencimento</th>
           <th>Status</th>
+          <th>Caixa Quitação</th> <!-- ✅ nova coluna -->
           <th>Ações</th>
         </tr>
       </thead>
@@ -72,10 +73,11 @@
           <tr>
             <td><%= l.tipo || '-' %></td>
             <td><%= l.pessoa_nome || '-' %></td>
-            <td><%= l.caixa_nome || '-' %></td>
+            <td><%= l.caixa_origem_nome || '-' %></td>
             <td>R$ <%= !isNaN(parseFloat(l.valor)) ? parseFloat(l.valor).toFixed(2) : '0.00' %></td>
             <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString() : '-' %></td>
             <td><%= l.status || '-' %></td>
+            <td><%= l.caixa_quitacao_nome || 'Não quitado' %></td>
             <td class="acoes">
   <a href="/financeiro/exibir/<%= l.id %>" class="btn btn-acao btn-azul" title="Exibir">
     <i class="fas fa-eye"></i>
@@ -106,7 +108,7 @@
         <% }) %>
         <% if (lancamentos.length === 0) { %>
           <tr>
-            <td colspan="7">Nenhum lançamento encontrado.</td>
+            <td colspan="8">Nenhum lançamento encontrado.</td>
           </tr>
         <% } %>
       </tbody>

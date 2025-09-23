@@ -231,51 +231,63 @@ module.exports = {
   },
 
   // Finaliza OS e gera lançamento financeiro
-  finalizarOS: async (req, res) => {
-    const id = req.params.id;
+finalizarOS: async (req, res) => {
+  const id = req.params.id;
 
-    try {
-      await db.query(`
-        UPDATE ordens_servico SET
-          status = 'concluida',
-          data_fechamento = NOW()
-        WHERE id = ?
-      `, [id]);
+  try {
+    // Atualiza status da OS
+    await db.query(`
+      UPDATE ordens_servico SET
+        status = 'concluida',
+        data_fechamento = NOW()
+      WHERE id = ?
+    `, [id]);
 
-      const [[os]] = await db.query(`
-        SELECT responsavel_id, valor_total, tipo_servico
-        FROM ordens_servico
-        WHERE id = ?
-      `, [id]);
+    // Busca dados da OS
+    const [[os]] = await db.query(`
+      SELECT solicitante_id, valor_total, tipo_servico
+      FROM ordens_servico
+      WHERE id = ?
+    `, [id]);
 
-      await db.query(`
-        INSERT INTO financeiro (
-          tipo,
-          pessoa_id,
-          caixa_id,
-          valor,
-          vencimento,
-          status,
-          descricao,
-          ordem_servico_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        'receber',
-        os.responsavel_id,
-        null,
-        os.valor_total,
-        new Date(),
-        'pendente',
-        `Serviço concluído: ${os.tipo_servico}`,
-        id
-      ]);
-
-      res.redirect('/os/listar?sucesso=OS finalizada e lançamento financeiro gerado!');
-    } catch (err) {
-      console.error('Erro ao finalizar OS e gerar financeiro:', err);
-      res.status(500).send('Erro ao finalizar OS');
+    // Validação dos dados antes de gerar lançamento
+    if (!os.solicitante_id || !os.valor_total || os.valor_total <= 0) {
+      return res.redirect('/os/listar?erro=Dados insuficientes para gerar lançamento financeiro.');
     }
-  },
+    
+        // Caixa padrão
+    const caixaPadrao = 1;
+
+    // Gera lançamento financeiro
+    await db.query(`
+      INSERT INTO financeiro (
+        tipo,
+        pessoa_id,
+        caixa_id,
+        valor,
+        vencimento,
+        status,
+        descricao,
+        ordem_servico_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      'receber',
+      os.solicitante_id,
+      caixaPadrao, // ✅ agora está usando o valor 1 corretamente
+      os.valor_total,
+      new Date(),
+      'pendente',
+      `Serviço concluído: ${os.tipo_servico}`,
+      id
+    ]);
+
+    // Redireciona com sucesso
+    res.redirect('/os/listar?sucesso=OS finalizada e lançamento financeiro gerado!');
+  } catch (err) {
+    console.error('Erro ao finalizar OS e gerar financeiro:', err);
+    res.status(500).send('Erro ao finalizar OS');
+  }
+},
 
    // 👁️ Exibir OS
   exibirOS: async (req, res) => {

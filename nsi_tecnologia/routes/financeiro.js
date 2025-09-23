@@ -10,10 +10,13 @@ router.get('/', async (req, res) => {
 
   let sql = `
     SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
-           p.nome AS pessoa_nome, c.nome AS caixa_nome
+           p.nome AS pessoa_nome,
+           c1.nome AS caixa_origem_nome,
+           c2.nome AS caixa_quitacao_nome
     FROM financeiro f
     LEFT JOIN pessoas p ON f.pessoa_id = p.id
-    LEFT JOIN caixas c ON f.caixa_quitacao_id = c.id
+    LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+    LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
     WHERE 1 = 1
   `;
   const params = [];
@@ -38,14 +41,13 @@ router.get('/', async (req, res) => {
 
   try {
     const [lancamentos] = await db.query(sql, params);
-    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true'); // ✅ ADICIONADO
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
 
     const countParams = [...params.slice(0, params.length - 2)];
     const countSql = `
       SELECT COUNT(*) AS total
       FROM financeiro f
       LEFT JOIN pessoas p ON f.pessoa_id = p.id
-      LEFT JOIN caixas c ON f.caixa_id = c.id
       WHERE 1 = 1
       ${busca ? ' AND (f.descricao LIKE ? OR p.nome LIKE ?)' : ''}
       ${tipo ? ' AND f.tipo = ?' : ''}
@@ -58,7 +60,7 @@ router.get('/', async (req, res) => {
     res.render('financeiro/listar', {
       titulo: 'Lançamentos Financeiros',
       lancamentos,
-      caixas, // ✅ ADICIONADO
+      caixas,
       busca,
       tipo,
       status,
@@ -72,7 +74,7 @@ router.get('/', async (req, res) => {
     res.render('financeiro/listar', {
       titulo: 'Lançamentos Financeiros',
       lancamentos: [],
-      caixas: [], // ✅ ADICIONADO para evitar erro na view
+      caixas: [],
       busca,
       tipo,
       status,
@@ -114,7 +116,7 @@ router.post('/novo', async (req, res) => {
   const {
     tipo,
     pessoa_id,
-    caixa_quitacao_id,
+    caixa_id,
     valor,
     vencimento,
     status,
@@ -122,8 +124,9 @@ router.post('/novo', async (req, res) => {
   } = req.body;
 
   try {
-    // Validação básica
-    if (!tipo || !pessoa_id || !caixa_quitacao_id || !valor || !vencimento) {
+    const valorFinal = parseFloat(valor);
+
+    if (!tipo || !pessoa_id || !caixa_id || !valorFinal || valorFinal <= 0 || !vencimento) {
       const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
       const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
 
@@ -136,15 +139,10 @@ router.post('/novo', async (req, res) => {
       });
     }
 
-    // Conversão segura de valor
-    const valorConvertido = parseFloat(valor);
-    const valorFinal = isNaN(valorConvertido) ? 0 : valorConvertido;
-
-    // Inserção no banco
     await db.query('INSERT INTO financeiro SET ?', {
       tipo,
       pessoa_id,
-      caixa_quitacao_id: parseInt(caixa_quitacao_id),
+      caixa_id: parseInt(caixa_id),
       valor: valorFinal,
       vencimento,
       status,
@@ -168,11 +166,39 @@ router.post('/novo', async (req, res) => {
 });
 
 // ✏️ Formulário de edição
+router.get('/editar/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
+    if (!lancamento) {
+      return res.redirect('/financeiro?erro=Lançamento não encontrado');
+    }
+
+    const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+    res.render('financeiro/editar', {
+      titulo: 'Editar Lançamento Financeiro',
+      lancamento,
+      pessoas,
+      caixas,
+      erro: null,
+      sucesso: null
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar edição:', erro.message, erro.stack);
+    res.redirect('/financeiro?erro=Erro ao carregar edição');
+  }
+});
+
+
 router.post('/editar/:id', async (req, res) => {
   const { id } = req.params;
   const {
     tipo,
     pessoa_id,
+    caixa_id,
     caixa_quitacao_id,
     valor,
     vencimento,
@@ -181,8 +207,7 @@ router.post('/editar/:id', async (req, res) => {
   } = req.body;
 
   try {
-    // Validação básica
-    if (!tipo || !pessoa_id || !caixa_quitacao_id || !valor || !vencimento) {
+    if (!tipo || !pessoa_id || !caixa_id || !valor || !vencimento) {
       const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
       const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
       const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
@@ -197,48 +222,14 @@ router.post('/editar/:id', async (req, res) => {
       });
     }
 
-    const valorConvertido = parseFloat(valor);
-    const valorFinal = isNaN(valorConvertido) ? 0 : valorConvertido;
+    const valorFinal = parseFloat(valor) || 0;
 
     await db.query('UPDATE financeiro SET ? WHERE id = ?', [{
       tipo,
       pessoa_id,
+      caixa_id: parseInt(caixa_id),
       caixa_quitacao_id: parseInt(caixa_quitacao_id),
       valor: valorFinal,
-      vencimento,
-      status,
-      descricao
-    }, id]);
-
-    res.redirect('/financeiro?sucesso=Lançamento atualizado com sucesso!');
-  } catch (erro) {
-    console.error('Erro ao atualizar lançamento:', erro);
-    const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
-    const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
-    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
-
-    res.render('financeiro/editar', {
-      titulo: 'Editar Lançamento Financeiro',
-      erro: 'Erro ao atualizar lançamento.',
-      sucesso: null,
-      lancamento,
-      pessoas,
-      caixas
-    });
-  }
-});
-
-// 💾 Salvar edição (✅ AJUSTADO)
-router.post('/editar/:id', async (req, res) => {
-  const { id } = req.params;
-  const { tipo, pessoa_id, caixa_id, valor, vencimento, status, descricao } = req.body;
-
-  try {
-    await db.query('UPDATE financeiro SET ? WHERE id = ?', [{
-      tipo,
-      pessoa_id,
-      caixa_id,
-      valor: parseFloat(valor) || 0,
       vencimento,
       status,
       descricao
@@ -268,10 +259,13 @@ router.get('/exibir/:id', async (req, res) => {
 
   try {
     const [[lancamento]] = await db.query(`
-      SELECT f.*, p.nome AS pessoa_nome, c.nome AS caixa_nome
+      SELECT f.*, p.nome AS pessoa_nome,
+             c1.nome AS caixa_origem_nome,
+             c2.nome AS caixa_quitacao_nome
       FROM financeiro f
       LEFT JOIN pessoas p ON f.pessoa_id = p.id
-      LEFT JOIN caixas c ON f.caixa_id = c.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
       WHERE f.id = ?
     `, [id]);
 
@@ -297,15 +291,14 @@ router.post('/excluir/:id', async (req, res) => {
     await db.query('DELETE FROM financeiro WHERE id = ?', [id]);
     res.redirect('/financeiro?sucesso=Lançamento excluído com sucesso!');
   } catch (erro) {
+    console.error('Erro ao excluir lançamento:', erro);
     res.redirect('/financeiro?erro=Erro ao excluir lançamento.');
   }
 });
 
-//Quitar lancamento
-
 // 💳 Quitar lançamento financeiro
 router.post('/quitar/:id', async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
   const { caixa_quitacao_id } = req.body;
 
   try {
@@ -314,7 +307,7 @@ router.post('/quitar/:id', async (req, res) => {
       SET status = 'pago',
           caixa_quitacao_id = ?
       WHERE id = ?
-    `, [caixa_quitacao_id, id]);
+    `, [parseInt(caixa_quitacao_id), id]);
 
     res.redirect('/financeiro?sucesso=Lançamento quitado com sucesso!');
   } catch (erro) {
@@ -340,15 +333,18 @@ router.get('/relatorio', async (req, res) => {
 
   try {
     const [lancamentos] = await db.query(`
-      SELECT f.*, p.nome AS pessoa_nome, c.nome AS caixa_nome
+      SELECT f.*, p.nome AS pessoa_nome,
+             c1.nome AS caixa_origem_nome,
+             c2.nome AS caixa_quitacao_nome
       FROM financeiro f
       LEFT JOIN pessoas p ON f.pessoa_id = p.id
-      LEFT JOIN caixas c ON f.caixa_quitacao_id = c.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
       WHERE f.vencimento BETWEEN ? AND ?
       ORDER BY f.vencimento ASC
     `, [inicio, fim]);
 
-        let totalReceber = 0;
+    let totalReceber = 0;
     let totalPagar = 0;
 
     lancamentos.forEach(l => {

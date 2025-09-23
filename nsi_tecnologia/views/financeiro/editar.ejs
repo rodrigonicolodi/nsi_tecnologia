@@ -11,7 +11,7 @@
     <p class="sucesso"><%= sucesso %></p>
   <% } %>
 
-  <form method="POST" action="/financeiro/editar/<%= lancamento.id %>" class="form-grid">
+  <form method="POST" action="/financeiro/editar/<%= lancamento.id %>" class="form-coluna">
     <div class="campo">
       <label>Tipo:</label>
       <select name="tipo" required>
@@ -30,10 +30,19 @@
     </div>
 
     <div class="campo">
-      <label>Caixa:</label>
+      <label>Caixa de Origem:</label>
       <select name="caixa_id" required>
         <% caixas.forEach(c => { %>
           <option value="<%= c.id %>" <%= lancamento.caixa_id === c.id ? 'selected' : '' %>><%= c.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Caixa de Quitação:</label>
+      <select name="caixa_quitacao_id" required>
+        <% caixas.forEach(c => { %>
+          <option value="<%= c.id %>" <%= lancamento.caixa_quitacao_id === c.id ? 'selected' : '' %>><%= c.nome %></option>
         <% }) %>
       </select>
     </div>
