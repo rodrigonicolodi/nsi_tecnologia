@@ -76,8 +76,8 @@
                 <i class="fas fa-edit"></i>
               </a>
               <% if (os.status !== 'concluida') { %>
-                <button type="button" class="btn btn-acao btn-verde" data-id="<%= os.id %>" title="Finalizar OS">
-                  <i class="fas fa-check"></i>
+                <button type="button" class="btn btn-acao btn-verde" data-id="<%= os.id %>" title="Finalizar OS com Parcelamento">
+                  <i class="fas fa-check-circle"></i>
                 </button>
               <% } %>
             </td>
@@ -120,8 +120,8 @@
     document.querySelectorAll('.btn-verde[data-id]').forEach(botao => {
       botao.addEventListener('click', () => {
         const id = botao.getAttribute('data-id');
-        formConfirmar.setAttribute('action', `/os/finalizar/${id}`);
-        modal.style.display = 'flex';
+        // Redirecionar para o formulário de finalização com parcelamento
+        window.location.href = `/os/finalizar/${id}`;
       });
     });
 

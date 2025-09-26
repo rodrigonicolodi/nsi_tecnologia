@@ -93,6 +93,73 @@ router.get('/', async (req, res) => {
   }
 });
 
+// 🔍 Listar produtos (rota alternativa para consistência)
+router.get('/listar', async (req, res) => {
+  const { busca = '', categoria = '', status = '', pagina = 1, erro = null, sucesso = null } = req.query;
+  const limite = 10;
+  const offset = (pagina - 1) * limite;
+
+  try {
+    let sql = 'SELECT * FROM produtos WHERE 1=1';
+    let countSql = 'SELECT COUNT(*) AS total FROM produtos WHERE 1=1';
+    const params = [];
+    const countParams = [];
+
+    if (busca) {
+      sql += ' AND nome LIKE ?';
+      countSql += ' AND nome LIKE ?';
+      params.push(`%${busca}%`);
+      countParams.push(`%${busca}%`);
+    }
+
+    if (categoria) {
+      sql += ' AND categoria = ?';
+      countSql += ' AND categoria = ?';
+      params.push(categoria);
+      countParams.push(categoria);
+    }
+
+    if (status) {
+      sql += ' AND status = ?';
+      countSql += ' AND status = ?';
+      params.push(status);
+      countParams.push(status);
+    }
+
+    sql += ' ORDER BY nome ASC LIMIT ? OFFSET ?';
+    params.push(limite, offset);
+
+    const [produtos] = await bd.query(sql, params);
+    const [contagem] = await bd.query(countSql, countParams);
+    const totalPaginas = Math.ceil(contagem[0].total / limite);
+
+    res.render('estoque/listar', {
+      titulo: 'Estoque de Produtos',
+      produtos,
+      busca,
+      categoria,
+      status,
+      pagina: Number(pagina),
+      totalPaginas,
+      erro,
+      sucesso
+    });
+  } catch (erro) {
+    console.error('Erro ao listar produtos:', erro);
+    res.render('estoque/listar', {
+      titulo: 'Estoque de Produtos',
+      produtos: [],
+      busca,
+      categoria,
+      status,
+      pagina: 1,
+      totalPaginas: 1,
+      erro: 'Erro ao carregar produtos.',
+      sucesso: null
+    });
+  }
+});
+
 // 👁️ Exibir produto
 router.get('/exibir/:id', async (req, res) => {
   try {

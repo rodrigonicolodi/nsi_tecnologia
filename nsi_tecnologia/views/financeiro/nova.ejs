@@ -47,13 +47,31 @@
     </div>
 
     <div class="campo">
-      <label>Valor:</label>
-      <input type="number" step="0.01" name="valor" required>
+      <label>Valor Total:</label>
+      <input type="number" step="0.01" name="valor" id="valor" required>
     </div>
 
     <div class="campo">
-      <label>Vencimento:</label>
-      <input type="date" name="vencimento" required>
+      <label>Parcelamento:</label>
+      <select name="parcelamento" id="parcelamento" onchange="toggleParcelamento()">
+        <option value="avista">À Vista</option>
+        <option value="parcelado">Parcelado</option>
+      </select>
+    </div>
+
+    <div class="campo" id="campo-parcelas" style="display: none;">
+      <label>Número de Parcelas:</label>
+      <input type="number" name="total_parcelas" id="total_parcelas" min="2" max="24" value="2">
+    </div>
+
+    <div class="campo" id="campo-intervalo" style="display: none;">
+      <label>Intervalo entre Parcelas (dias):</label>
+      <input type="number" name="intervalo_dias" id="intervalo_dias" min="1" max="365" value="30">
+    </div>
+
+    <div class="campo">
+      <label>Vencimento da 1ª Parcela:</label>
+      <input type="date" name="vencimento" id="vencimento" required>
     </div>
 
     <div class="campo">
@@ -79,6 +97,23 @@
 </div>
 
 <script>
+  function toggleParcelamento() {
+    const parcelamento = document.getElementById('parcelamento').value;
+    const campoParcelas = document.getElementById('campo-parcelas');
+    const campoIntervalo = document.getElementById('campo-intervalo');
+    const labelVencimento = document.querySelector('label[for="vencimento"]');
+    
+    if (parcelamento === 'parcelado') {
+      campoParcelas.style.display = 'block';
+      campoIntervalo.style.display = 'block';
+      labelVencimento.textContent = 'Vencimento da 1ª Parcela:';
+    } else {
+      campoParcelas.style.display = 'none';
+      campoIntervalo.style.display = 'none';
+      labelVencimento.textContent = 'Vencimento:';
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('form');
     const botao = document.getElementById('btn-salvar-financeiro');
@@ -87,5 +122,8 @@
       botao.disabled = true;
       botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     });
+
+    // Inicializar estado dos campos
+    toggleParcelamento();
   });
 </script>

@@ -14,7 +14,8 @@ router.get('/editar/:id', osController.editarOS);
 router.post('/atualizar/:id', osController.atualizarOS); // ← ajustado aqui
 
 // Finalização de OS
-router.post('/finalizar/:id', osController.finalizarOS);
+router.get('/finalizar/:id', osController.finalizarOS);
+router.post('/finalizar/:id', osController.processarFinalizacao);
 
 // Imprimeir Os
 router.get('/exibir/:id', osController.exibirOS);

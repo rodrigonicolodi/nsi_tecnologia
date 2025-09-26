@@ -1,0 +1,242 @@
+<% layout = 'layout' %>
+<% titulo = 'Relatório de Serviços e Produtos por Mês' %>
+
+<div class="container">
+    <h2>Relatório de Serviços e Produtos por Mês</h2>
+
+    <!-- Filtros -->
+    <form method="GET" action="/relatorios/servicos-produtos-mes" class="filtros">
+        <div class="campo">
+            <label for="mes">Mês:</label>
+            <select name="mes" id="mes">
+                <option value="1" <%= mes == 1 ? 'selected' : '' %>>Janeiro</option>
+                <option value="2" <%= mes == 2 ? 'selected' : '' %>>Fevereiro</option>
+                <option value="3" <%= mes == 3 ? 'selected' : '' %>>Março</option>
+                <option value="4" <%= mes == 4 ? 'selected' : '' %>>Abril</option>
+                <option value="5" <%= mes == 5 ? 'selected' : '' %>>Maio</option>
+                <option value="6" <%= mes == 6 ? 'selected' : '' %>>Junho</option>
+                <option value="7" <%= mes == 7 ? 'selected' : '' %>>Julho</option>
+                <option value="8" <%= mes == 8 ? 'selected' : '' %>>Agosto</option>
+                <option value="9" <%= mes == 9 ? 'selected' : '' %>>Setembro</option>
+                <option value="10" <%= mes == 10 ? 'selected' : '' %>>Outubro</option>
+                <option value="11" <%= mes == 11 ? 'selected' : '' %>>Novembro</option>
+                <option value="12" <%= mes == 12 ? 'selected' : '' %>>Dezembro</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="ano">Ano:</label>
+            <input type="number" name="ano" id="ano" value="<%= ano %>" min="2020" max="2030">
+        </div>
+
+        <div class="campo">
+            <button type="submit" class="btn btn-azul">
+                <i class="fas fa-search"></i> Gerar Relatório
+            </button>
+        </div>
+    </form>
+
+    <% if (erro) { %>
+        <p class="erro"><%= erro %></p>
+    <% } %>
+
+    <% if (resultados && Object.keys(resultados).length > 0) { %>
+        <!-- Resumo Geral -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Resumo do Mês</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Total de OS:</label>
+                    <span class="valor-destaque"><%= resultados.total_os || 0 %></span>
+                </div>
+                <div class="info-item">
+                    <label>Total Serviços:</label>
+                    <span class="valor-verde">R$ <%= parseFloat(resultados.total_servicos || 0).toFixed(2) %></span>
+                </div>
+                <div class="info-item">
+                    <label>Total Produtos:</label>
+                    <span class="valor-azul">R$ <%= parseFloat(resultados.total_produtos || 0).toFixed(2) %></span>
+                </div>
+                <div class="info-item">
+                    <label>Total Descontos:</label>
+                    <span class="valor-vermelho">R$ <%= parseFloat(resultados.total_descontos || 0).toFixed(2) %></span>
+                </div>
+                <div class="info-item">
+                    <label>Total Geral:</label>
+                    <span class="valor-principal">R$ <%= parseFloat(resultados.total_geral || 0).toFixed(2) %></span>
+                </div>
+                <div class="info-item">
+                    <label>Ticket Médio:</label>
+                    <span class="valor-destaque">R$ <%= parseFloat(resultados.ticket_medio || 0).toFixed(2) %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalhes por OS -->
+        <div class="table-wrapper" style="margin-top: 20px;">
+            <h3>Detalhes por Ordem de Serviço</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>OS</th>
+                        <th>Cliente</th>
+                        <th>Tipo de Serviço</th>
+                        <th>Valor Serviço</th>
+                        <th>Valor Produtos</th>
+                        <th>Desconto</th>
+                        <th>Total</th>
+                        <th>Data Fechamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% detalhes.forEach(os => { %>
+                        <tr>
+                            <td><%= os.numero_os %></td>
+                            <td><%= os.cliente_nome %></td>
+                            <td><%= os.tipo_servico %></td>
+                            <td class="valor-verde">R$ <%= parseFloat(os.valor_servico).toFixed(2) %></td>
+                            <td class="valor-azul">R$ <%= parseFloat(os.valor_produtos).toFixed(2) %></td>
+                            <td class="valor-vermelho">R$ <%= parseFloat(os.desconto).toFixed(2) %></td>
+                            <td class="valor-principal">R$ <%= parseFloat(os.valor_total).toFixed(2) %></td>
+                            <td><%= new Date(os.data_fechamento).toLocaleDateString() %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <div class="card" style="margin-top: 20px; text-align: center;">
+            <p>Nenhum dado encontrado para o período selecionado.</p>
+        </div>
+    <% } %>
+
+    <div style="margin-top: 30px;">
+        <a href="/relatorios/listar" class="btn btn-azul">
+            <i class="fas fa-arrow-left"></i> Voltar para Relatórios
+        </a>
+    </div>
+</div>
+
+<style>
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.info-item span {
+    font-size: 1.1em;
+}
+
+.valor-destaque {
+    font-weight: bold;
+    color: #0077cc;
+    font-size: 1.2em !important;
+}
+
+.valor-verde {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.valor-azul {
+    font-weight: bold;
+    color: #0077cc;
+}
+
+.valor-vermelho {
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.valor-principal {
+    font-weight: bold;
+    color: #2e7d32;
+    font-size: 1.2em !important;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #0077cc;
+    padding-bottom: 10px;
+}
+
+.filtros {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.campo label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.campo input,
+.campo select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Estilos específicos para filtros */
+.filtros .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filtros .btn-azul {
+    background-color: #0077cc;
+    color: white;
+}
+
+.filtros .btn-azul:hover {
+    background-color: #005fa3;
+    color: white;
+    text-decoration: none;
+}
+</style>

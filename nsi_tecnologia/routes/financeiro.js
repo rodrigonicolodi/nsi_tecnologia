@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
 
   let sql = `
     SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
+           f.parcela_atual, f.total_parcelas, f.parcela_pai_id,
            p.nome AS pessoa_nome,
            c1.nome AS caixa_origem_nome,
            c2.nome AS caixa_quitacao_nome
@@ -120,11 +121,16 @@ router.post('/novo', async (req, res) => {
     valor,
     vencimento,
     status,
-    descricao
+    descricao,
+    parcelamento,
+    total_parcelas,
+    intervalo_dias
   } = req.body;
 
   try {
     const valorFinal = parseFloat(valor);
+    const numParcelas = parcelamento === 'parcelado' ? parseInt(total_parcelas) || 2 : 1;
+    const intervalo = parseInt(intervalo_dias) || 30;
 
     if (!tipo || !pessoa_id || !caixa_id || !valorFinal || valorFinal <= 0 || !vencimento) {
       const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
@@ -139,17 +145,50 @@ router.post('/novo', async (req, res) => {
       });
     }
 
-    await db.query('INSERT INTO financeiro SET ?', {
-      tipo,
-      pessoa_id,
-      caixa_id: parseInt(caixa_id),
-      valor: valorFinal,
-      vencimento,
-      status,
-      descricao
-    });
+    // Calcular valor por parcela
+    const valorParcela = valorFinal / numParcelas;
 
-    res.redirect('/financeiro?sucesso=Lançamento salvo com sucesso!');
+    // Criar lançamentos (parcelas)
+    const lancamentos = [];
+    let parcelaPaiId = null;
+
+    for (let i = 1; i <= numParcelas; i++) {
+      // Calcular data de vencimento da parcela
+      const dataVencimento = new Date(vencimento);
+      dataVencimento.setDate(dataVencimento.getDate() + ((i - 1) * intervalo));
+
+      const lancamento = {
+        tipo,
+        pessoa_id,
+        caixa_id: parseInt(caixa_id),
+        valor: valorParcela,
+        vencimento: dataVencimento.toISOString().split('T')[0],
+        status,
+        descricao: numParcelas > 1 ? `${descricao} - Parcela ${i}/${numParcelas}` : descricao,
+        parcela_atual: i,
+        total_parcelas: numParcelas,
+        parcela_pai_id: parcelaPaiId
+      };
+
+      // Se for a primeira parcela, salvar e obter o ID para usar como parcela_pai_id
+      if (i === 1) {
+        const [result] = await db.query('INSERT INTO financeiro SET ?', lancamento);
+        parcelaPaiId = result.insertId;
+        lancamento.parcela_pai_id = parcelaPaiId;
+        await db.query('UPDATE financeiro SET parcela_pai_id = ? WHERE id = ?', [parcelaPaiId, parcelaPaiId]);
+      } else {
+        lancamento.parcela_pai_id = parcelaPaiId;
+        await db.query('INSERT INTO financeiro SET ?', lancamento);
+      }
+
+      lancamentos.push(lancamento);
+    }
+
+    const mensagem = numParcelas > 1 
+      ? `Lançamento parcelado salvo com sucesso! ${numParcelas} parcelas criadas.`
+      : 'Lançamento salvo com sucesso!';
+
+    res.redirect(`/financeiro?sucesso=${encodeURIComponent(mensagem)}`);
   } catch (erro) {
     console.error('Erro ao salvar lançamento:', erro);
     const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
@@ -316,9 +355,190 @@ router.post('/quitar/:id', async (req, res) => {
   }
 });
 
+// 🔄 Converter lançamento único em parcelado
+router.get('/parcelar/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Buscar o lançamento atual
+    const [[lancamento]] = await db.query(`
+      SELECT f.*, p.nome AS pessoa_nome,
+             c1.nome AS caixa_origem_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      WHERE f.id = ? AND f.total_parcelas = 1
+    `, [id]);
+
+    if (!lancamento) {
+      return res.redirect('/financeiro?erro=Lançamento não encontrado ou já é parcelado.');
+    }
+
+    // Buscar caixas disponíveis
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+    res.render('financeiro/parcelar', {
+      titulo: 'Parcelar Lançamento',
+      lancamento,
+      caixas,
+      erro: null
+    });
+  } catch (erro) {
+    console.error('Erro ao carregar parcelamento:', erro);
+    res.redirect('/financeiro?erro=Erro ao carregar dados para parcelamento.');
+  }
+});
+
+// 💾 Processar parcelamento de lançamento existente
+router.post('/parcelar/:id', async (req, res) => {
+  const { id } = req.params;
+  const {
+    total_parcelas,
+    intervalo_dias,
+    vencimento,
+    caixa_id,
+    observacoes
+  } = req.body;
+
+  try {
+    // Buscar o lançamento atual
+    const [[lancamentoAtual]] = await db.query(`
+      SELECT * FROM financeiro 
+      WHERE id = ? AND total_parcelas = 1
+    `, [id]);
+
+    if (!lancamentoAtual) {
+      return res.redirect('/financeiro?erro=Lançamento não encontrado ou já é parcelado.');
+    }
+
+    const numParcelas = parseInt(total_parcelas) || 2;
+    const intervalo = parseInt(intervalo_dias) || 30;
+    const valorParcela = parseFloat(lancamentoAtual.valor) / numParcelas;
+    const caixaId = parseInt(caixa_id) || lancamentoAtual.caixa_id;
+
+    // Iniciar transação
+    await db.query('START TRANSACTION');
+
+    try {
+      // Atualizar o lançamento atual para ser a primeira parcela
+      await db.query(`
+        UPDATE financeiro SET
+          valor = ?,
+          vencimento = ?,
+          caixa_id = ?,
+          parcela_atual = 1,
+          total_parcelas = ?,
+          parcela_pai_id = ?,
+          descricao = ?
+        WHERE id = ?
+      `, [
+        valorParcela,
+        vencimento,
+        caixaId,
+        numParcelas,
+        id, // Será a parcela pai
+        `${lancamentoAtual.descricao} - Parcela 1/${numParcelas}${observacoes ? ` - ${observacoes}` : ''}`,
+        id
+      ]);
+
+      // Criar as parcelas restantes
+      for (let i = 2; i <= numParcelas; i++) {
+        const dataVencimento = new Date(vencimento);
+        dataVencimento.setDate(dataVencimento.getDate() + ((i - 1) * intervalo));
+
+        await db.query(`
+          INSERT INTO financeiro (
+            tipo, pessoa_id, caixa_id, valor, vencimento, status, descricao,
+            parcela_atual, total_parcelas, parcela_pai_id, ordem_servico_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+          lancamentoAtual.tipo,
+          lancamentoAtual.pessoa_id,
+          caixaId,
+          valorParcela,
+          dataVencimento.toISOString().split('T')[0],
+          lancamentoAtual.status,
+          `${lancamentoAtual.descricao} - Parcela ${i}/${numParcelas}${observacoes ? ` - ${observacoes}` : ''}`,
+          i,
+          numParcelas,
+          id,
+          lancamentoAtual.ordem_servico_id
+        ]);
+      }
+
+      // Confirmar transação
+      await db.query('COMMIT');
+
+      res.redirect(`/financeiro?sucesso=Lançamento parcelado com sucesso! ${numParcelas} parcelas criadas.`);
+    } catch (erro) {
+      // Reverter transação em caso de erro
+      await db.query('ROLLBACK');
+      throw erro;
+    }
+  } catch (erro) {
+    console.error('Erro ao parcelar lançamento:', erro);
+    res.redirect('/financeiro?erro=Erro ao parcelar lançamento.');
+  }
+});
+
+// 📋 Visualizar todas as parcelas de um lançamento
+router.get('/parcelas/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Buscar a parcela principal
+    const [[lancamentoPrincipal]] = await db.query(`
+      SELECT f.*, p.nome AS pessoa_nome,
+             c1.nome AS caixa_origem_nome,
+             c2.nome AS caixa_quitacao_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
+      WHERE f.id = ?
+    `, [id]);
+
+    if (!lancamentoPrincipal) {
+      return res.redirect('/financeiro?erro=Lançamento não encontrado');
+    }
+
+    // Buscar todas as parcelas do grupo
+    const parcelaPaiId = lancamentoPrincipal.parcela_pai_id || id;
+    const [parcelas] = await db.query(`
+      SELECT f.*, p.nome AS pessoa_nome,
+             c1.nome AS caixa_origem_nome,
+             c2.nome AS caixa_quitacao_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
+      WHERE f.parcela_pai_id = ? OR f.id = ?
+      ORDER BY f.parcela_atual ASC
+    `, [parcelaPaiId, parcelaPaiId]);
+
+    // Calcular totais
+    const totalValor = parcelas.reduce((sum, p) => sum + parseFloat(p.valor), 0);
+    const parcelasPagas = parcelas.filter(p => p.status === 'pago').length;
+    const parcelasPendentes = parcelas.filter(p => p.status === 'pendente').length;
+
+    res.render('financeiro/parcelas', {
+      titulo: 'Parcelas do Lançamento',
+      lancamentoPrincipal,
+      parcelas,
+      totalValor,
+      parcelasPagas,
+      parcelasPendentes,
+      totalParcelas: parcelas.length
+    });
+  } catch (erro) {
+    console.error('Erro ao buscar parcelas:', erro);
+    res.redirect('/financeiro?erro=Erro ao carregar parcelas.');
+  }
+});
+
 // 📊 Relatório financeiro por período
 router.get('/relatorio', async (req, res) => {
-  const { inicio, fim } = req.query;
+  const { inicio, fim, status } = req.query;
 
   if (!inicio || !fim) {
     return res.render('financeiro/relatorio', {
@@ -327,7 +547,8 @@ router.get('/relatorio', async (req, res) => {
       totalReceber: 0,
       totalPagar: 0,
       inicio,
-      fim
+      fim,
+      status: status || ''
     });
   }
 
@@ -359,6 +580,7 @@ router.get('/relatorio', async (req, res) => {
       totalPagar,
       inicio,
       fim,
+      status: status || '',
       erro: null
     });
   } catch (erro) {
@@ -370,6 +592,7 @@ router.get('/relatorio', async (req, res) => {
       totalPagar: 0,
       inicio,
       fim,
+      status: status || '',
       erro: 'Erro ao gerar relatório.'
     });
   }

@@ -4,8 +4,100 @@
 <div class="container">
     <h2>Índice de Relatórios</h2>
 
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <a href="/caixas/consulta" class="btn btn-azul">
-          <i class="fas fa-search"></i> Consulta de Caixas
-        </a>
+    <!-- Relatórios Financeiros -->
+    <div class="relatorio-section">
+        <h3>📊 Relatórios Financeiros</h3>
+        <div class="botoes-relatorios">
+            <a href="/caixas/consulta" class="btn btn-azul">
+                <i class="fas fa-search"></i> Consulta de Caixas
+            </a>
+            <a href="/financeiro/relatorio" class="btn btn-azul">
+                <i class="fas fa-chart-line"></i> Relatório Financeiro
+            </a>
+        </div>
     </div>
+
+    <!-- Relatórios de Ordens de Serviço -->
+    <div class="relatorio-section">
+        <h3>🔧 Relatórios de Ordens de Serviço</h3>
+        <div class="botoes-relatorios">
+            <a href="/relatorios/servicos-produtos-mes" class="btn btn-azul">
+                <i class="fas fa-calculator"></i> Serviços e Produtos por Mês
+            </a>
+            <a href="/relatorios/os-status-periodo" class="btn btn-azul">
+                <i class="fas fa-tasks"></i> OS por Status e Período
+            </a>
+            <a href="/relatorios/faturamento-cliente" class="btn btn-azul">
+                <i class="fas fa-users"></i> Faturamento por Cliente
+            </a>
+            <a href="/relatorios/performance-tecnicos" class="btn btn-azul">
+                <i class="fas fa-user-tie"></i> Performance de Técnicos
+            </a>
+        </div>
+    </div>
+
+    <!-- Relatórios de Estoque -->
+    <div class="relatorio-section">
+        <h3>📦 Relatórios de Estoque</h3>
+        <div class="botoes-relatorios">
+            <a href="/estoque/listar" class="btn btn-azul">
+                <i class="fas fa-boxes"></i> Lista de Produtos
+            </a>
+            <a href="/movimentacoes" class="btn btn-azul">
+                <i class="fas fa-exchange-alt"></i> Movimentações
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.relatorio-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #0077cc;
+}
+
+.relatorio-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.2em;
+}
+
+.botoes-relatorios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+/* Estilos específicos para botões de relatórios */
+.botoes-relatorios .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.botoes-relatorios .btn-azul {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+}
+
+.botoes-relatorios .btn-azul:hover {
+    background-color: #005fa3;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 119, 204, 0.3);
+}
+
+.botoes-relatorios .btn i {
+    font-size: 1.1em;
+}
+</style>

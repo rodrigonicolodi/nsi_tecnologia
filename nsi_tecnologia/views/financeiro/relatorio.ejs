@@ -5,19 +5,25 @@
   <h2><%= titulo %></h2>
 
   <form method="GET" action="/financeiro/relatorio" class="filtros">
-    <label>Início:</label>
-    <input type="date" name="inicio" value="<%= inicio || '' %>" required>
+    <div class="campo">
+      <label>Início:</label>
+      <input type="date" name="inicio" value="<%= inicio || '' %>" required>
+    </div>
 
-    <label>Fim:</label>
-    <input type="date" name="fim" value="<%= fim || '' %>" required>
+    <div class="campo">
+      <label>Fim:</label>
+      <input type="date" name="fim" value="<%= fim || '' %>" required>
+    </div>
 
-    <label>Status:</label>
-    <select name="status">
-      <option value="">Todos</option>
-      <option value="pendente" <%= status === 'pendente' ? 'selected' : '' %>>Pendente</option>
-      <option value="pago" <%= status === 'pago' ? 'selected' : '' %>>Pago</option>
-      <option value="cancelado" <%= status === 'cancelado' ? 'selected' : '' %>>Cancelado</option>
-    </select>
+    <div class="campo">
+      <label>Status:</label>
+      <select name="status">
+        <option value="">Todos</option>
+        <option value="pendente" <%= status === 'pendente' ? 'selected' : '' %>>Pendente</option>
+        <option value="pago" <%= status === 'pago' ? 'selected' : '' %>>Pago</option>
+        <option value="cancelado" <%= status === 'cancelado' ? 'selected' : '' %>>Cancelado</option>
+      </select>
+    </div>
 
     <button type="submit" class="btn btn-azul">
       <i class="fas fa-search"></i> Gerar Relatório
@@ -34,17 +40,30 @@
             <th>Pessoa</th>
             <th>Caixa</th>
             <th>Valor</th>
+            <th>Parcelas</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <% lancamentos.forEach(l => { %>
             <tr>
-              <td><%= l.data_formatada %></td>
+              <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString() : '-' %></td>
               <td><%= l.tipo %></td>
               <td><%= l.pessoa_nome %></td>
-              <td><%= l.caixa_nome %></td>
-              <td>R$ <%= l.valor.toFixed(2) %></td>
+              <td><%= l.caixa_origem_nome %></td>
+              <td>R$ <%= parseFloat(l.valor).toFixed(2) %></td>
+              <td>
+                <% if (l.total_parcelas > 1) { %>
+                  <span class="parcela-info">
+                    <%= l.parcela_atual || 1 %>/<%= l.total_parcelas || 1 %>
+                    <% if (l.parcela_pai_id === l.id) { %>
+                      <span class="parcela-principal" title="Parcela principal">👑</span>
+                    <% } %>
+                  </span>
+                <% } else { %>
+                  <span class="avista">À Vista</span>
+                <% } %>
+              </td>
               <td><%= l.status %></td>
             </tr>
           <% }) %>
@@ -61,8 +80,66 @@
   <% } %>
 
   <div style="margin-top: 30px;">
-    <a href="/financeiro" class="btn btn-cinza">
+    <a href="/financeiro" class="btn btn-azul">
       <i class="fas fa-arrow-left"></i> Voltar para lançamentos
     </a>
   </div>
 </div>
+
+<style>
+/* Garantir que os botões do relatório financeiro sejam azuis */
+.filtros .btn-azul,
+.btn-azul {
+    background-color: #0077cc !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.filtros .btn-azul:hover,
+.btn-azul:hover {
+    background-color: #005fa3 !important;
+    color: white !important;
+    text-decoration: none !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 4px rgba(0, 119, 204, 0.3) !important;
+}
+
+.filtros {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.filtros .campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filtros .campo label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.filtros .campo input,
+.filtros .campo select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+</style>

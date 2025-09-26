@@ -1,0 +1,174 @@
+<% layout = 'layout' %>
+<% titulo = 'Parcelas do Lançamento' %>
+
+<div class="container">
+  <h2>Parcelas do Lançamento</h2>
+
+  <!-- Informações do lançamento principal -->
+  <div class="card" style="margin-bottom: 20px;">
+    <h3>Informações Gerais</h3>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Pessoa:</label>
+        <span><%= lancamentoPrincipal.pessoa_nome %></span>
+      </div>
+      <div class="info-item">
+        <label>Tipo:</label>
+        <span><%= lancamentoPrincipal.tipo === 'receber' ? 'Receber' : 'Pagar' %></span>
+      </div>
+      <div class="info-item">
+        <label>Valor Total:</label>
+        <span class="valor-total">R$ <%= totalValor.toFixed(2) %></span>
+      </div>
+      <div class="info-item">
+        <label>Total de Parcelas:</label>
+        <span><%= totalParcelas %></span>
+      </div>
+      <div class="info-item">
+        <label>Parcelas Pagas:</label>
+        <span class="status-pago"><%= parcelasPagas %></span>
+      </div>
+      <div class="info-item">
+        <label>Parcelas Pendentes:</label>
+        <span class="status-pendente"><%= parcelasPendentes %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de parcelas -->
+  <div class="table-wrapper">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Parcela</th>
+          <th>Valor</th>
+          <th>Vencimento</th>
+          <th>Status</th>
+          <th>Caixa Quitação</th>
+          <th>Descrição</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% parcelas.forEach(parcela => { %>
+          <tr class="<%= parcela.status === 'pago' ? 'parcela-paga' : '' %>">
+            <td>
+              <span class="parcela-info">
+                <%= parcela.parcela_atual %>/<%= parcela.total_parcelas %>
+                <% if (parcela.parcela_pai_id === parcela.id) { %>
+                  <span class="parcela-principal" title="Parcela principal">👑</span>
+                <% } %>
+              </span>
+            </td>
+            <td>R$ <%= parseFloat(parcela.valor).toFixed(2) %></td>
+            <td><%= new Date(parcela.vencimento).toLocaleDateString() %></td>
+            <td>
+              <span class="status-<%= parcela.status %>">
+                <%= parcela.status === 'pago' ? 'Pago' : 
+                    parcela.status === 'pendente' ? 'Pendente' : 'Cancelado' %>
+              </span>
+            </td>
+            <td><%= parcela.caixa_quitacao_nome || 'Não quitado' %></td>
+            <td><%= parcela.descricao %></td>
+            <td class="acoes">
+              <a href="/financeiro/exibir/<%= parcela.id %>" class="btn btn-acao btn-azul" title="Exibir">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="/financeiro/editar/<%= parcela.id %>" class="btn btn-acao btn-azul" title="Editar">
+                <i class="fas fa-edit"></i>
+              </a>
+              
+              <% if (parcela.status === 'pendente') { %>
+                <form action="/financeiro/quitar/<%= parcela.id %>" method="POST" style="display: inline;">
+                  <select name="caixa_quitacao_id" class="input-pequeno" required>
+                    <option value="">Selecione</option>
+                    <!-- Aqui você pode adicionar as opções de caixas se necessário -->
+                  </select>
+                  <button type="submit" class="btn btn-acao btn-verde" title="Quitar">
+                    <i class="fas fa-check-circle"></i>
+                  </button>
+                </form>
+              <% } else { %>
+                <span class="status-quitado">Quitado</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Botões de ação -->
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
+    <a href="/financeiro" class="btn btn-azul">
+      <i class="fas fa-arrow-left"></i> Voltar para Lista
+    </a>
+    
+    <% if (parcelasPagas < totalParcelas) { %>
+      <button class="btn btn-verde" onclick="quitarTodasParcelas()">
+        <i class="fas fa-check-double"></i> Quitar Todas as Parcelas
+      </button>
+    <% } %>
+  </div>
+</div>
+
+<style>
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.info-item span {
+  font-size: 1.1em;
+}
+
+.valor-total {
+  font-weight: bold;
+  color: #2e7d32;
+  font-size: 1.2em !important;
+}
+
+.status-pago {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.status-pendente {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.parcela-paga {
+  background-color: #f8f9fa !important;
+}
+
+.status-quitado {
+  color: #2e7d32;
+  font-size: 0.9em;
+  font-style: italic;
+}
+</style>
+
+<script>
+function quitarTodasParcelas() {
+  if (confirm('Tem certeza que deseja quitar todas as parcelas pendentes?')) {
+    // Implementar lógica para quitar todas as parcelas
+    alert('Funcionalidade em desenvolvimento');
+  }
+}
+</script>
+

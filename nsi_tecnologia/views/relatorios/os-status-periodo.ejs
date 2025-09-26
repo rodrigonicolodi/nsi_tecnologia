@@ -1,0 +1,268 @@
+<% layout = 'layout' %>
+<% titulo = 'Relatório de OS por Status e Período' %>
+
+<div class="container">
+    <h2>Relatório de OS por Status e Período</h2>
+
+    <!-- Filtros -->
+    <form method="GET" action="/relatorios/os-status-periodo" class="filtros">
+        <div class="campo">
+            <label for="inicio">Data Início:</label>
+            <input type="date" name="inicio" id="inicio" value="<%= inicio %>">
+        </div>
+
+        <div class="campo">
+            <label for="fim">Data Fim:</label>
+            <input type="date" name="fim" id="fim" value="<%= fim %>">
+        </div>
+
+        <div class="campo">
+            <label for="status">Status:</label>
+            <select name="status" id="status">
+                <option value="">Todos os Status</option>
+                <option value="aberta" <%= status === 'aberta' ? 'selected' : '' %>>Aberta</option>
+                <option value="orcamento" <%= status === 'orcamento' ? 'selected' : '' %>>Orçamento</option>
+                <option value="chamado_tecnico" <%= status === 'chamado_tecnico' ? 'selected' : '' %>>Chamado Técnico</option>
+                <option value="concluida" <%= status === 'concluida' ? 'selected' : '' %>>Concluída</option>
+                <option value="cancelada" <%= status === 'cancelada' ? 'selected' : '' %>>Cancelada</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <button type="submit" class="btn btn-azul">
+                <i class="fas fa-search"></i> Gerar Relatório
+            </button>
+        </div>
+    </form>
+
+    <% if (erro) { %>
+        <p class="erro"><%= erro %></p>
+    <% } %>
+
+    <% if (resultados && resultados.length > 0) { %>
+        <!-- Resumo por Status -->
+        <div class="card" style="margin-top: 20px;">
+            <h3>Resumo por Status</h3>
+            <div class="table-wrapper">
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Quantidade</th>
+                            <th>Valor Total</th>
+                            <th>Ticket Médio</th>
+                            <th>% do Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% 
+                        const totalGeral = resultados.reduce((sum, r) => sum + parseFloat(r.valor_total || 0), 0);
+                        const totalOS = resultados.reduce((sum, r) => sum + parseInt(r.quantidade || 0), 0);
+                        %>
+                        <% resultados.forEach(status => { %>
+                            <tr>
+                                <td>
+                                    <span class="status-badge status-<%= status.status %>">
+                                        <%= status.status.charAt(0).toUpperCase() + status.status.slice(1).replace('_', ' ') %>
+                                    </span>
+                                </td>
+                                <td class="valor-destaque"><%= status.quantidade %></td>
+                                <td class="valor-principal">R$ <%= parseFloat(status.valor_total || 0).toFixed(2) %></td>
+                                <td class="valor-azul">R$ <%= parseFloat(status.ticket_medio || 0).toFixed(2) %></td>
+                                <td class="valor-verde">
+                                    <%= totalGeral > 0 ? ((parseFloat(status.valor_total || 0) / totalGeral) * 100).toFixed(1) : 0 %>%
+                                </td>
+                            </tr>
+                        <% }) %>
+                        <tr class="total-row">
+                            <td><strong>TOTAL</strong></td>
+                            <td class="valor-destaque"><strong><%= totalOS %></strong></td>
+                            <td class="valor-principal"><strong>R$ <%= totalGeral.toFixed(2) %></strong></td>
+                            <td class="valor-azul"><strong>R$ <%= totalGeral > 0 ? (totalGeral / totalOS).toFixed(2) : 0 %></strong></td>
+                            <td class="valor-verde"><strong>100%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Detalhes das OS -->
+        <div class="table-wrapper" style="margin-top: 20px;">
+            <h3>Detalhes das Ordens de Serviço</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Número OS</th>
+                        <th>Cliente</th>
+                        <th>Tipo de Serviço</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Valor Total</th>
+                        <th>Data Abertura</th>
+                        <th>Data Fechamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% detalhes.forEach(os => { %>
+                        <tr>
+                            <td><%= os.id %></td>
+                            <td><%= os.numero_os %></td>
+                            <td><%= os.cliente_nome %></td>
+                            <td><%= os.tipo_servico %></td>
+                            <td>
+                                <span class="prioridade-badge prioridade-<%= os.prioridade %>">
+                                    <%= os.prioridade.charAt(0).toUpperCase() + os.prioridade.slice(1) %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<%= os.status %>">
+                                    <%= os.status.charAt(0).toUpperCase() + os.status.slice(1).replace('_', ' ') %>
+                                </span>
+                            </td>
+                            <td class="valor-principal">R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></td>
+                            <td><%= new Date(os.data_abertura).toLocaleDateString() %></td>
+                            <td><%= os.data_fechamento ? new Date(os.data_fechamento).toLocaleDateString() : '-' %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <div class="card" style="margin-top: 20px; text-align: center;">
+            <p>Nenhum dado encontrado para o período selecionado.</p>
+        </div>
+    <% } %>
+
+    <div style="margin-top: 30px;">
+        <a href="/relatorios/listar" class="btn btn-azul">
+            <i class="fas fa-arrow-left"></i> Voltar para Relatórios
+        </a>
+    </div>
+</div>
+
+<style>
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-aberta { background-color: #fff3cd; color: #856404; }
+.status-orcamento { background-color: #d1ecf1; color: #0c5460; }
+.status-chamado_tecnico { background-color: #f8d7da; color: #721c24; }
+.status-concluida { background-color: #d4edda; color: #155724; }
+.status-cancelada { background-color: #f5c6cb; color: #721c24; }
+
+.prioridade-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.prioridade-baixa { background-color: #d1ecf1; color: #0c5460; }
+.prioridade-media { background-color: #fff3cd; color: #856404; }
+.prioridade-alta { background-color: #f8d7da; color: #721c24; }
+.prioridade-critica { background-color: #f5c6cb; color: #721c24; }
+
+.valor-destaque {
+    font-weight: bold;
+    color: #0077cc;
+}
+
+.valor-principal {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.valor-azul {
+    font-weight: bold;
+    color: #0077cc;
+}
+
+.valor-verde {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.total-row {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.card h3 {
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #0077cc;
+    padding-bottom: 10px;
+}
+
+.filtros {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.campo label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.campo input,
+.campo select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Estilos específicos para filtros */
+.filtros .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filtros .btn-azul {
+    background-color: #0077cc;
+    color: white;
+}
+
+.filtros .btn-azul:hover {
+    background-color: #005fa3;
+    color: white;
+    text-decoration: none;
+}
+</style>

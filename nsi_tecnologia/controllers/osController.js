@@ -230,64 +230,126 @@ module.exports = {
     }
   },
 
-  // Finaliza OS e gera lançamento financeiro
-finalizarOS: async (req, res) => {
-  const id = req.params.id;
+  // Mostra formulário de finalização com opções de parcelamento
+  finalizarOS: async (req, res) => {
+    const id = req.params.id;
 
-  try {
-    // Atualiza status da OS
-    await db.query(`
-      UPDATE ordens_servico SET
-        status = 'concluida',
-        data_fechamento = NOW()
-      WHERE id = ?
-    `, [id]);
+    try {
+      // Busca dados da OS
+      const [[os]] = await db.query(`
+        SELECT o.id, o.numero_os, o.tipo_servico, o.valor_total, o.problema_informado,
+               p.nome AS solicitante_nome
+        FROM ordens_servico o
+        LEFT JOIN pessoas p ON o.solicitante_id = p.id
+        WHERE o.id = ? AND o.status = 'aberta'
+      `, [id]);
 
-    // Busca dados da OS
-    const [[os]] = await db.query(`
-      SELECT solicitante_id, valor_total, tipo_servico
-      FROM ordens_servico
-      WHERE id = ?
-    `, [id]);
+      if (!os) {
+        return res.redirect('/os/listar?erro=Ordem de serviço não encontrada ou já finalizada.');
+      }
 
-    // Validação dos dados antes de gerar lançamento
-    if (!os.solicitante_id || !os.valor_total || os.valor_total <= 0) {
-      return res.redirect('/os/listar?erro=Dados insuficientes para gerar lançamento financeiro.');
+      // Validação dos dados
+      if (!os.valor_total || os.valor_total <= 0) {
+        return res.redirect('/os/listar?erro=Valor inválido para gerar lançamento financeiro.');
+      }
+
+      // Busca caixas disponíveis
+      const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+      res.render('os/finalizar', {
+        titulo: 'Finalizar Ordem de Serviço',
+        os,
+        caixas,
+        erro: null
+      });
+    } catch (err) {
+      console.error('Erro ao carregar finalização de OS:', err);
+      res.redirect('/os/listar?erro=Erro ao carregar dados da OS.');
     }
-    
-        // Caixa padrão
-    const caixaPadrao = 1;
+  },
 
-    // Gera lançamento financeiro
-    await db.query(`
-      INSERT INTO financeiro (
-        tipo,
-        pessoa_id,
-        caixa_id,
-        valor,
-        vencimento,
-        status,
-        descricao,
-        ordem_servico_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [
-      'receber',
-      os.solicitante_id,
-      caixaPadrao, // ✅ agora está usando o valor 1 corretamente
-      os.valor_total,
-      new Date(),
-      'pendente',
-      `Serviço concluído: ${os.tipo_servico}`,
-      id
-    ]);
+  // Processa a finalização da OS com parcelamento
+  processarFinalizacao: async (req, res) => {
+    const id = req.params.id;
+    const {
+      parcelamento,
+      total_parcelas,
+      intervalo_dias,
+      vencimento,
+      caixa_id,
+      observacoes
+    } = req.body;
 
-    // Redireciona com sucesso
-    res.redirect('/os/listar?sucesso=OS finalizada e lançamento financeiro gerado!');
-  } catch (err) {
-    console.error('Erro ao finalizar OS e gerar financeiro:', err);
-    res.status(500).send('Erro ao finalizar OS');
-  }
-},
+    try {
+      // Busca dados da OS
+      const [[os]] = await db.query(`
+        SELECT solicitante_id, valor_total, tipo_servico, numero_os
+        FROM ordens_servico
+        WHERE id = ? AND status = 'aberta'
+      `, [id]);
+
+      if (!os) {
+        return res.redirect('/os/listar?erro=Ordem de serviço não encontrada ou já finalizada.');
+      }
+
+      // Atualiza status da OS
+      await db.query(`
+        UPDATE ordens_servico SET
+          status = 'concluida',
+          data_fechamento = NOW()
+        WHERE id = ?
+      `, [id]);
+
+      // Configurações de parcelamento
+      const numParcelas = parcelamento === 'parcelado' ? parseInt(total_parcelas) || 2 : 1;
+      const intervalo = parseInt(intervalo_dias) || 30;
+      const valorParcela = os.valor_total / numParcelas;
+      const caixaId = parseInt(caixa_id) || 1;
+
+      // Criar lançamentos (parcelas)
+      let parcelaPaiId = null;
+
+      for (let i = 1; i <= numParcelas; i++) {
+        // Calcular data de vencimento da parcela
+        const dataVencimento = new Date(vencimento);
+        dataVencimento.setDate(dataVencimento.getDate() + ((i - 1) * intervalo));
+
+        const lancamento = {
+          tipo: 'receber',
+          pessoa_id: os.solicitante_id,
+          caixa_id: caixaId,
+          valor: valorParcela,
+          vencimento: dataVencimento.toISOString().split('T')[0],
+          status: 'pendente',
+          descricao: `${os.tipo_servico} - ${os.numero_os}${numParcelas > 1 ? ` - Parcela ${i}/${numParcelas}` : ''}${observacoes ? ` - ${observacoes}` : ''}`,
+          parcela_atual: i,
+          total_parcelas: numParcelas,
+          parcela_pai_id: parcelaPaiId,
+          ordem_servico_id: id
+        };
+
+        // Se for a primeira parcela, salvar e obter o ID para usar como parcela_pai_id
+        if (i === 1) {
+          const [result] = await db.query('INSERT INTO financeiro SET ?', lancamento);
+          parcelaPaiId = result.insertId;
+          lancamento.parcela_pai_id = parcelaPaiId;
+          await db.query('UPDATE financeiro SET parcela_pai_id = ? WHERE id = ?', [parcelaPaiId, parcelaPaiId]);
+        } else {
+          lancamento.parcela_pai_id = parcelaPaiId;
+          await db.query('INSERT INTO financeiro SET ?', lancamento);
+        }
+      }
+
+      const mensagem = numParcelas > 1 
+        ? `OS finalizada e lançamento parcelado criado! ${numParcelas} parcelas geradas.`
+        : 'OS finalizada e lançamento financeiro gerado!';
+
+      res.redirect(`/os/listar?sucesso=${encodeURIComponent(mensagem)}`);
+    } catch (err) {
+      console.error('Erro ao finalizar OS:', err);
+      res.redirect('/os/listar?erro=Erro ao finalizar OS.');
+    }
+  },
 
    // 👁️ Exibir OS
   exibirOS: async (req, res) => {

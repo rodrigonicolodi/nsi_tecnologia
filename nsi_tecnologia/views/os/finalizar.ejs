@@ -1,0 +1,201 @@
+<% layout = 'layout' %>
+<% titulo = 'Finalizar Ordem de Serviço' %>
+
+<div class="container">
+  <h2>Finalizar Ordem de Serviço</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <!-- Informações da OS -->
+  <div class="card" style="margin-bottom: 20px;">
+    <h3>Informações da OS</h3>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Número:</label>
+        <span><%= os.numero_os %></span>
+      </div>
+      <div class="info-item">
+        <label>Tipo de Serviço:</label>
+        <span><%= os.tipo_servico %></span>
+      </div>
+      <div class="info-item">
+        <label>Solicitante:</label>
+        <span><%= os.solicitante_nome %></span>
+      </div>
+      <div class="info-item">
+        <label>Valor Total:</label>
+        <span class="valor-total">R$ <%= parseFloat(os.valor_total).toFixed(2) %></span>
+      </div>
+    </div>
+    <div class="info-item" style="margin-top: 15px;">
+      <label>Problema Informado:</label>
+      <p style="margin-top: 5px; padding: 10px; background-color: #f5f5f5; border-radius: 4px;"><%= os.problema_informado %></p>
+    </div>
+  </div>
+
+  <!-- Formulário de Finalização -->
+  <form method="POST" action="/os/finalizar/<%= os.id %>" class="form-coluna">
+    <h3>Configuração do Lançamento Financeiro</h3>
+
+    <div class="campo">
+      <label>Caixa:</label>
+      <select name="caixa_id" required>
+        <% if (caixas.length > 0) { %>
+          <% caixas.forEach(c => { %>
+            <option value="<%= c.id %>"><%= c.nome %></option>
+          <% }) %>
+        <% } else { %>
+          <option disabled selected>⚠ Nenhum caixa disponível</option>
+        <% } %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label>Parcelamento:</label>
+      <select name="parcelamento" id="parcelamento" onchange="toggleParcelamento()">
+        <option value="avista">À Vista</option>
+        <option value="parcelado">Parcelado</option>
+      </select>
+    </div>
+
+    <div class="campo" id="campo-parcelas" style="display: none;">
+      <label>Número de Parcelas:</label>
+      <input type="number" name="total_parcelas" id="total_parcelas" min="2" max="24" value="2">
+    </div>
+
+    <div class="campo" id="campo-intervalo" style="display: none;">
+      <label>Intervalo entre Parcelas (dias):</label>
+      <input type="number" name="intervalo_dias" id="intervalo_dias" min="1" max="365" value="30">
+    </div>
+
+    <div class="campo">
+      <label>Vencimento da 1ª Parcela:</label>
+      <input type="date" name="vencimento" id="vencimento" required>
+    </div>
+
+    <div class="campo" style="grid-column: span 2;">
+      <label>Observações Adicionais:</label>
+      <textarea name="observacoes" rows="3" placeholder="Observações sobre o lançamento financeiro..."></textarea>
+    </div>
+
+    <div class="campo">
+      <button type="submit" class="btn btn-azul" id="btn-finalizar">
+        <i class="fas fa-check-circle"></i> Finalizar OS e Gerar Lançamento
+      </button>
+      <a href="/os/listar" class="btn btn-azul" style="margin-left: 10px;">
+        <i class="fas fa-arrow-left"></i> Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+
+<style>
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-item label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.info-item span {
+  font-size: 1.1em;
+}
+
+.valor-total {
+  font-weight: bold;
+  color: #2e7d32;
+  font-size: 1.2em !important;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 2px solid #0077cc;
+  padding-bottom: 10px;
+}
+
+/* Garantir que os botões usem os estilos padrão */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  margin: 5px;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.btn-azul {
+  background-color: #0077cc;
+  color: white;
+}
+
+.btn-azul:hover {
+  background-color: #005fa3;
+  color: white;
+  text-decoration: none;
+}
+</style>
+
+<script>
+function toggleParcelamento() {
+  const parcelamento = document.getElementById('parcelamento').value;
+  const campoParcelas = document.getElementById('campo-parcelas');
+  const campoIntervalo = document.getElementById('campo-intervalo');
+  const labelVencimento = document.querySelector('label[for="vencimento"]');
+  
+  if (parcelamento === 'parcelado') {
+    campoParcelas.style.display = 'block';
+    campoIntervalo.style.display = 'block';
+    labelVencimento.textContent = 'Vencimento da 1ª Parcela:';
+  } else {
+    campoParcelas.style.display = 'none';
+    campoIntervalo.style.display = 'none';
+    labelVencimento.textContent = 'Vencimento:';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.querySelector('form');
+  const botao = document.getElementById('btn-finalizar');
+
+  form.addEventListener('submit', function () {
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finalizando...';
+  });
+
+  // Inicializar estado dos campos
+  toggleParcelamento();
+  
+  // Definir data de vencimento padrão (hoje + 30 dias)
+  const hoje = new Date();
+  hoje.setDate(hoje.getDate() + 30);
+  document.getElementById('vencimento').value = hoje.toISOString().split('T')[0];
+});
+</script>

@@ -12,8 +12,23 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar">
+  <div class="layout" id="layout">
+    <!-- 🔄 Botão de Alternância de Modo -->
+    <button class="mode-toggle" id="modeToggle" title="Alternar Modo">
+      <i class="fas fa-mobile-alt" id="modeIcon"></i>
+    </button>
+
+    <!-- 🍔 Menu Hambúrguer para Mobile -->
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- 🌫️ Overlay para Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-logo">
         <img src="/img/logo-nsi.png" alt="NSI Tecnologia">
       </div>
@@ -21,20 +36,93 @@
         <a href="/pessoas" class="btn"><i class="fas fa-users"></i> Pessoas</a>
         <a href="/estoque" class="btn"><i class="fas fa-boxes"></i> Estoque</a>
         <a href="/movimentacoes" class="btn"><i class="fas fa-exchange-alt"></i> Movimentações</a>
-        <a href="/os/listar" class="btn"><i class="fas fa-clipboard-check"></i> Ordem de Serviço</a> <!-- ✅ Corrigido -->
+        <a href="/os/listar" class="btn"><i class="fas fa-clipboard-check"></i> Ordem de Serviço</a>
         <a href="/financeiro" class="btn"><i class="fas fa-money-bill-wave"></i> Financeiro</a>
         <a href="/relatorios/listar" class="btn"><i class="fas fa-chart-line"></i> Relatórios</a>
-        <!-- <a href="/inventario" class="btn"><i class="fas fa-desktop"></i> Inventário</a> -->
-        <!-- <a href="/auditoria" class="btn"><i class="fas fa-clipboard-list"></i> Auditoria</a> -->
         <a href="/logout" class="btn logout"><i class="fas fa-sign-out-alt"></i> Sair</a>
       </nav>
     </aside>
 
-       <main class="container">
+    <main class="container">
       <%- body %>
     </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script>
+    // 🔄 Sistema de Alternância de Modo
+    document.addEventListener('DOMContentLoaded', function() {
+      const modeToggle = document.getElementById('modeToggle');
+      const modeIcon = document.getElementById('modeIcon');
+      const layout = document.getElementById('layout');
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      
+      // Verificar preferência salva ou detectar dispositivo
+      const isMobile = window.innerWidth <= 991;
+      const savedMode = localStorage.getItem('layoutMode');
+      const currentMode = savedMode || (isMobile ? 'mobile' : 'desktop');
+      
+      // Aplicar modo inicial
+      applyMode(currentMode);
+      
+      // Botão de alternância de modo
+      if (modeToggle && modeIcon) {
+        modeToggle.addEventListener('click', function() {
+          const currentMode = layout.classList.contains('mobile-mode') ? 'mobile' : 'desktop';
+          const newMode = currentMode === 'mobile' ? 'desktop' : 'mobile';
+          applyMode(newMode);
+          localStorage.setItem('layoutMode', newMode);
+        });
+      }
+      
+      // Menu hambúrguer (apenas no modo mobile)
+      if (menuToggle && sidebar && overlay) {
+        function toggleMenu() {
+          if (layout.classList.contains('mobile-mode')) {
+            sidebar.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+            overlay.classList.toggle('active');
+          }
+        }
+        
+        function closeMenu() {
+          sidebar.classList.remove('active');
+          menuToggle.classList.remove('active');
+          overlay.classList.remove('active');
+        }
+        
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
+        
+        // Fechar menu ao clicar em links
+        const menuLinks = sidebar.querySelectorAll('a');
+        menuLinks.forEach(link => {
+          link.addEventListener('click', closeMenu);
+        });
+      }
+      
+      // Redimensionar janela
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 991 && layout.classList.contains('mobile-mode')) {
+          closeMenu();
+        }
+      });
+      
+      function applyMode(mode) {
+        if (mode === 'mobile') {
+          layout.classList.add('mobile-mode');
+          modeIcon.className = 'fas fa-desktop';
+          modeToggle.title = 'Modo Desktop';
+        } else {
+          layout.classList.remove('mobile-mode');
+          modeIcon.className = 'fas fa-mobile-alt';
+          modeToggle.title = 'Modo Mobile';
+        }
+      }
+    });
+  </script>
 </body>
 </html>
