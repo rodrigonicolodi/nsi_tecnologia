@@ -78,15 +78,15 @@
         });
       }
       
-      // Menu hambúrguer (apenas no modo mobile)
-      if (menuToggle && sidebar && overlay) {
-        function toggleMenu() {
-          if (layout.classList.contains('mobile-mode')) {
-            sidebar.classList.toggle('active');
-            menuToggle.classList.toggle('active');
-            overlay.classList.toggle('active');
-          }
-        }
+       // Menu hambúrguer (apenas no modo mobile)
+       if (menuToggle && sidebar && overlay) {
+         function toggleMenu() {
+           if (layout.classList.contains('mobile-mode')) {
+             sidebar.classList.toggle('active');
+             menuToggle.classList.toggle('active');
+             overlay.classList.toggle('active');
+           }
+         }
         
         function closeMenu() {
           sidebar.classList.remove('active');
