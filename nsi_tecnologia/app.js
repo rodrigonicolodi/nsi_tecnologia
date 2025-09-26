@@ -13,6 +13,7 @@ const estoqueRoutes = require('./routes/estoque');
 const movimentacoesRoutes = require('./routes/movimentacoes');
 const financeiroRoutes = require('./routes/financeiro'); // ✅ Adicionada
 const caixasRouter = require('./routes/caixas');
+const relatoriosRoutes = require('./routes/relatorios'); 
 
 
 // 🧩 Middlewares globais
@@ -50,6 +51,7 @@ app.use('/movimentacoes', movimentacoesRoutes);
 app.use('/os', osRoutes);
 app.use('/financeiro', financeiroRoutes); // ✅ Ativada corretamente
 app.use('/caixas', caixasRouter);
+app.use('/relatorios', relatoriosRoutes);
 
 // 🔁 Redireciona raiz para login
 app.get('/', (req, res) => {

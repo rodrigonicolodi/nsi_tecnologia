@@ -1,0 +1,9 @@
+
+exports.listarRelatorios = (req, res) => {
+    // A view agora é estática, não precisa de dados injetados
+    res.render('relatorios/listar', {
+        titulo: 'Índice de Relatórios', 
+        erro: null,
+        sucesso: null
+    });
+};
