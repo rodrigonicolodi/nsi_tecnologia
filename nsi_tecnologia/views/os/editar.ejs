@@ -25,23 +25,23 @@
     </div>
 
     <div class="campo" style="grid-column: 1 / -1;">
-      <label for="problema_informado">Problema Informado</label>
-      <textarea id="problema_informado" name="problema_informado" rows="3"><%= os.problema_informado %></textarea>
+      <label for="problema_informado">Problema Informado <small>(opcional)</small></label>
+      <textarea id="problema_informado" name="problema_informado" rows="3" placeholder="Descreva o problema relatado pelo cliente"><%= os.problema_informado %></textarea>
     </div>
 
     <div class="campo">
-      <label for="valor_servico">Valor do Serviço</label>
-      <input type="number" step="0.01" id="valor_servico" name="valor_servico" value="<%= os.valor_servico %>">
+      <label for="valor_servico">Valor do Serviço <small>(opcional)</small></label>
+      <input type="number" step="0.01" id="valor_servico" name="valor_servico" value="<%= os.valor_servico %>" placeholder="0.00">
     </div>
 
     <div class="campo">
-      <label for="desconto">Desconto</label>
-      <input type="number" step="0.01" id="desconto" name="desconto" value="<%= os.desconto %>">
+      <label for="desconto">Desconto <small>(opcional)</small></label>
+      <input type="number" step="0.01" id="desconto" name="desconto" value="<%= os.desconto %>" placeholder="0.00">
     </div>
 
     <div class="campo">
-      <label for="acrescimos">Valor de Produto</label>
-      <input type="number" step="0.01" id="acrescimos" name="acrescimos" value="<%= os.acrescimos %>">
+      <label for="acrescimos">Valor de Produto <small>(opcional)</small></label>
+      <input type="number" step="0.01" id="acrescimos" name="acrescimos" value="<%= os.acrescimos %>" placeholder="0.00">
     </div>
 
     <div class="campo" style="grid-column: 1 / -1; text-align: center;">

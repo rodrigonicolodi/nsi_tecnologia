@@ -150,6 +150,9 @@ router.post('/novo', async (req, res) => {
   } = req.body;
 
   try {
+    // Tratar data_nascimento vazia
+    const dataNascimento = data_nascimento && data_nascimento.trim() !== '' ? data_nascimento : null;
+
     await db.query(
       `INSERT INTO pessoas (
         tipo, nome, razao_social, nome_fantasia, documento, rg_ie,
@@ -160,7 +163,7 @@ router.post('/novo', async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         tipo, nome, razao_social, nome_fantasia, documento, rg_ie,
-        data_nascimento, sexo, estado_civil, profissao, email,
+        dataNascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
         observacoes, status
@@ -189,6 +192,9 @@ router.post('/editar/:id', async (req, res) => {
   } = req.body;
 
   try {
+    // Tratar data_nascimento vazia
+    const dataNascimento = data_nascimento && data_nascimento.trim() !== '' ? data_nascimento : null;
+
     await db.query(
       `UPDATE pessoas SET
         tipo = ?, nome = ?, razao_social = ?, nome_fantasia = ?, documento = ?, rg_ie = ?,
@@ -199,7 +205,7 @@ router.post('/editar/:id', async (req, res) => {
       WHERE id = ?`,
       [
         tipo, nome, razao_social, nome_fantasia, documento, rg_ie,
-        data_nascimento, sexo, estado_civil, profissao, email,
+        dataNascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
         observacoes, status, id

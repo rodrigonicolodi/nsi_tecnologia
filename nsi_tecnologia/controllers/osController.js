@@ -34,7 +34,22 @@ module.exports = {
         acrescimos
       } = req.body;
 
-      const valor_total = parseFloat(valor_servico || 0) - parseFloat(desconto || 0) + parseFloat(acrescimos || 0);
+      // Validações básicas
+      if (!solicitante_id || !responsavel_id || !tipo_servico) {
+        const [pessoas] = await db.query('SELECT id, nome FROM pessoas ORDER BY nome');
+        return res.status(400).render('os/nova', {
+          titulo: 'Nova Ordem de Serviço',
+          erro: 'Campos obrigatórios não preenchidos: Solicitante, Responsável e Tipo de Serviço são obrigatórios.',
+          pessoas
+        });
+      }
+
+      // Tratar valores vazios para campos decimais - mais flexível
+      const valor_servico_clean = valor_servico && valor_servico.toString().trim() !== '' && !isNaN(parseFloat(valor_servico)) ? parseFloat(valor_servico) : 0;
+      const desconto_clean = desconto && desconto.toString().trim() !== '' && !isNaN(parseFloat(desconto)) ? parseFloat(desconto) : 0;
+      const acrescimos_clean = acrescimos && acrescimos.toString().trim() !== '' && !isNaN(parseFloat(acrescimos)) ? parseFloat(acrescimos) : 0;
+      
+      const valor_total = valor_servico_clean - desconto_clean + acrescimos_clean;
 
       const [[{ ultimo }]] = await db.query(`
         SELECT MAX(CAST(SUBSTRING(numero_os, 4) AS UNSIGNED)) AS ultimo
@@ -66,19 +81,44 @@ module.exports = {
         tipo_servico,
         prioridade,
         problema_informado,
-        valor_servico,
-        desconto,
-        acrescimos,
+        valor_servico_clean,
+        desconto_clean,
+        acrescimos_clean,
         valor_total
       ]);
 
       res.redirect('/os/listar?sucesso=Ordem de serviço criada com sucesso!');
     } catch (err) {
       console.error('Erro ao salvar OS:', err);
+      
+      // Buscar pessoas novamente para o formulário
+      let pessoas = [];
+      try {
+        const [pessoasResult] = await db.query('SELECT id, nome FROM pessoas ORDER BY nome');
+        pessoas = pessoasResult;
+      } catch (pessoasErr) {
+        console.error('Erro ao carregar pessoas para erro:', pessoasErr);
+      }
+      
+      // Determinar mensagem de erro específica
+      let mensagemErro = 'Erro ao salvar OS. Verifique os dados e tente novamente.';
+      
+      if (err.code === 'ER_NO_REFERENCED_ROW_2') {
+        mensagemErro = 'Erro: Solicitante ou responsável selecionado não existe.';
+      } else if (err.code === 'ER_DUP_ENTRY') {
+        mensagemErro = 'Erro: Número da OS já existe. Tente novamente.';
+      } else if (err.code === 'ER_BAD_NULL_ERROR') {
+        mensagemErro = 'Erro: Campos obrigatórios não preenchidos.';
+      } else if (err.code === 'ER_ACCESS_DENIED_ERROR') {
+        mensagemErro = 'Erro de conexão com o banco de dados.';
+      } else if (err.code === 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
+        mensagemErro = 'Erro: Valores inválidos nos campos numéricos. Verifique se os valores estão corretos.';
+      }
+      
       res.status(500).render('os/nova', {
         titulo: 'Nova Ordem de Serviço',
-        erro: 'Erro ao salvar OS. Verifique os dados e tente novamente.',
-        pessoas: []
+        erro: mensagemErro,
+        pessoas
       });
     }
   },
@@ -194,7 +234,12 @@ module.exports = {
       acrescimos
     } = req.body;
 
-    const valor_total = parseFloat(valor_servico || 0) - parseFloat(desconto || 0) + parseFloat(acrescimos || 0);
+    // Tratar valores vazios para campos decimais - mais flexível
+    const valor_servico_clean = valor_servico && valor_servico.toString().trim() !== '' && !isNaN(parseFloat(valor_servico)) ? parseFloat(valor_servico) : 0;
+    const desconto_clean = desconto && desconto.toString().trim() !== '' && !isNaN(parseFloat(desconto)) ? parseFloat(desconto) : 0;
+    const acrescimos_clean = acrescimos && acrescimos.toString().trim() !== '' && !isNaN(parseFloat(acrescimos)) ? parseFloat(acrescimos) : 0;
+    
+    const valor_total = valor_servico_clean - desconto_clean + acrescimos_clean;
 
     try {
       await db.query(`
@@ -211,9 +256,9 @@ module.exports = {
         tipo_servico,
         prioridade,
         problema_informado,
-        valor_servico,
-        desconto,
-        acrescimos,
+        valor_servico_clean,
+        desconto_clean,
+        acrescimos_clean,
         valor_total,
         id
       ]);
