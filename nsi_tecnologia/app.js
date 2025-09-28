@@ -69,11 +69,11 @@ app.use((req, res) => {
 // 🚀 Inicializa servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
+console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
 });
 
 // 🚀 Inicializa servidor com porta do integrador
 // const PORT = process.env.PORT || 61910;
 // app.listen(PORT, '0.0.0.0', () => {
-//   console.log(`✅ Servidor rodando na porta ${PORT}`);
+// console.log(`✅ Servidor rodando na porta ${PORT}`);
 // });

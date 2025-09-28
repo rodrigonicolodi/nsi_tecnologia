@@ -4,30 +4,39 @@
 <div class="container">
   <h2><%= titulo %></h2>
 
+  <!-- Filtros -->
   <form method="GET" action="/financeiro/relatorio" class="filtros">
     <div class="campo">
-      <label>Início:</label>
-      <input type="date" name="inicio" value="<%= inicio || '' %>" required>
+      <label for="inicio">Data Início:</label>
+      <input type="date" name="inicio" id="inicio" value="<%= inicio || '' %>" required>
     </div>
 
     <div class="campo">
-      <label>Fim:</label>
-      <input type="date" name="fim" value="<%= fim || '' %>" required>
+      <label for="fim">Data Fim:</label>
+      <input type="date" name="fim" id="fim" value="<%= fim || '' %>" required>
     </div>
 
     <div class="campo">
-      <label>Status:</label>
-      <select name="status">
-        <option value="">Todos</option>
+      <label for="status">Status:</label>
+      <select name="status" id="status">
+        <option value="">Todos os status</option>
         <option value="pendente" <%= status === 'pendente' ? 'selected' : '' %>>Pendente</option>
         <option value="pago" <%= status === 'pago' ? 'selected' : '' %>>Pago</option>
         <option value="cancelado" <%= status === 'cancelado' ? 'selected' : '' %>>Cancelado</option>
       </select>
     </div>
 
-    <button type="submit" class="btn btn-azul">
-      <i class="fas fa-search"></i> Gerar Relatório
-    </button>
+    <div class="campo">
+      <button type="submit" class="btn btn-azul">
+        <i class="fas fa-search"></i> Gerar Relatório
+      </button>
+    </div>
+
+    <div class="campo">
+      <a href="/pdf/financeiro?inicio=<%= encodeURIComponent(inicio || '') %>&fim=<%= encodeURIComponent(fim || '') %>&status=<%= encodeURIComponent(status || '') %>" class="btn btn-vermelho" target="_blank">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+      </a>
+    </div>
   </form>
 
   <% if (lancamentos && lancamentos.length > 0) { %>
@@ -87,31 +96,6 @@
 </div>
 
 <style>
-/* Garantir que os botões do relatório financeiro sejam azuis */
-.filtros .btn-azul,
-.btn-azul {
-    background-color: #0077cc !important;
-    color: white !important;
-    border: none !important;
-    padding: 10px 20px !important;
-    border-radius: 4px !important;
-    text-decoration: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    font-weight: 500 !important;
-    transition: all 0.3s ease !important;
-}
-
-.filtros .btn-azul:hover,
-.btn-azul:hover {
-    background-color: #005fa3 !important;
-    color: white !important;
-    text-decoration: none !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 2px 4px rgba(0, 119, 204, 0.3) !important;
-}
-
 .filtros {
     display: flex;
     gap: 15px;
@@ -123,23 +107,60 @@
     border-radius: 8px;
 }
 
-.filtros .campo {
+.campo {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 
-.filtros .campo label {
+.campo label {
     font-weight: 600;
     color: #333;
     font-size: 0.9em;
 }
 
-.filtros .campo input,
-.filtros .campo select {
+.campo input,
+.campo select {
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+}
+
+/* Estilos específicos para filtros */
+.filtros .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filtros .btn-azul {
+    background-color: #0077cc;
+    color: white;
+}
+
+.filtros .btn-azul:hover {
+    background-color: #005fa3;
+    color: white;
+    text-decoration: none;
+}
+
+.filtros .btn-vermelho {
+    background-color: #cc3300;
+    color: white;
+}
+
+.filtros .btn-vermelho:hover {
+    background-color: #a62800;
+    color: white;
+    text-decoration: none;
 }
 </style>

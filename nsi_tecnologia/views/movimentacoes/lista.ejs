@@ -12,20 +12,38 @@
     </a>
   </div>
 
-  <!-- 🔍 Filtros horizontais -->
-  <form method="GET" action="/movimentacoes" class="filtros" style="display: flex; gap: 10px; margin-bottom: 20px;">
-    <select name="tipo">
-      <option value="">Todos os tipos</option>
-      <option value="entrada" <%= tipo === 'entrada' ? 'selected' : '' %>>Entrada</option>
-      <option value="saida" <%= tipo === 'saida' ? 'selected' : '' %>>Saída</option>
-    </select>
+  <!-- 🔍 Filtros -->
+  <form method="GET" action="/movimentacoes" class="filtros">
+    <div class="campo">
+      <label for="tipo">Tipo:</label>
+      <select name="tipo" id="tipo">
+        <option value="">Todos os tipos</option>
+        <option value="entrada" <%= tipo === 'entrada' ? 'selected' : '' %>>Entrada</option>
+        <option value="saida" <%= tipo === 'saida' ? 'selected' : '' %>>Saída</option>
+      </select>
+    </div>
 
-    <input type="text" name="produto" placeholder="Buscar por produto" value="<%= produto %>" class="input-busca">
-    <input type="text" name="pessoa" placeholder="Buscar por pessoa" value="<%= pessoa %>" class="input-busca">
+    <div class="campo">
+      <label for="produto">Produto:</label>
+      <input type="text" name="produto" id="produto" placeholder="Buscar por produto" value="<%= produto %>">
+    </div>
 
-    <button type="submit" class="btn btn-azul">
-      <i class="fas fa-filter"></i> Filtrar
-    </button>
+    <div class="campo">
+      <label for="pessoa">Pessoa:</label>
+      <input type="text" name="pessoa" id="pessoa" placeholder="Buscar por pessoa" value="<%= pessoa %>">
+    </div>
+
+    <div class="campo">
+      <button type="submit" class="btn btn-azul">
+        <i class="fas fa-filter"></i> Filtrar
+      </button>
+    </div>
+
+    <div class="campo">
+      <a href="/pdf/movimentacoes?tipo=<%= encodeURIComponent(tipo || '') %>&produto=<%= encodeURIComponent(produto || '') %>&pessoa=<%= encodeURIComponent(pessoa || '') %>" class="btn btn-vermelho" target="_blank">
+        <i class="fas fa-file-pdf"></i> Exportar PDF
+      </a>
+    </div>
   </form>
 
   <% if (erro) { %>
@@ -118,3 +136,73 @@
     };
   });
 </script>
+
+<style>
+.filtros {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.campo label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.campo input,
+.campo select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Estilos específicos para filtros */
+.filtros .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filtros .btn-azul {
+    background-color: #0077cc;
+    color: white;
+}
+
+.filtros .btn-azul:hover {
+    background-color: #005fa3;
+    color: white;
+    text-decoration: none;
+}
+
+.filtros .btn-vermelho {
+    background-color: #cc3300;
+    color: white;
+}
+
+.filtros .btn-vermelho:hover {
+    background-color: #a62800;
+    color: white;
+    text-decoration: none;
+}
+</style>

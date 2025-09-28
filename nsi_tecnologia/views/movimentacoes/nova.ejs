@@ -1,4 +1,14 @@
-<form action="/movimentacoes/nova" method="POST" class="form-coluna">
+<% layout = 'layout' %>
+<% titulo = 'Nova Movimentação' %>
+
+<div class="container">
+  <h2>Nova Movimentação</h2>
+
+  <% if (erro) { %>
+    <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <form action="/movimentacoes" method="POST" class="form-coluna">
   <div class="campo">
     <label for="tipo">Tipo</label>
     <select id="tipo" name="tipo" required>
@@ -43,4 +53,5 @@
       <i class="fas fa-arrow-left"></i> Cancelar
     </a>
   </div>
-</form>
+  </form>
+</div>

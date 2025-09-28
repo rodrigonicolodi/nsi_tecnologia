@@ -21,6 +21,12 @@
                 <i class="fas fa-search"></i> Gerar Relatório
             </button>
         </div>
+
+        <div class="campo">
+            <a href="/pdf/faturamento-cliente?inicio=<%= encodeURIComponent(inicio || '') %>&fim=<%= encodeURIComponent(fim || '') %>" class="btn btn-vermelho" target="_blank">
+                <i class="fas fa-file-pdf"></i> Exportar PDF
+            </a>
+        </div>
     </form>
 
     <% if (erro) { %>

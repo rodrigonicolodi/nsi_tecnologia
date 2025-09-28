@@ -33,6 +33,12 @@
                 <i class="fas fa-search"></i> Gerar Relatório
             </button>
         </div>
+        
+        <div class="campo">
+            <a href="/pdf/os?inicio=<%= encodeURIComponent(inicio || '') %>&fim=<%= encodeURIComponent(fim || '') %>&status=<%= encodeURIComponent(status || '') %>" class="btn btn-vermelho" target="_blank">
+                <i class="fas fa-file-pdf"></i> Exportar PDF
+            </a>
+        </div>
     </form>
 
     <% if (erro) { %>
@@ -262,6 +268,17 @@
 
 .filtros .btn-azul:hover {
     background-color: #005fa3;
+    color: white;
+    text-decoration: none;
+}
+
+.filtros .btn-vermelho {
+    background-color: #cc3300;
+    color: white;
+}
+
+.filtros .btn-vermelho:hover {
+    background-color: #a62800;
     color: white;
     text-decoration: none;
 }

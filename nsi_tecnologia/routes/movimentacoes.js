@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const movimentacaoController = require('../controllers/movimentacaoController');
 
+// Middleware de verificação de login
+function verificarLogin(req, res, next) {
+  if (req.session && req.session.usuario) return next();
+  return res.redirect('/login');
+}
+
+// Aplicar middleware de autenticação a todas as rotas
+router.use(verificarLogin);
+
 // 📋 Listar movimentações
 router.get('/', movimentacaoController.listar); // /movimentacoes
 

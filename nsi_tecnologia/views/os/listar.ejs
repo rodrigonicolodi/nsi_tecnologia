@@ -11,7 +11,7 @@
   </div>
 
   <!-- 🔍 Filtros e busca -->
-  <form method="GET" action="/os/listar" class="filtros">
+  <form method="GET" action="/os/listar" class="filtros" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
     <input type="text" name="busca" placeholder="Buscar por tipo ou cliente" value="<%= busca %>" class="input-busca">
 
     <select name="status">
@@ -28,9 +28,13 @@
       <option value="critica" <%= prioridade === 'critica' ? 'selected' : '' %>>Crítica</option>
     </select>
 
-    <button type="submit" class="btn btn-azul">
+    <button type="submit" class="btn-azul">
       <i class="fas fa-filter"></i> Filtrar
     </button>
+    
+    <a href="/pdf/os?<%= new URLSearchParams({busca: busca || '', status: status || '', prioridade: prioridade || ''}).toString() %>" class="btn btn-vermelho">
+      <i class="fas fa-file-pdf"></i> Exportar PDF
+    </a>
   </form>
 
   <% if (erro) { %>
@@ -44,7 +48,7 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Número OS</th>
           <th>Solicitante</th>
           <th>Técnico</th>
           <th>Tipo</th>
@@ -57,7 +61,7 @@
       <tbody>
         <% (ordens || []).forEach(os => { %>
           <tr>
-            <td><%= os.id %></td>
+            <td><strong><%= os.numero_os %></strong></td>
             <td><%= os.solicitante %></td>
             <td><%= os.responsavel %></td>
             <td><%= os.tipo_servico %></td>
@@ -72,7 +76,7 @@
               <a href="/os/exibir/<%= os.id %>" class="btn btn-acao btn-azul" title="Exibir OS">
                 <i class="fas fa-eye"></i>
               </a>
-                     <a href="/os/editar/<%= os.id %>" class="btn btn-acao btn-azul" title="Editar OS">
+              <a href="/os/editar/<%= os.id %>" class="btn btn-acao btn-azul" title="Editar OS">
                 <i class="fas fa-edit"></i>
               </a>
               <% if (os.status !== 'concluida') { %>
