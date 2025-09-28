@@ -3,76 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <title>Impressão OS <%= os.numero_os || os.id %></title>
+  <link rel="stylesheet" href="/css/cupom-print.css">
+  <script>
+    // Controles simples apenas para impressão
+    function imprimir() {
+      window.print();
+    }
+    
+    function fechar() {
+      window.close();
+    }
+  </script>
   <style>
     @page {
-      size: 70mm auto;
+      size: 80mm auto;
       margin: 0;
+      color-adjust: exact;
+      -webkit-print-color-adjust: exact;
     }
 
     body {
-      width: 75mm;
+      width: 80mm;
       margin: 0;
-      padding-left: 10mm;
-      padding-right: 2mm;
-      font-family: monospace;
+      padding: 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.1;
       overflow: hidden !important;
       height: auto !important;
       box-sizing: border-box;
-    }
-
-    .linha {
-      border-top: 1px dashed #000;
-      margin: 10px 0;
-    }
-
-    .centro {
-      text-align: center;
-    }
-
-    .bold {
+      background: white;
+      color: #000 !important;
       font-weight: bold;
     }
 
-    .espaco {
-      margin-bottom: 5px;
-      font-size: 11px;
-      line-height: 1.4;
-      word-break: break-word;
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
-      max-width: 65mm;
+    /* Usar apenas o CSS do cupom-print.css */
+
+    /* Ajustes para impressão */
+    @media print {
+      body {
+        font-size: 13px;
+        line-height: 1.1;
+        margin: 0;
+        padding: 0;
+      }
+      
+      /* Ocultar controles na impressão */
+      div[style*="position: fixed"] {
+        display: none !important;
+      }
+      
+      .cupom-print {
+        padding: 3mm !important;
+        margin: 0 !important;
+      }
+      
+      /* Forçar TODO o texto em negrito */
+      .cupom-print, .cupom-print * {
+        font-weight: bold !important;
+        color: #000 !important;
+      }
+      
+      /* Remover tarja preta do total */
+      .cupom-total {
+        background: transparent !important;
+        color: #000 !important;
+        border: 2px solid #000 !important;
+      }
     }
   </style>
 </head>
-<body onload="window.print()">
-  <div class="centro bold">ORDEM DE SERVIÇO</div>
-  <div class="centro">Nº <%= os.numero_os || os.id %></div>
-  <div class="linha"></div>
-
-  <div class="espaco">Cliente: <%= os.cliente_nome || 'N/D' %></div>
-  <div class="espaco">Data: <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
-
-  <div class="espaco">Serviço:</div>
-  <div class="espaco">
-    <%- (os.descricao_servico || os.tipo_servico || 'N/D')
-      .replace(/\r?\n/g, '<br>') %>
+<body>
+  <!-- Controles simples -->
+  <div style="position: fixed; top: 20px; right: 20px; z-index: 1000; background: white; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <button onclick="imprimir()" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer; margin-right: 5px;">
+      🖨️ Imprimir
+    </button>
+    <button onclick="fechar()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer;">
+      ❌ Fechar
+    </button>
   </div>
+  
+  <div class="cupom-print" style="padding: 12mm; margin-top: 60px;">
+    <div class="cupom-titulo">ORDEM DE SERVIÇO</div>
+    <div class="cupom-numero">Nº <%= os.numero_os || os.id %></div>
+    <div class="cupom-linha"></div>
 
-  <div class="espaco">Problema informado:</div>
-  <div class="espaco">
-    <%- (os.problema_informado || 'N/D')
-      .replace(/\r?\n/g, '<br>') %>
+    <div class="cupom-cliente"><strong>Cliente:</strong> <%= os.cliente_nome || 'N/D' %></div>
+    <div class="cupom-cliente"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
+    <div class="cupom-cliente"><strong>Status:</strong> <%= os.status || 'N/D' %></div>
+
+    <div class="cupom-linha"></div>
+
+           <div class="cupom-servico">
+             <strong>Serviços:</strong><br>
+             <%- (os.descricao_servico || os.tipo_servico || 'N/D')
+               .replace(/\r?\n/g, '<br>') %>
+           </div>
+
+    <div class="cupom-servico">
+      <strong>Problema informado:</strong><br>
+      <%- (os.problema_informado || 'N/D')
+        .replace(/\r?\n/g, '<br>') %>
+    </div>
+
+    <div class="cupom-linha"></div>
+
+    <div class="cupom-valor"><strong>Serviços:</strong> R$ <%= parseFloat(os.valor_servico || os.valor || 0).toFixed(2) %></div>
+    <div class="cupom-valor"><strong>Desconto:</strong> R$ <%= parseFloat(os.desconto || 0).toFixed(2) %></div>
+    <div class="cupom-valor"><strong>Produtos:</strong> R$ <%= parseFloat(os.acrescimos || 0).toFixed(2) %></div>
+    
+    <div class="cupom-total">TOTAL: R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></div>
+
+    <div class="cupom-linha"></div>
+    <div class="cupom-rodape">Obrigado pela preferência!</div>
   </div>
-
-  <div class="espaco">Status: <%= os.status || 'N/D' %></div>
-  <div class="linha"></div>
-
-  <div class="espaco">Valor: R$ <%= parseFloat(os.valor_servico || os.valor || 0).toFixed(2) %></div>
-  <div class="espaco">Desconto: R$ <%= parseFloat(os.desconto || 0).toFixed(2) %></div>
-  <div class="espaco">Acréscimos: R$ <%= parseFloat(os.acrescimos || 0).toFixed(2) %></div>
-  <div class="bold espaco">Total: R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></div>
-
-  <div class="linha"></div>
-  <div class="centro">Obrigado pela preferência!</div>
 </body>
 </html>

@@ -24,7 +24,7 @@
 
     <div class="campo">
       <label for="nome"><strong>Nome:</strong></label>
-      <input type="text" name="nome" id="nome" value="<%= pessoa.nome %>" required>
+      <input type="text" name="nome" id="nome" value="<%= pessoa.nome %>">
     </div>
 
     <div class="campo">
@@ -39,12 +39,12 @@
 
     <div class="campo">
       <label><strong>CPF / CNPJ:</strong></label>
-      <input type="text" name="documento" value="<%= pessoa.documento %>">
+      <input type="text" name="documento" id="documento" value="<%= pessoa.documento %>" placeholder="000.000.000-00 ou 00.000.000/0000-00">
     </div>
 
     <div class="campo">
       <label><strong>RG / IE:</strong></label>
-      <input type="text" name="rg_ie" value="<%= pessoa.rg_ie %>">
+      <input type="text" name="rg_ie" id="rg_ie" value="<%= pessoa.rg_ie %>" placeholder="00.000.000-0">
     </div>
 
     <div class="campo">
@@ -77,23 +77,13 @@
     </div>
 
     <div class="campo">
-      <label><strong>Telefone:</strong></label>
-      <input type="text" name="telefone" value="<%= pessoa.telefone %>">
-    </div>
-
-    <div class="campo">
-      <label><strong>Celular:</strong></label>
-      <input type="text" name="celular" value="<%= pessoa.celular %>">
-    </div>
-
-    <div class="campo">
-      <label><strong>WhatsApp:</strong></label>
-      <input type="text" name="whatsapp" value="<%= pessoa.whatsapp %>">
+      <label><strong>Telefone/Celular:</strong></label>
+      <input type="text" name="telefone" id="telefone" value="<%= pessoa.telefone || pessoa.celular || pessoa.whatsapp %>" placeholder="(11) 99999-9999">
     </div>
 
     <div class="campo">
       <label><strong>CEP:</strong></label>
-      <input type="text" name="cep" value="<%= pessoa.cep %>">
+      <input type="text" name="cep" id="cep" value="<%= pessoa.cep %>" placeholder="00000-000">
     </div>
 
     <div class="campo">
@@ -156,3 +146,68 @@
     </div>
   </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Máscara para CPF/CNPJ
+  const documentoInput = document.getElementById('documento');
+  if (documentoInput) {
+    documentoInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 11) {
+        // CPF: 000.000.000-00
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      } else {
+        // CNPJ: 00.000.000/0000-00
+        value = value.replace(/(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1/$2');
+        value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+      }
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para RG
+  const rgInput = document.getElementById('rg_ie');
+  if (rgInput) {
+    rgInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      value = value.replace(/(\d{2})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para telefone
+  const telefoneInput = document.getElementById('telefone');
+  if (telefoneInput) {
+    telefoneInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length <= 10) {
+        // Telefone fixo: (11) 3333-4444
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+      } else {
+        // Celular: (11) 99999-9999
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      }
+      e.target.value = value;
+    });
+  }
+
+  // Máscara para CEP
+  const cepInput = document.getElementById('cep');
+  if (cepInput) {
+    cepInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      e.target.value = value;
+    });
+  }
+});
+</script>

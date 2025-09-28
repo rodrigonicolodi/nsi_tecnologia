@@ -1,18 +1,11 @@
 const mysql = require('mysql2/promise');
-require('dotenv').config();
 
-// Verificar se as variáveis de ambiente estão configuradas
-if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_NAME) {
-  console.error('❌ ERRO: Variáveis de ambiente do banco não configuradas!');
-  console.error('Crie o arquivo .env baseado no config.env.example');
-  process.exit(1);
-}
-
+// Configurações do banco de dados
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: 'sistema.nsitecnologia.com.br',
+  user: 'rodri6000_nsi_tecnologia',
+  password: 'RRn@285879',
+  database: 'rodri6000_nsi_tecnologia',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

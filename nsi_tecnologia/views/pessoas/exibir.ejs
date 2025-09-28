@@ -20,9 +20,7 @@
     <p><strong>Estado Civil:</strong> <%= pessoa.estado_civil %></p>
     <p><strong>Profissão:</strong> <%= pessoa.profissao %></p>
     <p><strong>Email:</strong> <%= pessoa.email %></p>
-    <p><strong>Telefone:</strong> <%= pessoa.telefone %></p>
-    <p><strong>Celular:</strong> <%= pessoa.celular %></p>
-    <p><strong>WhatsApp:</strong> <%= pessoa.whatsapp %></p>
+    <p><strong>Telefone/Celular:</strong> <%= pessoa.telefone || pessoa.celular || pessoa.whatsapp %></p>
     <p><strong>CEP:</strong> <%= pessoa.cep %></p>
     <p><strong>Endereço:</strong> <%= pessoa.endereco %>, <%= pessoa.numero %> - <%= pessoa.complemento %></p>
     <p><strong>Bairro:</strong> <%= pessoa.bairro %></p>

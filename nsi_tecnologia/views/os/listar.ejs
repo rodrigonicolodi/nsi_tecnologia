@@ -79,6 +79,9 @@
               <a href="/os/editar/<%= os.id %>" class="btn btn-acao btn-azul" title="Editar OS">
                 <i class="fas fa-edit"></i>
               </a>
+              <a href="/os/cupom/<%= os.id %>" class="btn btn-acao btn-laranja" title="Imprimir Cupom" target="_blank">
+                <i class="fas fa-print"></i>
+              </a>
               <% if (os.status !== 'concluida') { %>
                 <button type="button" class="btn btn-acao btn-verde" data-id="<%= os.id %>" title="Finalizar OS com Parcelamento">
                   <i class="fas fa-check-circle"></i>

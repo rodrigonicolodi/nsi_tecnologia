@@ -13,16 +13,16 @@ async function gerarCodigoSequencial() {
     `);
 
     if (result.length === 0 || !result[0].codigo) {
-      return 'PROD-001';
+      return 'PROD-00001';
     }
 
     const match = result[0].codigo.match(/^PROD-(\d+)$/);
     const numero = match ? parseInt(match[1]) : 0;
     const novoNumero = numero + 1;
-    return 'PROD-' + String(novoNumero).padStart(3, '0');
+    return 'PROD-' + String(novoNumero).padStart(5, '0');
   } catch (erro) {
     console.error('Erro ao gerar código sequencial:', erro);
-    return 'PROD-001';
+    return 'PROD-00001';
   }
 }
 

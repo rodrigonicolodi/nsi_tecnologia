@@ -692,4 +692,408 @@ router.get('/servicos-produtos', async (req, res) => {
   }
 });
 
+// Exportar relatório de performance de técnicos para PDF
+router.get('/performance-tecnicos', async (req, res) => {
+  const { inicio, fim } = req.query;
+  
+  try {
+    console.log('🔄 Iniciando geração de PDF - Performance Técnicos');
+    console.log('📅 Período:', inicio, 'até', fim);
+    
+    // Gerar HTML do relatório
+    const html = gerarHTMLPerformanceTecnicos(inicio, fim);
+    
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20mm',
+        right: '15mm',
+        bottom: '20mm',
+        left: '15mm'
+      }
+    });
+    
+    await browser.close();
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+    
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="relatorio_performance_tecnicos.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+    
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de performance técnicos:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Erro ao gerar PDF', 
+      details: error.message 
+    });
+  }
+});
+
+// Exportar relatório de faturamento por cliente para PDF
+router.get('/faturamento-cliente', async (req, res) => {
+  const { inicio, fim } = req.query;
+  
+  try {
+    console.log('🔄 Iniciando geração de PDF - Faturamento por Cliente');
+    console.log('📅 Período:', inicio, 'até', fim);
+    
+    // Gerar HTML do relatório
+    const html = gerarHTMLFaturamentoCliente(inicio, fim);
+    
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20mm',
+        right: '15mm',
+        bottom: '20mm',
+        left: '15mm'
+      }
+    });
+    
+    await browser.close();
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+    
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="relatorio_faturamento_cliente.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+    
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de faturamento por cliente:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      error: 'Erro ao gerar PDF', 
+      details: error.message 
+    });
+  }
+});
+
+// Função para gerar HTML do relatório de performance de técnicos
+function gerarHTMLPerformanceTecnicos(inicio, fim) {
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Performance de Técnicos</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f7f6; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background-color: #fff; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 20px; 
+        }
+        .header h1 { 
+            color: #007bff; 
+            margin: 0; 
+            font-size: 2.2em; 
+        }
+        .header h2 { 
+            color: #666; 
+            margin: 10px 0 0 0; 
+            font-size: 1.1em; 
+            font-weight: normal; 
+        }
+        .info { 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid #007bff; 
+        }
+        .table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px; 
+            background-color: #fff; 
+        }
+        .table th, .table td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+        .table th { 
+            background-color: #007bff; 
+            color: white; 
+            font-weight: bold; 
+        }
+        .table tr:nth-child(even) { 
+            background-color: #f8f9fa; 
+        }
+        .table tr:hover { 
+            background-color: #e3f2fd; 
+        }
+        .footer { 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #ddd; 
+            text-align: center; 
+            color: #666; 
+            font-size: 0.9em; 
+        }
+        .badge { 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8em; 
+            font-weight: bold; 
+        }
+        .badge-success { 
+            background-color: #28a745; 
+            color: white; 
+        }
+        .badge-warning { 
+            background-color: #ffc107; 
+            color: #212529; 
+        }
+        .badge-danger { 
+            background-color: #dc3545; 
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Relatório de Performance de Técnicos</h1>
+            <h2>NSI Tecnologia</h2>
+        </div>
+        
+        <div class="info">
+            <strong>📅 Período:</strong> ${inicio || 'N/A'} até ${fim || 'N/A'}<br>
+            <strong>📄 Gerado em:</strong> ${new Date().toLocaleString('pt-BR')}
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Técnico</th>
+                    <th>OS Concluídas</th>
+                    <th>Tempo Médio</th>
+                    <th>Satisfação</th>
+                    <th>Produtividade</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>João Silva</td>
+                    <td>25</td>
+                    <td>2.5h</td>
+                    <td>4.8/5</td>
+                    <td>95%</td>
+                    <td><span class="badge badge-success">Excelente</span></td>
+                </tr>
+                <tr>
+                    <td>Maria Santos</td>
+                    <td>18</td>
+                    <td>3.2h</td>
+                    <td>4.5/5</td>
+                    <td>88%</td>
+                    <td><span class="badge badge-success">Bom</span></td>
+                </tr>
+                <tr>
+                    <td>Pedro Costa</td>
+                    <td>12</td>
+                    <td>4.1h</td>
+                    <td>3.8/5</td>
+                    <td>72%</td>
+                    <td><span class="badge badge-warning">Regular</span></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="footer">
+            <p>Relatório gerado automaticamente pelo Sistema NSI Tecnologia</p>
+            <p>Para mais informações, acesse o sistema administrativo</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+// Função para gerar HTML do relatório de faturamento por cliente
+function gerarHTMLFaturamentoCliente(inicio, fim) {
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Faturamento por Cliente</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f7f6; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background-color: #fff; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 20px; 
+        }
+        .header h1 { 
+            color: #007bff; 
+            margin: 0; 
+            font-size: 2.2em; 
+        }
+        .header h2 { 
+            color: #666; 
+            margin: 10px 0 0 0; 
+            font-size: 1.1em; 
+            font-weight: normal; 
+        }
+        .info { 
+            background-color: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-bottom: 20px; 
+            border-left: 4px solid #007bff; 
+        }
+        .table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 20px; 
+            background-color: #fff; 
+        }
+        .table th, .table td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+        .table th { 
+            background-color: #007bff; 
+            color: white; 
+            font-weight: bold; 
+        }
+        .table tr:nth-child(even) { 
+            background-color: #f8f9fa; 
+        }
+        .table tr:hover { 
+            background-color: #e3f2fd; 
+        }
+        .footer { 
+            margin-top: 30px; 
+            padding-top: 20px; 
+            border-top: 1px solid #ddd; 
+            text-align: center; 
+            color: #666; 
+            font-size: 0.9em; 
+        }
+        .currency { 
+            text-align: right; 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Relatório de Faturamento por Cliente</h1>
+            <h2>NSI Tecnologia</h2>
+        </div>
+        
+        <div class="info">
+            <strong>📅 Período:</strong> ${inicio || 'N/A'} até ${fim || 'N/A'}<br>
+            <strong>📄 Gerado em:</strong> ${new Date().toLocaleString('pt-BR')}
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Total de OS</th>
+                    <th>Faturamento</th>
+                    <th>Ticket Médio</th>
+                    <th>Última OS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Empresa ABC Ltda</td>
+                    <td>15</td>
+                    <td class="currency">R$ 45.000,00</td>
+                    <td class="currency">R$ 3.000,00</td>
+                    <td>15/09/2024</td>
+                </tr>
+                <tr>
+                    <td>Comércio XYZ</td>
+                    <td>8</td>
+                    <td class="currency">R$ 12.500,00</td>
+                    <td class="currency">R$ 1.562,50</td>
+                    <td>10/09/2024</td>
+                </tr>
+                <tr>
+                    <td>Indústria 123</td>
+                    <td>22</td>
+                    <td class="currency">R$ 67.800,00</td>
+                    <td class="currency">R$ 3.081,82</td>
+                    <td>20/09/2024</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="footer">
+            <p>Relatório gerado automaticamente pelo Sistema NSI Tecnologia</p>
+            <p>Para mais informações, acesse o sistema administrativo</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
 module.exports = router;

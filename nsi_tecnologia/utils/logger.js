@@ -48,11 +48,10 @@ class Logger {
   }
 
   debug(message, meta = {}) {
-    if (process.env.NODE_ENV === 'development') {
-      const formatted = this.formatMessage('DEBUG', message, meta);
-      console.debug(`🐛 ${message}`);
-      this.writeToFile('debug.log', formatted);
-    }
+    // Sempre habilitar debug
+    const formatted = this.formatMessage('DEBUG', message, meta);
+    console.debug(`🐛 ${message}`);
+    this.writeToFile('debug.log', formatted);
   }
 
   // Log específico para auditoria
@@ -69,3 +68,6 @@ class Logger {
 }
 
 module.exports = new Logger();
+
+
+

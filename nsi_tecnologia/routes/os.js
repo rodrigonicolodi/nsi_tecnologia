@@ -17,9 +17,10 @@ router.post('/atualizar/:id', osController.atualizarOS); // ← ajustado aqui
 router.get('/finalizar/:id', osController.finalizarOS);
 router.post('/finalizar/:id', osController.processarFinalizacao);
 
-// Imprimeir Os
+// Imprimir OS
 router.get('/exibir/:id', osController.exibirOS);
 router.get('/imprimir/:id', osController.imprimirOS);
+router.get('/cupom/:id', osController.cupomOS);
 
 // Exibir
 router.get('/exibir/:id', osController.exibirOS);

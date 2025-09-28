@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cupom OS <%= os.numero_os || os.id %></title>
+  <link rel="stylesheet" href="/css/cupom-print.css">
+  <script src="/js/cupom-print.js"></script>
+  <style>
+    /* Estilos específicos para esta página */
+    body {
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    .cupom-container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .cupom-header {
+      background: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .cupom-header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+    
+    .cupom-actions {
+      padding: 15px;
+      text-align: center;
+      background: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+    
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 0 5px;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    .btn:hover {
+      background: #0056b3;
+    }
+    
+    .btn-success {
+      background: #28a745;
+    }
+    
+    .btn-success:hover {
+      background: #1e7e34;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    
+    .cupom-info {
+      padding: 15px;
+      background: #fff;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .cupom-info h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 16px;
+    }
+    
+    .info-item {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    
+    .info-item strong {
+      color: #007bff;
+    }
+    
+    /* Ocultar cupom na tela, mostrar apenas na impressão */
+    .cupom-print {
+      display: none;
+    }
+    
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      .cupom-print {
+        display: block !important;
+      }
+      
+      /* Ocultar TODOS os elementos de interface na impressão */
+      .no-print, .cupom-container, .cupom-header, .cupom-info, .cupom-actions, button, .btn {
+        display: none !important;
+      }
+      
+      /* Remover estilos da tela na impressão */
+      .cupom-print {
+        margin: 0 !important;
+        max-width: none !important;
+        background: white !important;
+        padding: 5mm !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 80mm !important;
+      }
+      
+      /* Forçar TODO o texto do cupom em negrito */
+      .cupom-print, .cupom-print * {
+        font-weight: bold !important;
+        color: #000 !important;
+      }
+      
+      /* Remover tarja preta do total */
+      .cupom-total {
+        background: transparent !important;
+        color: #000 !important;
+        border: 2px solid #000 !important;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        background: white;
+        width: 80mm;
+        height: auto;
+        overflow: hidden;
+      }
+      
+      /* Garantir que o cupom ocupe toda a página */
+      .cupom-print {
+        width: 80mm;
+        margin: 0;
+        padding: 5mm;
+        height: auto;
+        overflow: hidden;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cupom-container">
+    <div class="cupom-header no-print">
+      <h1>🖨️ Impressão de Cupom</h1>
+    </div>
+    
+    <div class="cupom-info no-print">
+      <h3>📋 Informações da OS</h3>
+      <div class="info-item"><strong>Número:</strong> <%= os.numero_os || os.id %></div>
+      <div class="info-item"><strong>Cliente:</strong> <%= os.cliente_nome || 'N/D' %></div>
+      <div class="info-item"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
+      <div class="info-item"><strong>Status:</strong> <%= os.status || 'N/D' %></div>
+      <div class="info-item"><strong>Valor Total:</strong> R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></div>
+    </div>
+    
+    <div class="cupom-actions no-print">
+      <button class="btn" onclick="cupomPrint.print()">🖨️ Imprimir Cupom</button>
+      <button class="btn btn-success" onclick="cupomPrint.preview()">👁️ Visualizar</button>
+      <button class="btn btn-danger" onclick="window.close()">❌ Fechar</button>
+    </div>
+  </div>
+
+  <!-- Cupom para impressão (visível apenas na impressão) -->
+  <div class="cupom-print">
+    <div class="cupom-titulo">ORDEM DE SERVIÇO</div>
+    <div class="cupom-numero">Nº <%= os.numero_os || os.id %></div>
+    <div class="cupom-linha"></div>
+
+    <div class="cupom-cliente"><strong>Cliente:</strong> <%= os.cliente_nome || 'N/D' %></div>
+    <div class="cupom-cliente"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
+    <div class="cupom-cliente"><strong>Status:</strong> <%= os.status || 'N/D' %></div>
+
+    <div class="cupom-linha"></div>
+
+           <div class="cupom-servico">
+             <strong>Serviços:</strong><br>
+             <%- (os.descricao_servico || os.tipo_servico || 'N/D')
+               .replace(/\r?\n/g, '<br>') %>
+           </div>
+
+    <div class="cupom-servico">
+      <strong>Problema informado:</strong><br>
+      <%- (os.problema_informado || 'N/D')
+        .replace(/\r?\n/g, '<br>') %>
+    </div>
+
+    <div class="cupom-linha"></div>
+
+    <div class="cupom-valor"><strong>Serviços:</strong> R$ <%= parseFloat(os.valor_servico || os.valor || 0).toFixed(2) %></div>
+    <div class="cupom-valor"><strong>Desconto:</strong> R$ <%= parseFloat(os.desconto || 0).toFixed(2) %></div>
+    <div class="cupom-valor"><strong>Produtos:</strong> R$ <%= parseFloat(os.acrescimos || 0).toFixed(2) %></div>
+    
+    <div class="cupom-total">TOTAL: R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></div>
+
+    <div class="cupom-linha"></div>
+    <div class="cupom-rodape">Obrigado pela preferência!</div>
+  </div>
+
+  <script>
+    // Configurações específicas para esta página
+    document.addEventListener('DOMContentLoaded', function() {
+      // Otimiza o texto para impressão
+      cupomPrint.optimizeText();
+      
+      // Ajusta fonte baseado no tamanho da tela
+      const width = window.innerWidth;
+      cupomPrint.adjustFontSize(width);
+    });
+  </script>
+</body>
+</html>

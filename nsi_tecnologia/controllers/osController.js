@@ -442,5 +442,29 @@ module.exports = {
       console.error('Erro ao preparar impressão da OS:', err);
       res.redirect('/os/listar?erro=Erro ao preparar impressão');
     }
+  },
+
+  // 🖨️ Cupom OS (versão melhorada para impressão)
+  cupomOS: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const [[os]] = await db.query(`
+        SELECT os.*, s.nome AS cliente_nome
+        FROM ordens_servico os
+        JOIN pessoas s ON os.solicitante_id = s.id
+        WHERE os.id = ?
+      `, [id]);
+
+      if (!os) return res.redirect('/os/listar?erro=OS não encontrada');
+
+      res.render('os/cupom', {
+        layout: false, // 👈 ESSENCIAL para remover o layout padrão
+        titulo: 'Cupom de OS',
+        os
+      });
+    } catch (err) {
+      console.error('Erro ao preparar cupom da OS:', err);
+      res.redirect('/os/listar?erro=Erro ao preparar cupom');
+    }
   }
 };

@@ -24,7 +24,7 @@
 
     <div class="campo">
       <label>Nome:</label>
-      <input type="text" name="nome" required>
+      <input type="text" name="nome" id="nome">
     </div>
 
     <div class="campo">
@@ -39,12 +39,12 @@
 
     <div class="campo">
       <label>CPF / CNPJ:</label>
-      <input type="text" name="documento">
+      <input type="text" name="documento" id="documento" placeholder="000.000.000-00 ou 00.000.000/0000-00">
     </div>
 
     <div class="campo">
       <label>RG / IE:</label>
-      <input type="text" name="rg_ie">
+      <input type="text" name="rg_ie" id="rg_ie" placeholder="00.000.000-0">
     </div>
 
     <div class="campo">
@@ -77,23 +77,13 @@
     </div>
 
     <div class="campo">
-      <label>Telefone:</label>
-      <input type="text" name="telefone">
-    </div>
-
-    <div class="campo">
-      <label>Celular:</label>
-      <input type="text" name="celular">
-    </div>
-
-    <div class="campo">
-      <label>WhatsApp:</label>
-      <input type="text" name="whatsapp">
+      <label>Telefone/Celular:</label>
+      <input type="text" name="telefone" id="telefone" placeholder="(11) 99999-9999">
     </div>
 
     <div class="campo">
       <label>CEP:</label>
-      <input type="text" name="cep">
+      <input type="text" name="cep" id="cep" placeholder="00000-000">
     </div>
 
     <div class="campo">
@@ -166,5 +156,66 @@
       botao.disabled = true;
       botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     });
+
+    // Máscara para CPF/CNPJ
+    const documentoInput = document.getElementById('documento');
+    if (documentoInput) {
+      documentoInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length <= 11) {
+          // CPF: 000.000.000-00
+          value = value.replace(/(\d{3})(\d)/, '$1.$2');
+          value = value.replace(/(\d{3})(\d)/, '$1.$2');
+          value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        } else {
+          // CNPJ: 00.000.000/0000-00
+          value = value.replace(/(\d{2})(\d)/, '$1.$2');
+          value = value.replace(/(\d{3})(\d)/, '$1.$2');
+          value = value.replace(/(\d{3})(\d)/, '$1/$2');
+          value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+        }
+        e.target.value = value;
+      });
+    }
+
+    // Máscara para RG
+    const rgInput = document.getElementById('rg_ie');
+    if (rgInput) {
+      rgInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        e.target.value = value;
+      });
+    }
+
+    // Máscara para telefone
+    const telefoneInput = document.getElementById('telefone');
+    if (telefoneInput) {
+      telefoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length <= 10) {
+          // Telefone fixo: (11) 3333-4444
+          value = value.replace(/(\d{2})(\d)/, '($1) $2');
+          value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        } else {
+          // Celular: (11) 99999-9999
+          value = value.replace(/(\d{2})(\d)/, '($1) $2');
+          value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        }
+        e.target.value = value;
+      });
+    }
+
+    // Máscara para CEP
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+      cepInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = value;
+      });
+    }
   });
 </script>
