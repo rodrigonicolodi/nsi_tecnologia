@@ -3,6 +3,11 @@ const app = express();
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
+require('dotenv').config();
+
+// 🔗 Middlewares
+const { errorHandler, notFound } = require('./middleware/errorHandler');
+const logger = require('./utils/logger');
 
 // 🔗 Rotas
 const osRoutes = require('./routes/os');
@@ -27,9 +32,14 @@ app.set('layout', 'layout');
 
 // 🧠 Sessão
 app.use(session({
-  secret: 'chave_secreta_segura',
+  secret: process.env.SESSION_SECRET || 'chave_secreta_segura_fallback',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+  }
 }));
 
 // 👤 Disponibiliza usuário logado nas views
@@ -58,13 +68,9 @@ app.get('/', (req, res) => {
   res.redirect('/login');
 });
 
-// ❌ Página 404
-app.use((req, res) => {
-  res.status(404).render('404', {
-    titulo: 'Página não encontrada',
-    layout: false
-  });
-});
+// 🚨 Middleware de tratamento de erros
+app.use(notFound);
+app.use(errorHandler);
 
 // 🚀 Inicializa servidor
 const PORT = process.env.PORT || 3000;
