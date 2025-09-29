@@ -74,6 +74,14 @@ projeto/
 └── ...
 ```
 
+apos dados la
 
+cd /home/rodri6000/applications/nsi_tecnologia
+git pull
+rm -rf node_modules
+npm install
+npm rebuild bcrypt
+pkill -f "node app.js"
+node app.js &
 
 
