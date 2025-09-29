@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -14,13 +15,23 @@ const movimentacoesRoutes = require('./routes/movimentacoes');
 const financeiroRoutes = require('./routes/financeiro'); // ✅ Adicionada
 const caixasRouter = require('./routes/caixas');
 const relatoriosRoutes = require('./routes/relatorios');
-const pdfRoutes = require('./routes/pdf'); // 📄 PDF Export 
-
+const pdfRoutes = require('./routes/pdf');
 
 // 🧩 Middlewares globais
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// 🔒 Middleware de segurança básico
+app.use((req, res, next) => {
+  // Remove header X-Powered-By
+  res.removeHeader('X-Powered-By');
+  // Adiciona headers de segurança
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // 🖼️ Layout EJS
 app.use(expressLayouts);
@@ -28,9 +39,13 @@ app.set('layout', 'layout');
 
 // 🧠 Sessão
 app.use(session({
-  secret: 'chave_secreta_segura',
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+  }
 }));
 
 // 👤 Disponibiliza usuário logado nas views
@@ -53,7 +68,7 @@ app.use('/os', osRoutes);
 app.use('/financeiro', financeiroRoutes); // ✅ Ativada corretamente
 app.use('/caixas', caixasRouter);
 app.use('/relatorios', relatoriosRoutes);
-app.use('/pdf', pdfRoutes); // 📄 PDF Export
+app.use('/pdf', pdfRoutes);
 
 // 🔁 Redireciona raiz para login
 app.get('/', (req, res) => {
@@ -68,10 +83,22 @@ app.use((req, res) => {
   });
 });
 
+// 🚨 Middleware de tratamento de erros
+app.use((err, req, res, next) => {
+  console.error('🚨 Erro capturado:', err);
+  res.status(500).render('erro', {
+    titulo: 'Erro interno do servidor',
+    erro: err.message,
+    layout: false
+  });
+});
+
 // 🚀 Inicializa servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
+  console.log(`✅ Servidor NSI Tecnologia rodando em http://localhost:${PORT}`);
+  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 Banco: ${process.env.DB_NAME ? 'Configurado' : '❌ Não configurado'}`);
 });
 
 // 🚀 Inicializa servidor com porta do integrador
@@ -79,6 +106,3 @@ app.listen(PORT, () => {
 // app.listen(PORT, '0.0.0.0', () => {
 // console.log(`✅ Servidor rodando na porta ${PORT}`);
 // });
-
-// Exportar app para testes
-module.exports = app;

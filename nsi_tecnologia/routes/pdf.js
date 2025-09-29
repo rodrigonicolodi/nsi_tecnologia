@@ -1,6 +1,7 @@
 // Rotas para exportação de PDF
 const express = require('express');
 const puppeteer = require('puppeteer');
+const db = require('../db');
 const router = express.Router();
 
 // Middleware de verificação de login
@@ -460,28 +461,119 @@ router.get('/financeiro', async (req, res) => {
     
     const { inicio, fim, status } = req.query;
     
+    // Buscar dados financeiros
+    let whereClause = 'WHERE 1=1';
+    let params = [];
+    
+    if (inicio) {
+      whereClause += ' AND DATE(f.vencimento) >= ?';
+      params.push(inicio);
+    }
+    
+    if (fim) {
+      whereClause += ' AND DATE(f.vencimento) <= ?';
+      params.push(fim);
+    }
+    
+    if (status) {
+      whereClause += ' AND status = ?';
+      params.push(status);
+    }
+    
+    const [lancamentos] = await db.query(`
+      SELECT f.*, p.nome as pessoa_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      ${whereClause}
+      ORDER BY f.vencimento DESC
+    `, params);
+    
+    // Calcular totais
+    const totalReceber = lancamentos
+      .filter(l => l.tipo === 'receber')
+      .reduce((sum, l) => sum + parseFloat(l.valor || 0), 0);
+    
+    const totalPagar = lancamentos
+      .filter(l => l.tipo === 'pagar')
+      .reduce((sum, l) => sum + parseFloat(l.valor || 0), 0);
+    
     // Gerar HTML
-    const html = gerarHTMLFinanceiro(inicio, fim, status);
+    const html = `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório Financeiro</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .tipo-receber { color: green; font-weight: bold; }
+            .tipo-pagar { color: red; font-weight: bold; }
+            .status-pago { color: green; }
+            .status-pendente { color: orange; }
+            .status-vencido { color: red; }
+            .totais { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 5px; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>💰 Relatório Financeiro</h1>
+            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+        <div class="content">
+            <h3>Filtros Aplicados:</h3>
+            <p><strong>Período:</strong> ${inicio || 'Data inicial'} até ${fim || 'Data final'}</p>
+            <p><strong>Status:</strong> ${status || 'Todos os status'}</p>
+
+            <h3>Lançamentos (${lancamentos.length} encontrados):</h3>
+            ${lancamentos.length > 0 ? `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data Vencimento</th>
+                        <th>Cliente/Fornecedor</th>
+                        <th>Descrição</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lancamentos.map(lanc => `
+                    <tr>
+                        <td>${new Date(lanc.vencimento).toLocaleDateString('pt-BR')}</td>
+                        <td>${lanc.pessoa_nome || 'N/A'}</td>
+                        <td>${lanc.descricao || 'N/A'}</td>
+                        <td class="tipo-${lanc.tipo || 'pagar'}">${lanc.tipo === 'receber' ? 'A Receber' : 'A Pagar'}</td>
+                        <td>R$ ${parseFloat(lanc.valor || 0).toFixed(2)}</td>
+                        <td class="status-${lanc.status || 'pendente'}">${lanc.status || 'Pendente'}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="totais">
+                <h3>Resumo Financeiro:</h3>
+                <p><strong>Total a Receber:</strong> R$ ${totalReceber.toFixed(2)}</p>
+                <p><strong>Total a Pagar:</strong> R$ ${totalPagar.toFixed(2)}</p>
+                <p><strong>Saldo:</strong> R$ ${(totalReceber - totalPagar).toFixed(2)}</p>
+            </div>
+            ` : '<p>Nenhum lançamento encontrado com os filtros aplicados.</p>'}
+        </div>
+    </body>
+    </html>`;
     
     // Configurar Puppeteer
     const browser = await puppeteer.launch({
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu'
-      ]
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     
     const page = await browser.newPage();
-    await page.setContent(html, { 
-      waitUntil: 'networkidle0',
-      timeout: 30000 
-    });
+    await page.setContent(html, { waitUntil: 'networkidle0' });
     
     // Gerar PDF
     console.log('🔄 Gerando PDF...');
@@ -509,10 +601,153 @@ router.get('/financeiro', async (req, res) => {
     
   } catch (error) {
     console.error('❌ Erro ao gerar PDF financeiro:', error);
-    console.error('Stack trace:', error.stack);
-    res.status(500).json({ 
-      error: 'Erro ao gerar PDF', 
-      details: error.message 
+    res.status(500).json({
+      error: 'Erro interno do servidor ao gerar PDF',
+      details: error.message
+    });
+  }
+});
+
+// Rota para PDF de lançamentos (redireciona para financeiro)
+router.get('/lancamentos', async (req, res) => {
+  // Redireciona para a rota de financeiro com os mesmos parâmetros
+  const queryString = new URLSearchParams(req.query).toString();
+  res.redirect(`/pdf/financeiro?${queryString}`);
+});
+
+// Rota para PDF de estoque
+router.get('/estoque', async (req, res) => {
+  try {
+    console.log('📄 Exportando relatório de estoque...');
+    console.log('Parâmetros:', req.query);
+    
+    const { busca, categoria, status } = req.query;
+
+    // Buscar dados do estoque
+    let whereClause = 'WHERE 1=1';
+    let params = [];
+
+    if (busca) {
+      whereClause += ' AND (nome LIKE ? OR descricao LIKE ?)';
+      params.push(`%${busca}%`, `%${busca}%`);
+    }
+
+    if (categoria) {
+      whereClause += ' AND categoria = ?';
+      params.push(categoria);
+    }
+
+    if (status) {
+      whereClause += ' AND status = ?';
+      params.push(status);
+    }
+
+    const [produtos] = await db.query(`
+      SELECT * FROM produtos
+      ${whereClause}
+      ORDER BY nome
+    `, params);
+
+    // Gerar HTML
+    const html = `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Estoque</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .status-ativo { color: green; font-weight: bold; }
+            .status-inativo { color: red; font-weight: bold; }
+            .status-baixo { color: orange; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>📦 Relatório de Estoque</h1>
+            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+        <div class="content">
+            <h3>Filtros Aplicados:</h3>
+            <p><strong>Busca:</strong> ${busca || 'Todos os produtos'}</p>
+            <p><strong>Categoria:</strong> ${categoria || 'Todas as categorias'}</p>
+            <p><strong>Status:</strong> ${status || 'Todos os status'}</p>
+
+            <h3>Produtos (${produtos.length} encontrados):</h3>
+            ${produtos.length > 0 ? `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Estoque Atual</th>
+                        <th>Estoque Mínimo</th>
+                        <th>Preço</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${produtos.map(produto => `
+                    <tr>
+                        <td>${produto.codigo || 'N/A'}</td>
+                        <td>${produto.nome || 'N/A'}</td>
+                        <td>${produto.categoria || 'N/A'}</td>
+                        <td>${produto.estoque_atual || 0}</td>
+                        <td>${produto.estoque_minimo || 0}</td>
+                        <td>R$ ${produto.preco_venda ? parseFloat(produto.preco_venda).toFixed(2) : '0,00'}</td>
+                        <td class="status-${produto.status || 'inativo'}">${produto.status || 'Inativo'}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ` : '<p>Nenhum produto encontrado com os filtros aplicados.</p>'}
+        </div>
+    </body>
+    </html>`;
+
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      }
+    });
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+
+    await browser.close();
+
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="relatorio_estoque.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de estoque:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor ao gerar PDF',
+      details: error.message
     });
   }
 });
@@ -1095,5 +1330,267 @@ function gerarHTMLFaturamentoCliente(inicio, fim) {
 </body>
 </html>`;
 }
+
+// Rota para PDF de movimentações
+router.get('/movimentacoes', async (req, res) => {
+  try {
+    console.log('📄 Exportando relatório de movimentações...');
+    console.log('Parâmetros:', req.query);
+
+    const { inicio, fim, tipo } = req.query;
+
+    // Buscar dados das movimentações
+    let whereClause = 'WHERE 1=1';
+    let params = [];
+
+    if (inicio) {
+      whereClause += ' AND DATE(m.data) >= ?';
+      params.push(inicio);
+    }
+
+    if (fim) {
+      whereClause += ' AND DATE(m.data) <= ?';
+      params.push(fim);
+    }
+
+    if (tipo) {
+      whereClause += ' AND m.tipo = ?';
+      params.push(tipo);
+    }
+
+    const [movimentacoes] = await db.query(`
+      SELECT m.*, p.nome as produto_nome, p.codigo as produto_codigo
+      FROM movimentacoes m
+      LEFT JOIN produtos p ON m.produto_id = p.id
+      ${whereClause}
+      ORDER BY m.data DESC
+    `, params);
+
+    // Gerar HTML
+    const html = `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Movimentações</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .tipo-entrada { color: green; font-weight: bold; }
+            .tipo-saida { color: red; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>📦 Relatório de Movimentações</h1>
+            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+        <div class="content">
+            <h3>Filtros Aplicados:</h3>
+            <p><strong>Período:</strong> ${inicio || 'Data inicial'} até ${fim || 'Data final'}</p>
+            <p><strong>Tipo:</strong> ${tipo || 'Todos os tipos'}</p>
+
+            <h3>Movimentações (${movimentacoes.length} encontradas):</h3>
+            ${movimentacoes.length > 0 ? `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${movimentacoes.map(mov => `
+                    <tr>
+                        <td>${new Date(mov.data).toLocaleDateString('pt-BR')}</td>
+                        <td>${mov.produto_codigo || 'N/A'} - ${mov.produto_nome || 'N/A'}</td>
+                        <td class="tipo-${mov.tipo || 'saida'}">${mov.tipo || 'Saída'}</td>
+                        <td>${mov.quantidade || 0}</td>
+                        <td>${mov.observacoes || 'N/A'}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ` : '<p>Nenhuma movimentação encontrada com os filtros aplicados.</p>'}
+        </div>
+    </body>
+    </html>`;
+
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      }
+    });
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+
+    await browser.close();
+
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="relatorio_movimentacoes.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de movimentações:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor ao gerar PDF',
+      details: error.message
+    });
+  }
+});
+
+// Rota para PDF de pessoas
+router.get('/pessoas', async (req, res) => {
+  try {
+    console.log('📄 Exportando relatório de pessoas...');
+    console.log('Parâmetros:', req.query);
+    
+    const { busca, tipo } = req.query;
+
+    // Buscar dados das pessoas
+    let whereClause = 'WHERE 1=1';
+    let params = [];
+
+    if (busca) {
+      whereClause += ' AND (nome LIKE ? OR email LIKE ? OR telefone LIKE ?)';
+      params.push(`%${busca}%`, `%${busca}%`, `%${busca}%`);
+    }
+
+    if (tipo) {
+      whereClause += ' AND tipo = ?';
+      params.push(tipo);
+    }
+
+    const [pessoas] = await db.query(`
+      SELECT * FROM pessoas
+      ${whereClause}
+      ORDER BY nome
+    `, params);
+
+    // Gerar HTML
+    const html = `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Pessoas</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { padding: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .tipo-cliente { color: blue; font-weight: bold; }
+            .tipo-fornecedor { color: green; font-weight: bold; }
+            .tipo-tecnico { color: orange; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>👥 Relatório de Pessoas</h1>
+            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+        <div class="content">
+            <h3>Filtros Aplicados:</h3>
+            <p><strong>Busca:</strong> ${busca || 'Todas as pessoas'}</p>
+            <p><strong>Tipo:</strong> ${tipo || 'Todos os tipos'}</p>
+
+            <h3>Pessoas (${pessoas.length} encontradas):</h3>
+            ${pessoas.length > 0 ? `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>Tipo</th>
+                        <th>Endereço</th>
+                        <th>Data Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${pessoas.map(pessoa => `
+                    <tr>
+                        <td>${pessoa.nome || 'N/A'}</td>
+                        <td>${pessoa.email || 'N/A'}</td>
+                        <td>${pessoa.telefone || 'N/A'}</td>
+                        <td class="tipo-${pessoa.tipo || 'cliente'}">${pessoa.tipo || 'Cliente'}</td>
+                        <td>${pessoa.endereco || 'N/A'}</td>
+                        <td>${pessoa.data_cadastro ? new Date(pessoa.data_cadastro).toLocaleDateString('pt-BR') : (pessoa.created_at ? new Date(pessoa.created_at).toLocaleDateString('pt-BR') : 'N/A')}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ` : '<p>Nenhuma pessoa encontrada com os filtros aplicados.</p>'}
+        </div>
+    </body>
+    </html>`;
+
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      }
+    });
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+
+    await browser.close();
+
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="relatorio_pessoas.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de pessoas:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor ao gerar PDF',
+      details: error.message
+    });
+  }
+});
 
 module.exports = router;

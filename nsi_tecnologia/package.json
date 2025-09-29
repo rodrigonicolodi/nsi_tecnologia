@@ -5,6 +5,10 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon app.js",
+    "start": "node app.js",
+    "backup": "node backup_database.js create",
+    "backup:list": "node backup_database.js list",
+    "backup:restore": "node backup_database.js restore",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
