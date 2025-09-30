@@ -93,7 +93,7 @@
                 <span class="avista">À Vista</span>
               <% } %>
             </td>
-            <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString() : '-' %></td>
+            <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString('pt-BR') : '-' %></td>
             <td><%= l.status || '-' %></td>
             <td><%= l.caixa_quitacao_nome || 'Não quitado' %></td>
             <td class="acoes">

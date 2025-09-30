@@ -61,7 +61,7 @@
               </span>
             </td>
             <td>R$ <%= parseFloat(parcela.valor).toFixed(2) %></td>
-            <td><%= new Date(parcela.vencimento).toLocaleDateString() %></td>
+            <td><%= new Date(parcela.vencimento).toLocaleDateString('pt-BR') %></td>
             <td>
               <span class="status-<%= parcela.status %>">
                 <%= parcela.status === 'pago' ? 'Pago' : 

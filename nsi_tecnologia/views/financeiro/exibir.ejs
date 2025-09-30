@@ -9,7 +9,7 @@
     <p><strong>Pessoa:</strong> <%= lancamento.pessoa_nome || '—' %></p>
     <p><strong>Caixa:</strong> <%= lancamento.caixa_nome || '—' %></p>
     <p><strong>Valor:</strong> R$ <%= !isNaN(parseFloat(lancamento.valor)) ? parseFloat(lancamento.valor).toFixed(2) : '0,00' %></p>
-    <p><strong>Vencimento:</strong> <%= lancamento.vencimento ? new Date(lancamento.vencimento).toLocaleDateString() : '—' %></p>
+    <p><strong>Vencimento:</strong> <%= lancamento.vencimento ? new Date(lancamento.vencimento).toLocaleDateString('pt-BR') : '—' %></p>
     <p><strong>Status:</strong> <%= lancamento.status || '—' %></p>
     <p><strong>Descrição:</strong> <%= lancamento.descricao || '—' %></p>
 

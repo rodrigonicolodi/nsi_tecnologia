@@ -4,10 +4,14 @@ module.exports = {
   // Renderiza o formulário de nova OS com dados de pessoas
   novaOS: async (req, res) => {
     try {
+      // Carregar todas as pessoas para solicitante
       const [pessoas] = await db.query('SELECT id, nome FROM pessoas ORDER BY nome');
+      // Carregar apenas técnicos para responsável técnico
+      const [tecnicos] = await db.query("SELECT id, nome FROM pessoas WHERE tipo = 'tecnico' ORDER BY nome");
       res.render('os/nova', {
         titulo: 'Nova Ordem de Serviço',
         pessoas,
+        tecnicos,
         erro: null
       });
     } catch (err) {
@@ -15,7 +19,8 @@ module.exports = {
       res.status(500).render('os/nova', {
         titulo: 'Nova Ordem de Serviço',
         erro: 'Erro ao carregar dados de pessoas.',
-        pessoas: []
+        pessoas: [],
+        tecnicos: []
       });
     }
   },
@@ -37,10 +42,12 @@ module.exports = {
       // Validações básicas
       if (!solicitante_id || !responsavel_id || !tipo_servico) {
         const [pessoas] = await db.query('SELECT id, nome FROM pessoas ORDER BY nome');
+        const [tecnicos] = await db.query("SELECT id, nome FROM pessoas WHERE tipo = 'tecnico' ORDER BY nome");
         return res.status(400).render('os/nova', {
           titulo: 'Nova Ordem de Serviço',
           erro: 'Campos obrigatórios não preenchidos: Solicitante, Responsável e Tipo de Serviço são obrigatórios.',
-          pessoas
+          pessoas,
+          tecnicos
         });
       }
 
@@ -144,9 +151,15 @@ module.exports = {
         params.push(`%${busca}%`, `%${busca}%`);
       }
 
-      if (status) {
+      if (status && status !== '') {
         sql += ` AND os.status = ?`;
         params.push(status);
+      } else if (status === '') {
+        // Quando "Todos os status" é selecionado explicitamente, mostrar todas
+        // Não adicionar filtro de status
+      } else {
+        // Por padrão (quando não há parâmetro), mostrar apenas ordens abertas
+        sql += ` AND os.status IN ('aberta', 'pendente', 'em_andamento')`;
       }
 
       if (prioridade) {
@@ -159,15 +172,28 @@ module.exports = {
 
       const [ordens] = await db.query(sql, params);
 
-      const [totalRegistros] = await db.query(`
+      let sqlContagem = `
         SELECT COUNT(*) AS total
         FROM ordens_servico os
         JOIN pessoas s ON os.solicitante_id = s.id
         WHERE 1 = 1
         ${busca ? `AND (os.tipo_servico LIKE '%${busca}%' OR s.nome LIKE '%${busca}%')` : ''}
-        ${status ? `AND os.status = '${status}'` : ''}
-        ${prioridade ? `AND os.prioridade = '${prioridade}'` : ''}
-      `);
+      `;
+      
+      if (status && status !== '') {
+        sqlContagem += ` AND os.status = '${status}'`;
+      } else if (status === '') {
+        // Quando "Todos os status" é selecionado, não adicionar filtro
+      } else {
+        // Por padrão, mostrar apenas ordens abertas
+        sqlContagem += ` AND os.status IN ('aberta', 'pendente', 'em_andamento')`;
+      }
+      
+      if (prioridade) {
+        sqlContagem += ` AND os.prioridade = '${prioridade}'`;
+      }
+      
+      const [totalRegistros] = await db.query(sqlContagem);
 
       const totalPaginas = Math.ceil(totalRegistros[0].total / limite);
 
@@ -204,11 +230,13 @@ module.exports = {
     try {
       const [os] = await db.query('SELECT * FROM ordens_servico WHERE id = ?', [id]);
       const [pessoas] = await db.query('SELECT id, nome FROM pessoas ORDER BY nome');
+      const [tecnicos] = await db.query("SELECT id, nome FROM pessoas WHERE tipo = 'tecnico' ORDER BY nome");
 
       res.render('os/editar', {
         titulo: 'Editar Ordem de Serviço',
         os: os[0] || {},
         pessoas,
+        tecnicos,
         erro: null
       });
     } catch (err) {
@@ -217,6 +245,7 @@ module.exports = {
         titulo: 'Editar Ordem de Serviço',
         os: {},
         pessoas: [],
+        tecnicos: [],
         erro: 'Erro ao carregar dados da OS.'
       });
     }
@@ -226,6 +255,8 @@ module.exports = {
   atualizarOS: async (req, res) => {
     const id = req.params.id;
     const {
+      solicitante_id,
+      responsavel_id,
       tipo_servico,
       prioridade,
       problema_informado,
@@ -244,6 +275,8 @@ module.exports = {
     try {
       await db.query(`
         UPDATE ordens_servico SET
+          solicitante_id = ?,
+          responsavel_id = ?,
           tipo_servico = ?,
           prioridade = ?,
           problema_informado = ?,
@@ -253,6 +286,8 @@ module.exports = {
           valor_total = ?
         WHERE id = ?
       `, [
+        solicitante_id,
+        responsavel_id,
         tipo_servico,
         prioridade,
         problema_informado,
@@ -270,7 +305,8 @@ module.exports = {
         titulo: 'Editar Ordem de Serviço',
         os: {},
         erro: 'Erro ao atualizar OS.',
-        pessoas: []
+        pessoas: [],
+        tecnicos: []
       });
     }
   },

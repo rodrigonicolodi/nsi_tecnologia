@@ -27,8 +27,8 @@
     <div class="campo">
       <label for="responsavel_id">Responsável Técnico</label>
       <select id="responsavel_id" name="responsavel_id" required>
-        <% pessoas.forEach(p => { %>
-          <option value="<%= p.id %>"><%= p.nome %></option>
+        <% (tecnicos || []).forEach(t => { %>
+          <option value="<%= t.id %>"><%= t.nome %></option>
         <% }) %>
       </select>
     </div>

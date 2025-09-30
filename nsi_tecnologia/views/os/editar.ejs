@@ -10,6 +10,24 @@
 
   <form action="/os/atualizar/<%= os.id %>" method="POST" class="form-coluna">
     <div class="campo">
+      <label for="solicitante_id">Solicitante</label>
+      <select id="solicitante_id" name="solicitante_id" required>
+        <% (pessoas || []).forEach(p => { %>
+          <option value="<%= p.id %>" <%= os.solicitante_id == p.id ? 'selected' : '' %>><%= p.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="responsavel_id">Responsável Técnico</label>
+      <select id="responsavel_id" name="responsavel_id" required>
+        <% (tecnicos || []).forEach(t => { %>
+          <option value="<%= t.id %>" <%= os.responsavel_id == t.id ? 'selected' : '' %>><%= t.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
       <label for="tipo_servico">Tipo de Serviço</label>
       <input type="text" id="tipo_servico" name="tipo_servico" value="<%= os.tipo_servico %>" required>
     </div>

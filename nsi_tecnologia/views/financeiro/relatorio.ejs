@@ -56,7 +56,7 @@
         <tbody>
           <% lancamentos.forEach(l => { %>
             <tr>
-              <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString() : '-' %></td>
+              <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString('pt-BR') : '-' %></td>
               <td><%= l.tipo %></td>
               <td><%= l.pessoa_nome %></td>
               <td><%= l.caixa_origem_nome %></td>

@@ -14,9 +14,9 @@
   <form method="GET" action="/os/listar" class="filtros" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
     <input type="text" name="busca" placeholder="Buscar por tipo ou cliente" value="<%= busca %>" class="input-busca">
 
-    <select name="status">
+    <select name="status" id="status-filter">
       <option value="">Todos os status</option>
-      <option value="aberta" <%= status === 'aberta' ? 'selected' : '' %>>Aberta</option>
+      <option value="aberta" <%= (status === 'aberta' || !status) ? 'selected' : '' %>>Aberta</option>
       <option value="concluida" <%= status === 'concluida' ? 'selected' : '' %>>Concluída</option>
     </select>
 
@@ -118,11 +118,20 @@
   </div>
 </div>
 
-<!-- 🧠 Script para controle do modal -->
+<!-- 🧠 Script para controle do modal e filtro automático -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal-confirmacao');
     const formConfirmar = document.getElementById('form-confirmar');
+    const statusFilter = document.getElementById('status-filter');
+
+    // Aplicar filtro automaticamente se "Abertas" estiver selecionado e não há parâmetros na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('status') && statusFilter.value === 'aberta') {
+      // Se não há parâmetro de status na URL e "Abertas" está selecionado, aplicar filtro automaticamente
+      const form = document.querySelector('.filtros');
+      form.submit();
+    }
 
     document.querySelectorAll('.btn-verde[data-id]').forEach(botao => {
       botao.addEventListener('click', () => {

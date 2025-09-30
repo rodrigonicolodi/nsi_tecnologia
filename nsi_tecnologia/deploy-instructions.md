@@ -74,14 +74,90 @@ projeto/
 └── ...
 ```
 
-apos dados la
+## 🚀 **COMANDOS DE DEPLOY ATUALIZADOS:**
 
+### **1. Instalar PM2 (se não tiver):**
+```bash
+npm install -g pm2
+```
+
+### **2. Deploy com PM2 (RECOMENDADO):**
+```bash
+# Navegue para o projeto
 cd /home/rodri6000/applications/nsi_tecnologia
+
+# Ative o ambiente virtual
+source ~/nodevenv/nsi_tecnologia/bin/activate
+
+# Atualize o código
 git pull
+
+# Instale dependências
 rm -rf node_modules
 npm install
 npm rebuild bcrypt
+
+# Pare o servidor atual (se estiver rodando)
+pm2 stop nsi-tecnologia 2>/dev/null || true
+
+# Inicie com PM2 (fica rodando mesmo fechando SSH)
+pm2 start app.js --name "nsi-tecnologia" --env production
+
+# Salve a configuração do PM2
+pm2 save
+
+# Configure para iniciar automaticamente no boot
+pm2 startup
+```
+
+### **3. Comandos Úteis do PM2:**
+```bash
+# Ver status dos processos
+pm2 status
+
+# Ver logs
+pm2 logs nsi-tecnologia
+
+# Reiniciar
+pm2 restart nsi-tecnologia
+
+# Parar
+pm2 stop nsi-tecnologia
+
+# Deletar processo
+pm2 delete nsi-tecnologia
+```
+
+### **4. Deploy Rápido (após configurar PM2):**
+```bash
+cd /home/rodri6000/applications/nsi_tecnologia
+source ~/nodevenv/nsi_tecnologia/bin/activate
+git pull
+npm install
+pm2 restart nsi-tecnologia
+```
+
+
+
+
+
+# 1. Navegue para o projeto
+cd /home/rodri6000/applications/nsi_tecnologia
+
+# 2. Ative o ambiente virtual
+source ~/nodevenv/nsi_tecnologia/bin/activate
+
+# 3. Instale PM2
+npm install pm2
+
+# 4. Pare o servidor atual
 pkill -f "node app.js"
-node app.js &
 
+# 5. Inicie com PM2
+./node_modules/.bin/pm2 start app.js --name "nsi-tecnologia" --env production
 
+# 6. Salve a configuração
+./node_modules/.bin/pm2 save
+
+# 7. Configure para iniciar automaticamente
+./node_modules/.bin/pm2 startup
