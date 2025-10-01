@@ -161,3 +161,5 @@ pkill -f "node app.js"
 
 # 7. Configure para iniciar automaticamente
 ./node_modules/.bin/pm2 startup
+
+pm2 restart nsi-tecnologia && pm2 logs nsi-tecnologia --lines 5

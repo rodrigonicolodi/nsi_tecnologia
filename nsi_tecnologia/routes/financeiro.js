@@ -4,7 +4,7 @@ const db = require('../db');
 
 // 📄 Listagem com filtros e paginação
 router.get('/', async (req, res) => {
-  const { busca = '', tipo = '', status = '', pagina = 1 } = req.query;
+  const { busca = '', tipo = '', status = 'pendente', pagina = 1 } = req.query;
   const limite = 10;
   const offset = (pagina - 1) * limite;
 
