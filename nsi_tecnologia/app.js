@@ -16,6 +16,7 @@ const financeiroRoutes = require('./routes/financeiro'); // ✅ Adicionada
 const caixasRouter = require('./routes/caixas');
 const relatoriosRoutes = require('./routes/relatorios');
 const pdfRoutes = require('./routes/pdf');
+const apiRoutes = require('./routes/api');
 
 // 🧩 Middlewares globais
 app.use(express.urlencoded({ extended: true }));
@@ -69,6 +70,18 @@ app.use('/financeiro', financeiroRoutes); // ✅ Ativada corretamente
 app.use('/caixas', caixasRouter);
 app.use('/relatorios', relatoriosRoutes);
 app.use('/pdf', pdfRoutes);
+app.use('/api', apiRoutes);
+
+// 🏠 Dashboard
+app.get('/dashboard', (req, res) => {
+  if (!req.session.usuario) {
+    return res.redirect('/login');
+  }
+  res.render('dashboard', { 
+    titulo: 'Dashboard',
+    usuario: req.session.usuario 
+  });
+});
 
 // 🔁 Redireciona raiz para login
 app.get('/', (req, res) => {

@@ -1,3 +1,18 @@
+#!/bin/bash
+
+# 🔧 Atualizar apenas routes/api.js
+# Execute no servidor via SSH
+
+echo "🔧 Atualizando routes/api.js..."
+
+# 1. Parar serviço
+pm2 stop nsi-tecnologia
+
+# 2. Fazer backup do api.js atual
+cp routes/api.js routes/api.js.backup.$(date +%Y%m%d-%H%M)
+
+# 3. Substituir routes/api.js com as correções
+cat > routes/api.js << 'EOF'
 // 🔌 API REST para Integrações
 const express = require('express');
 const router = express.Router();
@@ -26,7 +41,7 @@ router.get('/dashboard/stats', cacheMiddleware(300), async (req, res) => {
       logger.warn('Tabela ordens_servico não encontrada ou erro na consulta');
     }
     
-    // Total de Pessoas
+    // Total de Pessoas - CORRIGIDO
     try {
       const [pessoasResult] = await db.query('SELECT COUNT(*) as total FROM pessoas');
       const [pessoasAtivasResult] = await db.query('SELECT COUNT(*) as ativas FROM pessoas WHERE status = "ativo" OR status IS NULL');
@@ -36,7 +51,7 @@ router.get('/dashboard/stats', cacheMiddleware(300), async (req, res) => {
       logger.warn('Tabela pessoas não encontrada ou erro na consulta');
     }
     
-    // Total de Produtos
+    // Total de Produtos - CORRIGIDO
     try {
       const [produtosResult] = await db.query('SELECT COUNT(*) as total FROM produtos');
       const [produtosBaixoResult] = await db.query('SELECT COUNT(*) as baixo FROM produtos WHERE estoque_atual <= 5');
@@ -107,7 +122,7 @@ router.get('/dashboard/alerts', cacheMiddleware(120), async (req, res) => {
       logger.warn('Erro ao verificar OS vencidas');
     }
 
-    // Produtos com estoque baixo
+    // Produtos com estoque baixo - CORRIGIDO
     try {
       const [produtosBaixo] = await db.query(`
         SELECT COUNT(*) as count FROM produtos 
@@ -127,7 +142,7 @@ router.get('/dashboard/alerts', cacheMiddleware(120), async (req, res) => {
       logger.warn('Erro ao verificar estoque baixo');
     }
 
-    // Lançamentos vencidos
+    // Lançamentos vencidos - CORRIGIDO
     try {
       const [lancamentosVencidos] = await db.query(`
         SELECT COUNT(*) as count FROM financeiro 
@@ -151,110 +166,6 @@ router.get('/dashboard/alerts', cacheMiddleware(120), async (req, res) => {
     res.json(alerts);
   } catch (error) {
     logger.error('Erro ao carregar alertas', { error: error.message });
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
-// 👥 Pessoas - Lista
-router.get('/pessoas', async (req, res) => {
-  try {
-    const { page = 1, limit = 10, search = '' } = req.query;
-    const offset = (page - 1) * limit;
-
-    let sql = 'SELECT * FROM pessoas WHERE 1=1';
-    const params = [];
-
-    if (search) {
-      sql += ' AND (nome LIKE ? OR email LIKE ? OR telefone LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-    }
-
-    sql += ' ORDER BY nome LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), offset);
-
-    const [pessoas] = await db.query(sql, params);
-
-    // Contar total
-    let countSql = 'SELECT COUNT(*) as total FROM pessoas WHERE 1=1';
-    const countParams = [];
-
-    if (search) {
-      countSql += ' AND (nome LIKE ? OR email LIKE ? OR telefone LIKE ?)';
-      countParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
-    }
-
-    const [countResult] = await db.query(countSql, countParams);
-
-    res.json({
-      pessoas,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total: countResult[0].total,
-        pages: Math.ceil(countResult[0].total / limit)
-      }
-    });
-  } catch (error) {
-    logger.error('Erro ao listar pessoas via API', { error: error.message });
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
-// 📋 OS - Lista
-router.get('/os', async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status = '' } = req.query;
-    const offset = (page - 1) * limit;
-
-    let sql = `
-      SELECT os.*, s.nome as solicitante, r.nome as responsavel
-      FROM ordens_servico os
-      JOIN pessoas s ON os.solicitante_id = s.id
-      JOIN pessoas r ON os.responsavel_id = r.id
-      WHERE 1=1
-    `;
-    const params = [];
-
-    if (status) {
-      sql += ' AND os.status = ?';
-      params.push(status);
-    }
-
-    sql += ' ORDER BY os.data_abertura DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), offset);
-
-    const [os] = await db.query(sql, params);
-
-    res.json({ os });
-  } catch (error) {
-    logger.error('Erro ao listar OS via API', { error: error.message });
-    res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
-
-// 📈 Produtos mais vendidos
-router.get('/reports/products', async (req, res) => {
-  try {
-    const [produtos] = await db.query(`
-      SELECT 
-        p.nome,
-        SUM(m.quantidade) as total_vendido
-      FROM movimentacoes m
-      JOIN produtos p ON m.produto_id = p.id
-      WHERE m.tipo = 'saida'
-      AND m.data >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-      GROUP BY p.id, p.nome
-      ORDER BY total_vendido DESC
-      LIMIT 10
-    `);
-
-    res.json({ 
-      labels: produtos.map(p => p.nome),
-      data: produtos.map(p => p.total_vendido)
-    });
-  } catch (error) {
-    logger.error('Erro ao carregar produtos mais vendidos', { error: error.message });
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
@@ -332,4 +243,61 @@ router.get('/reports/financial', async (req, res) => {
   }
 });
 
+// 📈 Produtos mais vendidos
+router.get('/reports/products', async (req, res) => {
+  try {
+    const [produtos] = await db.query(`
+      SELECT 
+        p.nome,
+        SUM(m.quantidade) as total_vendido
+      FROM movimentacoes m
+      JOIN produtos p ON m.produto_id = p.id
+      WHERE m.tipo = 'saida'
+      AND m.data >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+      GROUP BY p.id, p.nome
+      ORDER BY total_vendido DESC
+      LIMIT 10
+    `);
+
+    res.json({ 
+      labels: produtos.map(p => p.nome),
+      data: produtos.map(p => p.total_vendido)
+    });
+  } catch (error) {
+    logger.error('Erro ao carregar produtos mais vendidos', { error: error.message });
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
 module.exports = router;
+EOF
+
+# 4. Verificar sintaxe
+echo "🔍 Verificando sintaxe..."
+if node -c routes/api.js; then
+    echo "✅ Sintaxe OK"
+    
+    # 5. Reiniciar
+    echo "🔄 Reiniciando..."
+    pm2 start app.js --name nsi-tecnologia
+    
+    # 6. Aguardar e verificar
+    sleep 3
+    echo "📊 Status:"
+    pm2 status
+    
+    echo ""
+    echo "🧪 Testando API..."
+    sleep 2
+    curl -s http://localhost:61910/api/dashboard/stats | head -c 200
+    echo ""
+    
+else
+    echo "❌ Erro de sintaxe - não reiniciando"
+    echo "Restaurando backup..."
+    cp routes/api.js.backup.* routes/api.js 2>/dev/null || true
+fi
+
+echo ""
+echo "✅ API atualizada!"
+echo "🌐 Teste: http://seu-servidor:61910/dashboard"

@@ -161,99 +161,142 @@ async function loadDashboardData() {
   }
 }
 
-function loadCharts() {
-  // Gráfico de OS por Status
-  const osStatusCtx = document.getElementById('osStatusChart').getContext('2d');
-  new Chart(osStatusCtx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Abertas', 'Em Andamento', 'Finalizadas', 'Canceladas'],
-      datasets: [{
-        data: [12, 8, 25, 3],
-        backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545']
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  });
+async function loadCharts() {
+  try {
+    // Carregar dados dos gráficos
+    const [osStatusData, faturamentoData, produtosData] = await Promise.all([
+      fetch('/api/dashboard/os-status').then(r => r.json()),
+      fetch('/api/reports/financial?months=6').then(r => r.json()),
+      fetch('/api/reports/products').then(r => r.json())
+    ]);
 
-  // Gráfico de Faturamento
-  const faturamentoCtx = document.getElementById('faturamentoChart').getContext('2d');
-  new Chart(faturamentoCtx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-      datasets: [{
-        label: 'Faturamento',
-        data: [12000, 15000, 18000, 16000, 20000, 22000],
-        borderColor: '#007bff',
-        backgroundColor: 'rgba(0, 123, 255, 0.1)',
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return 'R$ ' + value.toLocaleString();
+    // Gráfico de OS por Status
+    const osStatusCtx = document.getElementById('osStatusChart').getContext('2d');
+    new Chart(osStatusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: osStatusData.labels || ['Abertas', 'Em Andamento', 'Finalizadas', 'Canceladas'],
+        datasets: [{
+          data: osStatusData.data || [0, 0, 0, 0],
+          backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    // Gráfico de Faturamento
+    const faturamentoCtx = document.getElementById('faturamentoChart').getContext('2d');
+    new Chart(faturamentoCtx, {
+      type: 'line',
+      data: {
+        labels: faturamentoData.labels || ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [{
+          label: 'Faturamento',
+          data: faturamentoData.data || [0, 0, 0, 0, 0, 0],
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0, 123, 255, 0.1)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return 'R$ ' + value.toLocaleString();
+              }
             }
           }
         }
       }
-    }
-  });
+    });
 
-  // Gráfico de Produtos
-  const produtosCtx = document.getElementById('produtosChart').getContext('2d');
-  new Chart(produtosCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Produto A', 'Produto B', 'Produto C', 'Produto D'],
-      datasets: [{
-        label: 'Vendas',
-        data: [45, 32, 28, 15],
-        backgroundColor: '#28a745'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true
+    // Gráfico de Produtos
+    const produtosCtx = document.getElementById('produtosChart').getContext('2d');
+    new Chart(produtosCtx, {
+      type: 'bar',
+      data: {
+        labels: produtosData.labels || ['Sem dados'],
+        datasets: [{
+          label: 'Vendas',
+          data: produtosData.data || [0],
+          backgroundColor: '#28a745'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
         }
       }
-    }
-  });
+    });
 
-  // Gráfico de Técnicos
-  const tecnicosCtx = document.getElementById('tecnicosChart').getContext('2d');
-  new Chart(tecnicosCtx, {
-    type: 'radar',
-    data: {
-      labels: ['OS Concluídas', 'Tempo Médio', 'Satisfação', 'Produtividade'],
-      datasets: [{
-        label: 'Técnico A',
-        data: [85, 90, 88, 92],
-        borderColor: '#007bff',
-        backgroundColor: 'rgba(0, 123, 255, 0.2)'
-      }, {
-        label: 'Técnico B',
-        data: [78, 85, 82, 88],
-        borderColor: '#28a745',
-        backgroundColor: 'rgba(40, 167, 69, 0.2)'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
+    // Gráfico de Técnicos (dados estáticos por enquanto)
+    const tecnicosCtx = document.getElementById('tecnicosChart').getContext('2d');
+    new Chart(tecnicosCtx, {
+      type: 'radar',
+      data: {
+        labels: ['OS Concluídas', 'Tempo Médio', 'Satisfação', 'Produtividade'],
+        datasets: [{
+          label: 'Técnico A',
+          data: [85, 90, 88, 92],
+          borderColor: '#007bff',
+          backgroundColor: 'rgba(0, 123, 255, 0.2)'
+        }, {
+          label: 'Técnico B',
+          data: [78, 85, 82, 88],
+          borderColor: '#28a745',
+          backgroundColor: 'rgba(40, 167, 69, 0.2)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao carregar gráficos:', error);
+    // Fallback para gráficos com dados zerados
+    loadChartsFallback();
+  }
+}
+
+function loadChartsFallback() {
+  // Gráficos com dados zerados em caso de erro
+  const charts = [
+    { id: 'osStatusChart', type: 'doughnut', data: [0, 0, 0, 0], labels: ['Sem dados', 'Sem dados', 'Sem dados', 'Sem dados'] },
+    { id: 'faturamentoChart', type: 'line', data: [0, 0, 0, 0, 0, 0], labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'] },
+    { id: 'produtosChart', type: 'bar', data: [0], labels: ['Sem dados'] },
+    { id: 'tecnicosChart', type: 'radar', data: [0, 0, 0, 0], labels: ['Sem dados', 'Sem dados', 'Sem dados', 'Sem dados'] }
+  ];
+
+  charts.forEach(chart => {
+    const ctx = document.getElementById(chart.id).getContext('2d');
+    new Chart(ctx, {
+      type: chart.type,
+      data: {
+        labels: chart.labels,
+        datasets: [{
+          label: 'Sem dados',
+          data: chart.data,
+          backgroundColor: chart.type === 'doughnut' ? ['#e9ecef', '#e9ecef', '#e9ecef', '#e9ecef'] : '#e9ecef'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
   });
 }
 
