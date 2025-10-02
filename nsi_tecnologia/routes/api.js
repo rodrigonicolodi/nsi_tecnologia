@@ -332,4 +332,68 @@ router.get('/reports/financial', async (req, res) => {
   }
 });
 
+// 💰 API para buscar saldos dos caixas
+router.get('/caixas/saldos', async (req, res) => {
+  try {
+    // Buscar dados do financeiro
+    const [financeiroData] = await db.query(`
+      SELECT 
+        caixa_quitacao_id,
+        SUM(CASE WHEN tipo = 'receber' THEN valor ELSE 0 END) AS recebido,
+        SUM(CASE WHEN tipo = 'pagar' THEN valor ELSE 0 END) AS pago
+      FROM financeiro 
+      WHERE status = 'pago'
+      GROUP BY caixa_quitacao_id
+    `);
+
+    // Buscar dados das transferências
+    const [transferenciasData] = await db.query(`
+      SELECT 
+        caixa_origem_id,
+        caixa_destino_id,
+        SUM(valor) AS valor
+      FROM transferencias_caixas
+      GROUP BY caixa_origem_id, caixa_destino_id
+    `);
+
+    // Buscar caixas ativos
+    const [caixasRaw] = await db.query('SELECT id, nome, valor_inicial FROM caixas WHERE ativo = true ORDER BY nome');
+    
+    // Processar dados
+    const caixas = caixasRaw.map(caixa => {
+      const fin = financeiroData.find(f => f.caixa_quitacao_id === caixa.id) || { recebido: 0, pago: 0 };
+      
+      const transferenciasRecebidas = transferenciasData
+        .filter(t => t.caixa_destino_id === caixa.id)
+        .reduce((sum, t) => sum + parseFloat(t.valor), 0);
+      
+      const transferenciasEnviadas = transferenciasData
+        .filter(t => t.caixa_origem_id === caixa.id)
+        .reduce((sum, t) => sum + parseFloat(t.valor), 0);
+
+      const saldoAtual = parseFloat(caixa.valor_inicial) + 
+                        parseFloat(fin.recebido) - 
+                        parseFloat(fin.pago) + 
+                        transferenciasRecebidas - 
+                        transferenciasEnviadas;
+
+      return {
+        id: caixa.id,
+        nome: caixa.nome,
+        saldo_atual: saldoAtual
+      };
+    });
+
+    const saldos = {};
+    caixas.forEach(caixa => {
+      saldos[caixa.id] = parseFloat(caixa.saldo_atual);
+    });
+
+    res.json(saldos);
+  } catch (error) {
+    logger.error('Erro na API de saldos dos caixas', { error: error.message });
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
 module.exports = router;

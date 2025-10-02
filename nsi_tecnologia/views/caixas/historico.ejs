@@ -1,0 +1,219 @@
+<% layout = 'layout' %>
+<% titulo = 'Histórico de Transferências' %>
+
+<style>
+  .transferencia-item {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .transferencia-item:hover {
+    background: #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .transferencia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .transferencia-valor {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+  }
+  
+  .transferencia-data {
+    color: #6c757d;
+    font-size: 0.9em;
+  }
+  
+  .transferencia-detalhes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .transferencia-caixas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .transferencia-arrow {
+    color: #007bff;
+    font-size: 1.2em;
+  }
+  
+  .transferencia-descricao {
+    color: #495057;
+    font-style: italic;
+  }
+  
+  .transferencia-usuario {
+    color: #6c757d;
+    font-size: 0.9em;
+  }
+  
+  .filtros {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .paginacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .paginacao a, .paginacao span {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  .paginacao .ativa {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+</style>
+
+<div class="container">
+  <h2 style="text-align: center; margin-bottom: 30px;">📋 Histórico de Transferências entre Caixas</h2>
+
+  <div style="text-align: center; margin-bottom: 20px;">
+    <a href="/caixas" class="btn btn-azul" style="margin-right: 10px;">
+      <i class="fas fa-cash-register"></i> Gerenciar Caixas
+    </a>
+    <a href="/caixas/transferir" class="btn btn-success" style="margin-right: 10px;">
+      💸 Nova Transferência
+    </a>
+    <a href="/caixas/consulta" class="btn btn-info">
+      📊 Consultar Saldos
+    </a>
+  </div>
+
+  <div class="filtros">
+    <form method="GET" action="/caixas/historico" style="display: flex; gap: 15px; align-items: center;">
+      <div style="flex: 1;">
+        <label for="busca">🔍 Buscar:</label>
+        <input 
+          type="text" 
+          name="busca" 
+          id="busca" 
+          value="<%= busca %>" 
+          placeholder="Nome do caixa ou descrição..."
+          style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+        >
+      </div>
+      <button type="submit" class="btn btn-primary">
+        🔍 Buscar
+      </button>
+      <% if (busca) { %>
+        <a href="/caixas/historico" class="btn btn-azul">
+          ❌ Limpar
+        </a>
+      <% } %>
+    </form>
+  </div>
+
+  <% if (erro) { %>
+    <div class="erro" style="text-align: center; margin-bottom: 20px;">
+      <strong>❌ <%= erro %></strong>
+    </div>
+  <% } %>
+
+  <% if (transferencias.length > 0) { %>
+    <div class="transferencias-lista">
+      <% transferencias.forEach(transferencia => { %>
+        <div class="transferencia-item">
+          <div class="transferencia-header">
+            <div class="transferencia-valor">
+              R$ <%= parseFloat(transferencia.valor).toFixed(2).replace('.', ',') %>
+            </div>
+            <div class="transferencia-data">
+              📅 <%= new Date(transferencia.data_transferencia).toLocaleString('pt-BR') %>
+            </div>
+          </div>
+          
+          <div class="transferencia-detalhes">
+            <div class="transferencia-caixas">
+              <span class="badge badge-info">
+                📤 <%= transferencia.caixa_origem_nome %>
+              </span>
+              <span class="transferencia-arrow">→</span>
+              <span class="badge badge-success">
+                📥 <%= transferencia.caixa_destino_nome %>
+              </span>
+            </div>
+            
+            <div class="transferencia-usuario">
+              👤 <%= transferencia.usuario_nome %>
+            </div>
+          </div>
+          
+          <% if (transferencia.descricao) { %>
+            <div class="transferencia-descricao" style="margin-top: 10px;">
+              💬 <%= transferencia.descricao %>
+            </div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Paginação -->
+    <% if (totalPaginas > 1) { %>
+      <div class="paginacao">
+        <% if (pagina > 1) { %>
+          <a href="?pagina=<%= pagina - 1 %><%= busca ? '&busca=' + encodeURIComponent(busca) : '' %>">
+            ← Anterior
+          </a>
+        <% } %>
+        
+        <% for (let i = Math.max(1, pagina - 2); i <= Math.min(totalPaginas, pagina + 2); i++) { %>
+          <% if (i === pagina) { %>
+            <span class="ativa"><%= i %></span>
+          <% } else { %>
+            <a href="?pagina=<%= i %><%= busca ? '&busca=' + encodeURIComponent(busca) : '' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        <% } %>
+        
+        <% if (pagina < totalPaginas) { %>
+          <a href="?pagina=<%= pagina + 1 %><%= busca ? '&busca=' + encodeURIComponent(busca) : '' %>">
+            Próxima →
+          </a>
+        <% } %>
+      </div>
+    <% } %>
+
+  <% } else { %>
+    <div style="text-align: center; padding: 40px; color: #6c757d;">
+      <h3>📭 Nenhuma transferência encontrada</h3>
+      <p>
+        <% if (busca) { %>
+          Não foram encontradas transferências com os critérios de busca.
+        <% } else { %>
+          Ainda não foram realizadas transferências entre caixas.
+        <% } %>
+      </p>
+      <a href="/caixas/transferir" class="btn btn-success">
+        💸 Fazer Primeira Transferência
+      </a>
+    </div>
+  <% } %>
+</div>

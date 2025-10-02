@@ -1,0 +1,244 @@
+<% layout = 'layout' %>
+<% titulo = 'Transferência entre Caixas' %>
+
+<style>
+  .form-transferencia {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .caixa-info {
+    background: #e8f4fd;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 4px solid #2196F3;
+  }
+  
+  .valor-display {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2e7d32;
+  }
+  
+  .saldo-info {
+    background: #f3e5f5;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-size: 0.9em;
+  }
+</style>
+
+<div class="container">
+  <h2 style="text-align: center; margin-bottom: 30px;">💸 Transferência entre Caixas</h2>
+
+  <% if (erro) { %>
+    <div class="erro" style="text-align: center; margin-bottom: 20px;">
+      <strong>❌ <%= erro %></strong>
+    </div>
+  <% } %>
+
+  <div class="form-transferencia">
+    <form method="POST" action="/caixas/transferir" id="formTransferencia">
+      <div class="campo">
+        <label for="caixa_origem_id">📤 Caixa de Origem:</label>
+        <select name="caixa_origem_id" id="caixa_origem_id" required onchange="atualizarSaldo()">
+          <option value="">Selecione o caixa de origem</option>
+          <% caixas.forEach(caixa => { %>
+            <option value="<%= caixa.id %>" data-nome="<%= caixa.nome %>">
+              <%= caixa.nome %>
+            </option>
+          <% }) %>
+        </select>
+        <div id="saldo-origem" class="saldo-info" style="display: none;">
+          <strong>Saldo atual:</strong> <span id="saldo-valor">R$ 0,00</span>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="caixa_destino_id">📥 Caixa de Destino:</label>
+        <select name="caixa_destino_id" id="caixa_destino_id" required>
+          <option value="">Selecione o caixa de destino</option>
+          <% caixas.forEach(caixa => { %>
+            <option value="<%= caixa.id %>" data-nome="<%= caixa.nome %>">
+              <%= caixa.nome %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="valor">💰 Valor da Transferência:</label>
+        <input 
+          type="number" 
+          name="valor" 
+          id="valor" 
+          step="0.01" 
+          min="0.01" 
+          required 
+          placeholder="0,00"
+          onchange="validarValor()"
+        >
+        <small>Digite o valor em reais (ex: 100.50)</small>
+      </div>
+
+      <div class="campo">
+        <label for="descricao">📝 Descrição (opcional):</label>
+        <textarea 
+          name="descricao" 
+          id="descricao" 
+          rows="3" 
+          placeholder="Ex: Transferência para pagamento de fornecedor"
+        ></textarea>
+      </div>
+
+      <div class="caixa-info" id="resumo-transferencia" style="display: none;">
+        <h4>📋 Resumo da Transferência:</h4>
+        <p><strong>De:</strong> <span id="resumo-origem">-</span></p>
+        <p><strong>Para:</strong> <span id="resumo-destino">-</span></p>
+        <p><strong>Valor:</strong> <span id="resumo-valor" class="valor-display">R$ 0,00</span></p>
+        <p><strong>Descrição:</strong> <span id="resumo-descricao">-</span></p>
+      </div>
+
+      <div style="text-align: center; margin-top: 30px;">
+        <button type="button" onclick="atualizarResumo()" class="btn btn-info" style="margin-right: 10px;">
+          🔄 Atualizar Resumo
+        </button>
+        <button type="submit" class="btn btn-success" id="btn-transferir" disabled>
+          ✅ Confirmar Transferência
+        </button>
+        <a href="/caixas/consulta" class="btn btn-azul" style="margin-left: 10px;">
+          ❌ Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let saldosCaixas = {};
+
+  // Carregar saldos dos caixas
+  async function carregarSaldos() {
+    try {
+      const response = await fetch('/api/caixas/saldos');
+      if (response.ok) {
+        saldosCaixas = await response.json();
+      }
+    } catch (error) {
+      console.error('Erro ao carregar saldos:', error);
+    }
+  }
+
+  // Atualizar saldo do caixa de origem
+  function atualizarSaldo() {
+    const caixaOrigemId = document.getElementById('caixa_origem_id').value;
+    const saldoDiv = document.getElementById('saldo-origem');
+    const saldoValor = document.getElementById('saldo-valor');
+    
+    if (caixaOrigemId && saldosCaixas[caixaOrigemId]) {
+      const saldo = parseFloat(saldosCaixas[caixaOrigemId]);
+      saldoValor.textContent = `R$ ${saldo.toFixed(2).replace('.', ',')}`;
+      saldoDiv.style.display = 'block';
+      
+      // Atualizar resumo
+      atualizarResumo();
+    } else {
+      saldoDiv.style.display = 'none';
+    }
+  }
+
+  // Validar valor da transferência
+  function validarValor() {
+    const valor = parseFloat(document.getElementById('valor').value);
+    const caixaOrigemId = document.getElementById('caixa_origem_id').value;
+    const btnTransferir = document.getElementById('btn-transferir');
+    
+    if (caixaOrigemId && saldosCaixas[caixaOrigemId]) {
+      const saldoAtual = parseFloat(saldosCaixas[caixaOrigemId]);
+      
+      if (valor > saldoAtual) {
+        alert(`❌ Saldo insuficiente!\nSaldo atual: R$ ${saldoAtual.toFixed(2).replace('.', ',')}\nValor solicitado: R$ ${valor.toFixed(2).replace('.', ',')}`);
+        btnTransferir.disabled = true;
+        return false;
+      }
+    }
+    
+    btnTransferir.disabled = !valor || valor <= 0;
+    atualizarResumo();
+    return true;
+  }
+
+  // Atualizar resumo da transferência
+  function atualizarResumo() {
+    const caixaOrigemId = document.getElementById('caixa_origem_id').value;
+    const caixaDestinoId = document.getElementById('caixa_destino_id').value;
+    const valor = document.getElementById('valor').value;
+    const descricao = document.getElementById('descricao').value;
+    
+    const resumoDiv = document.getElementById('resumo-transferencia');
+    const resumoOrigem = document.getElementById('resumo-origem');
+    const resumoDestino = document.getElementById('resumo-destino');
+    const resumoValor = document.getElementById('resumo-valor');
+    const resumoDescricao = document.getElementById('resumo-descricao');
+    
+    if (caixaOrigemId && caixaDestinoId && valor) {
+      const origemSelect = document.getElementById('caixa_origem_id');
+      const destinoSelect = document.getElementById('caixa_destino_id');
+      
+      resumoOrigem.textContent = origemSelect.options[origemSelect.selectedIndex].text;
+      resumoDestino.textContent = destinoSelect.options[destinoSelect.selectedIndex].text;
+      resumoValor.textContent = `R$ ${parseFloat(valor).toFixed(2).replace('.', ',')}`;
+      resumoDescricao.textContent = descricao || 'Sem descrição';
+      
+      resumoDiv.style.display = 'block';
+    } else {
+      resumoDiv.style.display = 'none';
+    }
+  }
+
+  // Validar formulário antes do envio
+  document.getElementById('formTransferencia').addEventListener('submit', function(e) {
+    const caixaOrigemId = document.getElementById('caixa_origem_id').value;
+    const caixaDestinoId = document.getElementById('caixa_destino_id').value;
+    const valor = parseFloat(document.getElementById('valor').value);
+    
+    if (caixaOrigemId === caixaDestinoId) {
+      e.preventDefault();
+      alert('❌ Caixa de origem e destino devem ser diferentes!');
+      return false;
+    }
+    
+    if (!valor || valor <= 0) {
+      e.preventDefault();
+      alert('❌ Valor deve ser maior que zero!');
+      return false;
+    }
+    
+    if (saldosCaixas[caixaOrigemId] && valor > saldosCaixas[caixaOrigemId]) {
+      e.preventDefault();
+      alert('❌ Saldo insuficiente para realizar a transferência!');
+      return false;
+    }
+    
+    // Confirmar transferência
+    if (!confirm('⚠️ Confirmar transferência?\n\nEsta ação não pode ser desfeita.')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Carregar saldos quando a página carregar
+  document.addEventListener('DOMContentLoaded', function() {
+    carregarSaldos();
+    
+    // Atualizar resumo quando campos mudarem
+    document.getElementById('caixa_destino_id').addEventListener('change', atualizarResumo);
+    document.getElementById('descricao').addEventListener('input', atualizarResumo);
+  });
+</script>

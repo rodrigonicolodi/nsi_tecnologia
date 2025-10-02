@@ -12,8 +12,20 @@
 <div class="container">
   <h2 style="text-align: center;">Consulta de Caixas</h2>
 
+  <div style="text-align: center; margin-bottom: 20px;">
+    <a href="/caixas" class="btn btn-azul">
+      <i class="fas fa-cash-register"></i> Gerenciar Caixas
+    </a>
+  </div>
+
   <% if (erro) { %>
     <p class="erro"><%= erro %></p>
+  <% } %>
+
+  <% if (sucesso) { %>
+    <div class="sucesso" style="text-align: center; margin-bottom: 20px;">
+      <strong>✅ <%= sucesso %></strong>
+    </div>
   <% } %>
 
   <% 

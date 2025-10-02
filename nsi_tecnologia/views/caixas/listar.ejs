@@ -4,13 +4,22 @@
 <div class="container">
   <h2>Gerenciar Caixas</h2>
 
-  <% if (usuario.nivel === 'admin') { %>
-    <div class="btn-group" style="margin-bottom: 20px;">
+  <div class="btn-group" style="margin-bottom: 20px;">
+    <a href="/caixas/consulta" class="btn btn-info" style="margin-right: 10px;">
+      <i class="fas fa-chart-line"></i> Consultar Saldos
+    </a>
+    <a href="/caixas/transferir" class="btn btn-success" style="margin-right: 10px;">
+      <i class="fas fa-exchange-alt"></i> Transferir entre Caixas
+    </a>
+    <a href="/caixas/historico" class="btn btn-warning" style="margin-right: 10px;">
+      <i class="fas fa-history"></i> Histórico de Transferências
+    </a>
+    <% if (usuario.nivel === 'admin') { %>
       <a href="/caixas/novo" class="btn btn-azul">
         <i class="fas fa-plus"></i> Incluir Caixa
       </a>
-    </div>
-  <% } %>
+    <% } %>
+  </div>
 
   <% if (caixas.length > 0) { %>
     <table class="tabela">
