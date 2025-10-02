@@ -351,7 +351,274 @@ function gerarHTMLServicosProdutos(mes, ano, resultados, detalhes) {
 </html>`;
 }
 
-// Função para gerar HTML do relatório de OS
+// Função para gerar HTML do relatório de OS com dados reais
+function gerarHTMLOSComDados(inicio, fim, status, busca, prioridade, ordens, totais) {
+  // Calcular totais gerais
+  const totalGeral = ordens.length;
+  const valorTotalGeral = ordens.reduce((sum, os) => sum + parseFloat(os.valor_total || 0), 0);
+  const ticketMedioGeral = totalGeral > 0 ? valorTotalGeral / totalGeral : 0;
+  
+  // Calcular percentual por status
+  const totaisComPercentual = totais.map(item => ({
+    ...item,
+    percentual: valorTotalGeral > 0 ? (parseFloat(item.valor_total || 0) / valorTotalGeral * 100) : 0
+  }));
+  
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de OS</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f7f6; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background-color: #fff; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 20px; 
+        }
+        .header h1 { 
+            color: #007bff; 
+            margin: 0; 
+            font-size: 2.2em; 
+        }
+        .header h2 { 
+            color: #555; 
+            margin: 5px 0 15px; 
+            font-size: 1.6em; 
+        }
+        .header p { 
+            color: #777; 
+            font-size: 0.9em; 
+        }
+        .info { 
+            background: #e9f5ff; 
+            border-left: 5px solid #007bff; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .info h3 { 
+            color: #007bff; 
+            margin-top: 0; 
+            font-size: 1.4em; 
+        }
+        .info p { 
+            margin: 8px 0; 
+            line-height: 1.5; 
+        }
+        .cards-resumo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        .card-header {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .card-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+        }
+        .table-wrapper { 
+            overflow-x: auto; 
+            margin-bottom: 30px; 
+        }
+        .data-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+        }
+        .data-table th, .data-table td { 
+            border: 1px solid #ddd; 
+            padding: 10px 12px; 
+            text-align: left; 
+        }
+        .data-table th { 
+            background-color: #007bff; 
+            color: #fff; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.85em; 
+        }
+        .data-table tr:nth-child(even) { 
+            background-color: #f8f8f8; 
+        }
+        .data-table tr:hover { 
+            background-color: #f1f1f1; 
+        }
+        .valor { 
+            font-weight: bold; 
+            color: #28a745; 
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .status-concluida {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-aberta {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-cancelada {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 40px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            color: #888; 
+            font-size: 0.8em; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Relatório de OS por Status e Período</h1>
+            <h2>NSI Tecnologia</h2>
+            <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+        </div>
+        
+        <div class="info">
+            <h3>Filtros Aplicados:</h3>
+            <p><strong>Período:</strong> ${inicio || 'Não informado'} até ${fim || 'Não informado'}</p>
+            <p><strong>Status:</strong> ${status || 'Todos os status'}</p>
+            <p><strong>Busca:</strong> ${busca || 'Nenhuma'}</p>
+            <p><strong>Prioridade:</strong> ${prioridade || 'Todas'}</p>
+        </div>
+
+        <div class="cards-resumo">
+            <div class="card">
+                <div class="card-header">Total de OS</div>
+                <div class="card-value">${totalGeral}</div>
+            </div>
+            <div class="card">
+                <div class="card-header">Valor Total</div>
+                <div class="card-value">R$ ${valorTotalGeral.toFixed(2)}</div>
+            </div>
+            <div class="card">
+                <div class="card-header">Ticket Médio</div>
+                <div class="card-value">R$ ${ticketMedioGeral.toFixed(2)}</div>
+            </div>
+        </div>
+        
+        ${totais.length > 0 ? `
+        <div class="table-wrapper">
+            <h3>Resumo por Status</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Quantidade</th>
+                        <th>Valor Total</th>
+                        <th>Ticket Médio</th>
+                        <th>% do Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${totaisComPercentual.map(item => `
+                    <tr>
+                        <td><span class="status-badge status-${item.status.toLowerCase()}">${item.status}</span></td>
+                        <td>${item.quantidade}</td>
+                        <td class="valor">R$ ${parseFloat(item.valor_total || 0).toFixed(2)}</td>
+                        <td>R$ ${parseFloat(item.ticket_medio || 0).toFixed(2)}</td>
+                        <td>${parseFloat(item.percentual).toFixed(1)}%</td>
+                    </tr>
+                    `).join('')}
+                    <tr style="font-weight: bold; background-color: #e9ecef;">
+                        <td>TOTAL</td>
+                        <td>${totalGeral}</td>
+                        <td class="valor">R$ ${valorTotalGeral.toFixed(2)}</td>
+                        <td>R$ ${ticketMedioGeral.toFixed(2)}</td>
+                        <td>100%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        ` : ''}
+        
+        ${ordens.length > 0 ? `
+        <div class="table-wrapper">
+            <h3>Detalhes das Ordens de Serviço (${ordens.length} encontradas)</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Número OS</th>
+                        <th>Cliente</th>
+                        <th>Tipo de Serviço</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Valor Total</th>
+                        <th>Data Abertura</th>
+                        <th>Data Fechamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${ordens.map(os => `
+                    <tr>
+                        <td>${os.id}</td>
+                        <td>${os.numero_os}</td>
+                        <td>${os.cliente_nome || '-'}</td>
+                        <td>${os.tipo_servico || '-'}</td>
+                        <td>${os.prioridade || '-'}</td>
+                        <td><span class="status-badge status-${os.status?.toLowerCase() || 'aberta'}">${os.status || 'ABERTA'}</span></td>
+                        <td class="valor">R$ ${parseFloat(os.valor_total || 0).toFixed(2)}</td>
+                        <td>${os.data_abertura ? new Date(os.data_abertura).toLocaleDateString('pt-BR') : '-'}</td>
+                        <td>${os.data_fechamento ? new Date(os.data_fechamento).toLocaleDateString('pt-BR') : '-'}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        ` : '<div class="info"><h3>Nenhuma OS encontrada</h3><p>Não foram encontradas ordens de serviço com os filtros aplicados.</p></div>'}
+        
+        <div class="footer">
+            <p>NSI Tecnologia - Todos os direitos reservados.</p>
+            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+// Função para gerar HTML do relatório de OS (versão antiga - mantida para compatibilidade)
 function gerarHTMLOS(inicio, fim, status, busca, prioridade) {
   return `
 <!DOCTYPE html>
@@ -476,7 +743,7 @@ router.get('/financeiro', async (req, res) => {
     }
     
     if (status) {
-      whereClause += ' AND status = ?';
+      whereClause += ' AND f.status = ?';
       params.push(status);
     }
     
@@ -638,7 +905,7 @@ router.get('/estoque', async (req, res) => {
     }
 
     if (status) {
-      whereClause += ' AND status = ?';
+      whereClause += ' AND f.status = ?';
       params.push(status);
     }
 
@@ -760,8 +1027,59 @@ router.get('/os', async (req, res) => {
     
     const { inicio, fim, status, busca, prioridade } = req.query;
     
-    // Gerar HTML
-    const html = gerarHTMLOS(inicio, fim, status, busca, prioridade);
+    // Buscar dados reais do banco
+    let whereClause = 'WHERE 1=1';
+    const params = [];
+    
+    if (inicio) {
+      whereClause += ' AND DATE(o.data_abertura) >= ?';
+      params.push(inicio);
+    }
+    
+    if (fim) {
+      whereClause += ' AND DATE(o.data_abertura) <= ?';
+      params.push(fim);
+    }
+    
+    if (status) {
+      whereClause += ' AND o.status = ?';
+      params.push(status);
+    }
+    
+    if (busca) {
+      whereClause += ' AND (o.numero_os LIKE ? OR p.nome LIKE ? OR o.tipo_servico LIKE ?)';
+      params.push(`%${busca}%`, `%${busca}%`, `%${busca}%`);
+    }
+    
+    if (prioridade) {
+      whereClause += ' AND o.prioridade = ?';
+      params.push(prioridade);
+    }
+    
+    // Buscar OS
+    const [ordens] = await db.query(`
+      SELECT o.*, p.nome as cliente_nome
+      FROM ordens_servico o
+      LEFT JOIN pessoas p ON o.solicitante_id = p.id
+      ${whereClause}
+      ORDER BY o.data_abertura DESC
+    `, params);
+    
+    // Calcular totais por status
+    const [totais] = await db.query(`
+      SELECT 
+        o.status,
+        COUNT(*) as quantidade,
+        SUM(o.valor_total) as valor_total,
+        AVG(o.valor_total) as ticket_medio
+      FROM ordens_servico o
+      LEFT JOIN pessoas p ON o.solicitante_id = p.id
+      ${whereClause}
+      GROUP BY o.status
+    `, params);
+    
+    // Gerar HTML com dados reais
+    const html = gerarHTMLOSComDados(inicio, fim, status, busca, prioridade, ordens, totais);
     
     // Configurar Puppeteer
     const browser = await puppeteer.launch({
@@ -988,8 +1306,43 @@ router.get('/faturamento-cliente', async (req, res) => {
     console.log('🔄 Iniciando geração de PDF - Faturamento por Cliente');
     console.log('📅 Período:', inicio, 'até', fim);
     
-    // Gerar HTML do relatório
-    const html = gerarHTMLFaturamentoCliente(inicio, fim);
+    // Buscar dados reais do banco
+    let whereClause = 'WHERE o.status = "concluida"';
+    const params = [];
+    
+    if (inicio) {
+      whereClause += ' AND DATE(o.data_fechamento) >= ?';
+      params.push(inicio);
+    }
+    
+    if (fim) {
+      whereClause += ' AND DATE(o.data_fechamento) <= ?';
+      params.push(fim);
+    }
+    
+    // Buscar faturamento por cliente
+    const [clientes] = await db.query(`
+      SELECT 
+        p.id as cliente_id,
+        p.nome as cliente_nome,
+        COUNT(o.id) as total_os,
+        SUM(o.valor_total) as faturamento_total,
+        AVG(o.valor_total) as ticket_medio,
+        MAX(o.data_fechamento) as ultima_os
+      FROM ordens_servico o
+      LEFT JOIN pessoas p ON o.solicitante_id = p.id
+      ${whereClause}
+      GROUP BY p.id, p.nome
+      ORDER BY faturamento_total DESC
+    `, params);
+    
+    // Calcular totais gerais
+    const totalOS = clientes.reduce((sum, cliente) => sum + parseInt(cliente.total_os), 0);
+    const faturamentoGeral = clientes.reduce((sum, cliente) => sum + parseFloat(cliente.faturamento_total || 0), 0);
+    const ticketMedioGeral = totalOS > 0 ? faturamentoGeral / totalOS : 0;
+    
+    // Gerar HTML com dados reais
+    const html = gerarHTMLFaturamentoClienteComDados(inicio, fim, clientes, { totalOS, faturamentoGeral, ticketMedioGeral });
     
     // Configurar Puppeteer
     const browser = await puppeteer.launch({
@@ -1191,7 +1544,208 @@ function gerarHTMLPerformanceTecnicos(inicio, fim) {
 </html>`;
 }
 
-// Função para gerar HTML do relatório de faturamento por cliente
+// Função para gerar HTML do relatório de faturamento por cliente com dados reais
+function gerarHTMLFaturamentoClienteComDados(inicio, fim, clientes, totais) {
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Faturamento por Cliente</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f7f6; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background-color: #fff; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 20px; 
+        }
+        .header h1 { 
+            color: #007bff; 
+            margin: 0; 
+            font-size: 2.2em; 
+        }
+        .header h2 { 
+            color: #555; 
+            margin: 5px 0 15px; 
+            font-size: 1.6em; 
+        }
+        .header p { 
+            color: #777; 
+            font-size: 0.9em; 
+        }
+        .info { 
+            background: #e9f5ff; 
+            border-left: 5px solid #007bff; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .info h3 { 
+            color: #007bff; 
+            margin-top: 0; 
+            font-size: 1.4em; 
+        }
+        .info p { 
+            margin: 8px 0; 
+            line-height: 1.5; 
+        }
+        .cards-resumo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        .card-header {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .card-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+        }
+        .table-wrapper { 
+            overflow-x: auto; 
+            margin-bottom: 30px; 
+        }
+        .data-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+        }
+        .data-table th, .data-table td { 
+            border: 1px solid #ddd; 
+            padding: 10px 12px; 
+            text-align: left; 
+        }
+        .data-table th { 
+            background-color: #007bff; 
+            color: #fff; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.85em; 
+        }
+        .data-table tr:nth-child(even) { 
+            background-color: #f8f8f8; 
+        }
+        .data-table tr:hover { 
+            background-color: #f1f1f1; 
+        }
+        .valor { 
+            font-weight: bold; 
+            color: #28a745; 
+        }
+        .posicao {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 40px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            color: #888; 
+            font-size: 0.8em; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Relatório de Faturamento por Cliente</h1>
+            <h2>NSI Tecnologia</h2>
+            <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+        </div>
+        
+        <div class="info">
+            <h3>Filtros Aplicados:</h3>
+            <p><strong>Período:</strong> ${inicio || 'Todos os períodos'} até ${fim || 'Data atual'}</p>
+        </div>
+
+        <div class="cards-resumo">
+            <div class="card">
+                <div class="card-header">Total de Clientes</div>
+                <div class="card-value">${clientes.length}</div>
+            </div>
+            <div class="card">
+                <div class="card-header">Total de OS</div>
+                <div class="card-value">${totais.totalOS}</div>
+            </div>
+            <div class="card">
+                <div class="card-header">Faturamento Total</div>
+                <div class="card-value">R$ ${totais.faturamentoGeral.toFixed(2)}</div>
+            </div>
+            <div class="card">
+                <div class="card-header">Ticket Médio Geral</div>
+                <div class="card-value">R$ ${totais.ticketMedioGeral.toFixed(2)}</div>
+            </div>
+        </div>
+        
+        ${clientes.length > 0 ? `
+        <div class="table-wrapper">
+            <h3>Ranking de Faturamento por Cliente</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Cliente</th>
+                        <th>Total de OS</th>
+                        <th>Faturamento</th>
+                        <th>Ticket Médio</th>
+                        <th>Última OS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${clientes.map((cliente, index) => `
+                    <tr>
+                        <td class="posicao">${index + 1}º</td>
+                        <td><strong>${cliente.cliente_nome || 'Cliente sem nome'}</strong></td>
+                        <td>${cliente.total_os}</td>
+                        <td class="valor">R$ ${parseFloat(cliente.faturamento_total || 0).toFixed(2)}</td>
+                        <td>R$ ${parseFloat(cliente.ticket_medio || 0).toFixed(2)}</td>
+                        <td>${cliente.ultima_os ? new Date(cliente.ultima_os).toLocaleDateString('pt-BR') : '-'}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        ` : '<div class="info"><h3>Nenhum cliente encontrado</h3><p>Não foram encontrados clientes com faturamento no período selecionado.</p></div>'}
+        
+        <div class="footer">
+            <p>NSI Tecnologia - Todos os direitos reservados.</p>
+            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+// Função para gerar HTML do relatório de faturamento por cliente (versão antiga - mantida para compatibilidade)
 function gerarHTMLFaturamentoCliente(inicio, fim) {
   return `
 <!DOCTYPE html>
@@ -1457,6 +2011,356 @@ router.get('/movimentacoes', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Erro ao gerar PDF de movimentações:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor ao gerar PDF',
+      details: error.message
+    });
+  }
+});
+
+// Rota para PDF de contas a receber
+router.get('/contas-receber', async (req, res) => {
+  try {
+    console.log('📄 Exportando relatório de contas a receber...');
+    console.log('Parâmetros:', req.query);
+    
+    const { busca = '', status_vencimento = 'todas' } = req.query;
+
+    // Buscar dados das contas a receber
+    let sql = `
+      SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
+             f.parcela_atual, f.total_parcelas, f.parcela_pai_id,
+             p.nome AS pessoa_nome, p.telefone, p.email,
+             c1.nome AS caixa_origem_nome,
+             c2.nome AS caixa_quitacao_nome,
+             CASE 
+               WHEN f.vencimento < CURDATE() AND f.status = 'pendente' THEN 'vencida'
+               WHEN f.vencimento = CURDATE() AND f.status = 'pendente' THEN 'vencendo_hoje'
+               WHEN f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = 'pendente' THEN 'vencendo_7_dias'
+               WHEN f.status = 'pendente' THEN 'pendente'
+               ELSE 'quitada'
+             END AS status_vencimento_real
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
+      WHERE f.tipo = 'receber'
+    `;
+    const params = [];
+
+    if (busca) {
+      sql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)';
+      params.push(`%${busca}%`, `%${busca}%`);
+    }
+
+    if (status_vencimento && status_vencimento !== 'todas') {
+      if (status_vencimento === 'vencidas') {
+        sql += ' AND f.vencimento < CURDATE() AND f.status = "pendente"';
+      } else if (status_vencimento === 'vencendo_hoje') {
+        sql += ' AND f.vencimento = CURDATE() AND f.status = "pendente"';
+      } else if (status_vencimento === 'vencendo_7_dias') {
+        sql += ' AND f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = "pendente"';
+      } else if (status_vencimento === 'pendentes') {
+        sql += ' AND f.status = "pendente"';
+      } else if (status_vencimento === 'quitadas') {
+        sql += ' AND f.status = "pago"';
+      }
+    }
+
+    sql += ' ORDER BY f.vencimento ASC';
+
+    const [lancamentos] = await db.query(sql, params);
+
+    // Calcular totais
+    const [totais] = await db.query(`
+      SELECT 
+        COUNT(*) as total_lancamentos,
+        SUM(CASE WHEN f.vencimento < CURDATE() AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencidas,
+        SUM(CASE WHEN f.vencimento = CURDATE() AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencendo_hoje,
+        SUM(CASE WHEN f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencendo_7_dias,
+        SUM(CASE WHEN f.status = 'pendente' THEN f.valor ELSE 0 END) as total_pendentes,
+        SUM(CASE WHEN f.status = 'pago' THEN f.valor ELSE 0 END) as total_quitadas
+      FROM financeiro f
+      WHERE f.tipo = 'receber'
+    `);
+
+    // Gerar HTML
+    const html = `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Contas a Receber</title>
+        <style>
+            body { 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                margin: 0; 
+                padding: 20px; 
+                background-color: #f4f7f6; 
+                color: #333; 
+            }
+            .container { 
+                max-width: 1200px; 
+                margin: 0 auto; 
+                background-color: #fff; 
+                padding: 30px; 
+                border-radius: 8px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            }
+            .header { 
+                text-align: center; 
+                margin-bottom: 30px; 
+                border-bottom: 3px solid #007bff; 
+                padding-bottom: 20px; 
+            }
+            .header h1 { 
+                color: #007bff; 
+                margin: 0; 
+                font-size: 2.2em; 
+            }
+            .header h2 { 
+                color: #555; 
+                margin: 5px 0 15px; 
+                font-size: 1.6em; 
+            }
+            .header p { 
+                color: #777; 
+                font-size: 0.9em; 
+            }
+            .info { 
+                background: #e9f5ff; 
+                border-left: 5px solid #007bff; 
+                padding: 20px; 
+                margin: 20px 0; 
+                border-radius: 5px; 
+            }
+            .info h3 { 
+                color: #007bff; 
+                margin-top: 0; 
+                font-size: 1.4em; 
+            }
+            .info p { 
+                margin: 8px 0; 
+                line-height: 1.5; 
+            }
+            .cards-resumo {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 15px;
+                margin: 20px 0;
+            }
+            .card {
+                background: white;
+                border-radius: 8px;
+                padding: 15px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                text-align: center;
+            }
+            .card-header {
+                font-weight: 600;
+                color: #666;
+                font-size: 0.9em;
+                margin-bottom: 10px;
+            }
+            .card-value {
+                font-size: 1.4em;
+                font-weight: bold;
+                color: #333;
+            }
+            .card-vermelho { border-left: 4px solid #dc3545; }
+            .card-laranja { border-left: 4px solid #fd7e14; }
+            .card-amarelo { border-left: 4px solid #ffc107; }
+            .card-azul { border-left: 4px solid #007bff; }
+            .card-verde { border-left: 4px solid #28a745; }
+            .table-wrapper { 
+                overflow-x: auto; 
+                margin-bottom: 30px; 
+            }
+            .data-table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-top: 15px; 
+            }
+            .data-table th, .data-table td { 
+                border: 1px solid #ddd; 
+                padding: 10px 12px; 
+                text-align: left; 
+            }
+            .data-table th { 
+                background-color: #007bff; 
+                color: #fff; 
+                font-weight: 600; 
+                text-transform: uppercase; 
+                font-size: 0.85em; 
+            }
+            .data-table tr:nth-child(even) { 
+                background-color: #f8f8f8; 
+            }
+            .data-table tr:hover { 
+                background-color: #f1f1f1; 
+            }
+            .valor { 
+                font-weight: bold; 
+                color: #28a745; 
+            }
+            .data-vencimento.vencida { 
+                color: #dc3545; 
+                font-weight: bold; 
+            }
+            .data-vencimento.vencendo-hoje { 
+                color: #fd7e14; 
+                font-weight: bold; 
+            }
+            .status-badge {
+                padding: 4px 8px;
+                border-radius: 12px;
+                font-size: 0.8em;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            .status-pendente {
+                background-color: #fff3cd;
+                color: #856404;
+            }
+            .status-pago {
+                background-color: #d4edda;
+                color: #155724;
+            }
+            .footer { 
+                text-align: center; 
+                margin-top: 40px; 
+                padding-top: 20px; 
+                border-top: 1px solid #eee; 
+                color: #888; 
+                font-size: 0.8em; 
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>💰 Relatório de Contas a Receber</h1>
+                <h2>NSI Tecnologia</h2>
+                <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+            </div>
+            
+            <div class="info">
+                <h3>Filtros Aplicados:</h3>
+                <p><strong>Busca:</strong> ${busca || 'Todos os clientes'}</p>
+                <p><strong>Status de Vencimento:</strong> ${status_vencimento === 'todas' ? 'Todos' : status_vencimento}</p>
+            </div>
+
+            <div class="cards-resumo">
+                <div class="card card-vermelho">
+                    <div class="card-header">Vencidas</div>
+                    <div class="card-value">R$ ${parseFloat(totais[0]?.total_vencidas || 0).toFixed(2)}</div>
+                </div>
+                <div class="card card-laranja">
+                    <div class="card-header">Vence Hoje</div>
+                    <div class="card-value">R$ ${parseFloat(totais[0]?.total_vencendo_hoje || 0).toFixed(2)}</div>
+                </div>
+                <div class="card card-amarelo">
+                    <div class="card-header">Vence em 7 dias</div>
+                    <div class="card-value">R$ ${parseFloat(totais[0]?.total_vencendo_7_dias || 0).toFixed(2)}</div>
+                </div>
+                <div class="card card-azul">
+                    <div class="card-header">Total Pendente</div>
+                    <div class="card-value">R$ ${parseFloat(totais[0]?.total_pendentes || 0).toFixed(2)}</div>
+                </div>
+                <div class="card card-verde">
+                    <div class="card-header">Total Quitado</div>
+                    <div class="card-value">R$ ${parseFloat(totais[0]?.total_quitadas || 0).toFixed(2)}</div>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <h3>Detalhes das Contas a Receber (${lancamentos.length} encontradas)</h3>
+                ${lancamentos.length > 0 ? `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Descrição</th>
+                            <th>Valor</th>
+                            <th>Parcelas</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th>Contato</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${lancamentos.map(l => `
+                        <tr>
+                            <td><strong>${l.pessoa_nome || '-'}</strong></td>
+                            <td>${l.descricao || '-'}</td>
+                            <td class="valor">R$ ${parseFloat(l.valor).toFixed(2)}</td>
+                            <td>
+                                ${l.total_parcelas > 1 ? 
+                                    `${l.parcela_atual || 1}/${l.total_parcelas || 1}${l.parcela_pai_id === l.id ? ' (Principal)' : ''}` : 
+                                    'À Vista'
+                                }
+                            </td>
+                            <td>
+                                <span class="data-vencimento ${l.status_vencimento_real === 'vencida' ? 'vencida' : ''} ${l.status_vencimento_real === 'vencendo_hoje' ? 'vencendo-hoje' : ''}">
+                                    ${l.vencimento ? new Date(l.vencimento).toLocaleDateString('pt-BR') : '-'}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-${l.status}">${l.status || '-'}</span>
+                            </td>
+                            <td>
+                                ${l.telefone ? `Tel: ${l.telefone}` : ''}
+                                ${l.email ? `<br>Email: ${l.email}` : ''}
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                ` : '<p>Nenhuma conta a receber encontrada com os filtros aplicados.</p>'}
+            </div>
+            
+            <div class="footer">
+                <p>NSI Tecnologia - Todos os direitos reservados.</p>
+                <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+            </div>
+        </div>
+    </body>
+    </html>`;
+
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      }
+    });
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+
+    await browser.close();
+
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="relatorio_contas_receber.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de contas a receber:', error);
     res.status(500).json({
       error: 'Erro interno do servidor ao gerar PDF',
       details: error.message

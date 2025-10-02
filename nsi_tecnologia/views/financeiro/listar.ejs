@@ -93,8 +93,31 @@
                 <span class="avista">À Vista</span>
               <% } %>
             </td>
-            <td><%= l.vencimento ? new Date(l.vencimento).toLocaleDateString('pt-BR') : '-' %></td>
-            <td><%= l.status || '-' %></td>
+            <td>
+              <span class="data-vencimento <%= l.vencimento && new Date(l.vencimento) < new Date() && l.status === 'pendente' ? 'vencida' : '' %> <%= l.vencimento && new Date(l.vencimento).toDateString() === new Date().toDateString() && l.status === 'pendente' ? 'vencendo-hoje' : '' %>">
+                <%= l.vencimento ? new Date(l.vencimento).toLocaleDateString('pt-BR') : '-' %>
+              </span>
+              <% if (l.vencimento && l.status === 'pendente') { %>
+                <% 
+                  const hoje = new Date();
+                  const vencimento = new Date(l.vencimento);
+                  const diffTime = vencimento - hoje;
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                %>
+                <% if (diffDays < 0) { %>
+                  <br><small class="dias-vencida">Há <%= Math.abs(diffDays) %> dias</small>
+                <% } else if (diffDays === 0) { %>
+                  <br><small class="dias-hoje">Vence hoje!</small>
+                <% } else if (diffDays <= 7) { %>
+                  <br><small class="dias-proximo">Em <%= diffDays %> dias</small>
+                <% } %>
+              <% } %>
+            </td>
+            <td>
+              <span class="status-badge status-<%= l.status %>">
+                <%= l.status || '-' %>
+              </span>
+            </td>
             <td><%= l.caixa_quitacao_nome || 'Não quitado' %></td>
             <td class="acoes">
   <a href="/financeiro/exibir/<%= l.id %>" class="btn btn-acao btn-azul" title="Exibir">
@@ -252,5 +275,54 @@
     background-color: #a62800;
     color: white;
     text-decoration: none;
+}
+
+/* Estilos para marcação de vencimentos */
+.data-vencimento.vencida {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.data-vencimento.vencendo-hoje {
+    color: #fd7e14;
+    font-weight: bold;
+}
+
+.dias-vencida {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.dias-hoje {
+    color: #fd7e14;
+    font-weight: bold;
+}
+
+.dias-proximo {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-pendente {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-pago {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-cancelado {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 </style>
