@@ -59,6 +59,14 @@
     </div>
 
     <div class="campo">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado">
+        <option value="novo" <%= produto.estado === 'novo' ? 'selected' : '' %>>Novo</option>
+        <option value="usado" <%= produto.estado === 'usado' ? 'selected' : '' %>>Usado</option>
+      </select>
+    </div>
+
+    <div class="campo">
       <label for="status">Status</label>
       <select id="status" name="status">
         <option value="ativo" <%= produto.status === 'ativo' ? 'selected' : '' %>>Ativo</option>

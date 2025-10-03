@@ -28,7 +28,7 @@ async function gerarCodigoSequencial() {
 
 // 🔍 Listar produtos com filtros e paginação
 router.get('/', async (req, res) => {
-  const { busca = '', categoria = '', status = '', pagina = 1, erro = null, sucesso = null } = req.query;
+  const { busca = '', categoria = '', estado = '', status = '', pagina = 1, erro = null, sucesso = null } = req.query;
   const limite = 10;
   const offset = (pagina - 1) * limite;
 
@@ -52,6 +52,13 @@ router.get('/', async (req, res) => {
       countParams.push(categoria);
     }
 
+    if (estado) {
+      sql += ' AND estado = ?';
+      countSql += ' AND estado = ?';
+      params.push(estado);
+      countParams.push(estado);
+    }
+
     if (status) {
       sql += ' AND status = ?';
       countSql += ' AND status = ?';
@@ -71,6 +78,7 @@ router.get('/', async (req, res) => {
       produtos,
       busca,
       categoria,
+      estado,
       status,
       pagina: Number(pagina),
       totalPaginas,
@@ -84,6 +92,7 @@ router.get('/', async (req, res) => {
       produtos: [],
       busca,
       categoria,
+      estado,
       status,
       pagina: 1,
       totalPaginas: 1,
@@ -95,7 +104,7 @@ router.get('/', async (req, res) => {
 
 // 🔍 Listar produtos (rota alternativa para consistência)
 router.get('/listar', async (req, res) => {
-  const { busca = '', categoria = '', status = '', pagina = 1, erro = null, sucesso = null } = req.query;
+  const { busca = '', categoria = '', estado = '', status = '', pagina = 1, erro = null, sucesso = null } = req.query;
   const limite = 10;
   const offset = (pagina - 1) * limite;
 
@@ -119,6 +128,13 @@ router.get('/listar', async (req, res) => {
       countParams.push(categoria);
     }
 
+    if (estado) {
+      sql += ' AND estado = ?';
+      countSql += ' AND estado = ?';
+      params.push(estado);
+      countParams.push(estado);
+    }
+
     if (status) {
       sql += ' AND status = ?';
       countSql += ' AND status = ?';
@@ -138,6 +154,7 @@ router.get('/listar', async (req, res) => {
       produtos,
       busca,
       categoria,
+      estado,
       status,
       pagina: Number(pagina),
       totalPaginas,
@@ -151,6 +168,7 @@ router.get('/listar', async (req, res) => {
       produtos: [],
       busca,
       categoria,
+      estado,
       status,
       pagina: 1,
       totalPaginas: 1,

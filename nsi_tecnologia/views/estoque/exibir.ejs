@@ -16,6 +16,11 @@
       <tr><th>Preço de Venda</th><td>R$ <%= Number(produto.preco_venda || 0).toFixed(2) %></td></tr>
       <tr><th>Lucro</th><td>R$ <%= Number((produto.preco_venda || 0) - (produto.custo || 0)).toFixed(2) %></td></tr>
       <tr><th>Estoque Atual</th><td><%= produto.estoque_atual ?? '-' %></td></tr>
+      <tr><th>Estado</th><td>
+        <span class="status <%= produto.estado === 'novo' ? 'verde' : 'laranja' %>" style="padding: 5px 10px; border-radius: 12px;">
+          <%= produto.estado === 'novo' ? 'Novo' : 'Usado' %>
+        </span>
+      </td></tr>
       <tr><th>Status</th><td><%= produto.status || '-' %></td></tr>
       <tr><th>Descrição Técnica</th><td><%= produto.descricao_tecnica || '-' %></td></tr>
       <tr><th>Criado em</th><td><%= produto.criado_em ? produto.criado_em.toLocaleString() : '-' %></td></tr>

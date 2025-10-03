@@ -27,6 +27,15 @@
     </div>
 
     <div class="campo">
+      <label for="estado">Estado:</label>
+      <select name="estado" id="estado">
+        <option value="">Todos os estados</option>
+        <option value="novo" <%= estado === 'novo' ? 'selected' : '' %>>Novo</option>
+        <option value="usado" <%= estado === 'usado' ? 'selected' : '' %>>Usado</option>
+      </select>
+    </div>
+
+    <div class="campo">
       <label for="status">Status:</label>
       <select name="status" id="status">
         <option value="">Todos os status</option>
@@ -42,7 +51,7 @@
     </div>
 
     <div class="campo">
-      <a href="/pdf/estoque?busca=<%= encodeURIComponent(busca || '') %>&categoria=<%= encodeURIComponent(categoria || '') %>&status=<%= encodeURIComponent(status || '') %>" class="btn btn-vermelho" target="_blank">
+      <a href="/pdf/estoque?busca=<%= encodeURIComponent(busca || '') %>&categoria=<%= encodeURIComponent(categoria || '') %>&estado=<%= encodeURIComponent(estado || '') %>&status=<%= encodeURIComponent(status || '') %>" class="btn btn-vermelho" target="_blank">
         <i class="fas fa-file-pdf"></i> Exportar PDF
       </a>
     </div>
@@ -62,6 +71,7 @@
           <th>Nome</th>
           <th>Código</th>
           <th>Categoria</th>
+          <th>Estado</th>
           <th>Estoque</th>
           <th>Status</th>
           <th>Ações</th>
@@ -73,6 +83,11 @@
             <td><%= p.nome %></td>
             <td><%= p.codigo %></td>
             <td><%= p.categoria %></td>
+            <td>
+              <span class="status <%= p.estado === 'novo' ? 'verde' : 'laranja' %>" style="padding: 3px 8px; border-radius: 12px; font-size: 0.8em;">
+                <%= p.estado === 'novo' ? 'Novo' : 'Usado' %>
+              </span>
+            </td>
             <td><%= p.estoque_atual %></td>
             <td><%= p.status %></td>
             <td>
