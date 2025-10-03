@@ -292,7 +292,9 @@ module.exports = {
           valor_servico = ?,
           desconto = ?,
           acrescimos = ?,
-          valor_total = ?
+          valor_total = ?,
+          data_agendamento = ?,
+          observacoes_agendamento = ?
         WHERE id = ?
       `, [
         solicitante_id,
@@ -304,6 +306,8 @@ module.exports = {
         desconto_clean,
         acrescimos_clean,
         valor_total,
+        data_agendamento || null,
+        observacoes_agendamento || null,
         id
       ]);
 
@@ -317,6 +321,150 @@ module.exports = {
         pessoas: [],
         tecnicos: []
       });
+    }
+  },
+
+  // Dashboard de agendamentos
+  agendaOS: async (req, res) => {
+    try {
+      // Buscar todas as OS agendadas ordenadas por data
+      const [agendamentos] = await db.query(`
+        SELECT os.id, os.numero_os, os.tipo_servico, os.prioridade, os.status,
+               os.data_agendamento, os.observacoes_agendamento,
+               s.nome AS solicitante_nome,
+               t.nome AS tecnico_nome
+        FROM ordens_servico os
+        JOIN pessoas s ON os.solicitante_id = s.id
+        JOIN pessoas t ON os.responsavel_id = t.id
+        WHERE os.data_agendamento IS NOT NULL
+        ORDER BY os.data_agendamento ASC
+      `);
+
+      // Separar agendamentos por data
+      const agendamentosPorData = {};
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      agendamentos.forEach(agendamento => {
+        const dataAgendamento = new Date(agendamento.data_agendamento);
+        const dataKey = dataAgendamento.toLocaleDateString('pt-BR');
+        
+        if (!agendamentosPorData[dataKey]) {
+          agendamentosPorData[dataKey] = [];
+        }
+        
+        // Adicionar informações extras
+        agendamento.dataFormatada = dataAgendamento.toLocaleDateString('pt-BR');
+        agendamento.horaFormatada = dataAgendamento.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        agendamento.ehHoje = dataAgendamento.toDateString() === hoje.toDateString();
+        agendamento.ehPassado = dataAgendamento < hoje;
+        
+        agendamentosPorData[dataKey].push(agendamento);
+      });
+
+      // Estatísticas
+      const totalAgendamentos = agendamentos.length;
+      const agendamentosHoje = agendamentos.filter(a => {
+        const dataAgendamento = new Date(a.data_agendamento);
+        return dataAgendamento.toDateString() === hoje.toDateString();
+      }).length;
+      
+      const agendamentosPassados = agendamentos.filter(a => {
+        const dataAgendamento = new Date(a.data_agendamento);
+        return dataAgendamento < hoje;
+      }).length;
+
+      res.render('os/agenda', {
+        titulo: 'Agenda de Atendimentos',
+        agendamentosPorData,
+        totalAgendamentos,
+        agendamentosHoje,
+        agendamentosPassados,
+        hoje: hoje.toLocaleDateString('pt-BR')
+      });
+    } catch (err) {
+      console.error('Erro ao carregar agenda:', err);
+      res.status(500).render('os/agenda', {
+        titulo: 'Agenda de Atendimentos',
+        agendamentosPorData: {},
+        totalAgendamentos: 0,
+        agendamentosHoje: 0,
+        agendamentosPassados: 0,
+        hoje: new Date().toLocaleDateString('pt-BR'),
+        erro: 'Erro ao carregar agenda de agendamentos.'
+      });
+    }
+  },
+
+  // Exportar agenda para arquivo .ics
+  exportarAgenda: async (req, res) => {
+    try {
+      const { id } = req.params; // ID opcional para exportar apenas uma OS
+      
+      let query = `
+        SELECT os.id, os.numero_os, os.tipo_servico, os.prioridade, os.status,
+               os.data_agendamento, os.observacoes_agendamento,
+               s.nome AS solicitante_nome,
+               t.nome AS tecnico_nome
+        FROM ordens_servico os
+        JOIN pessoas s ON os.solicitante_id = s.id
+        JOIN pessoas t ON os.responsavel_id = t.id
+        WHERE os.data_agendamento IS NOT NULL
+      `;
+      
+      const params = [];
+      if (id) {
+        query += ` AND os.id = ?`;
+        params.push(id);
+      }
+      
+      query += ` ORDER BY os.data_agendamento ASC`;
+      
+      const [agendamentos] = await db.query(query, params);
+
+      // Gerar arquivo .ics
+      let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//NSI Tecnologia//Agenda OS//PT
+CALSCALE:GREGORIAN
+METHOD:PUBLISH`;
+
+      agendamentos.forEach(agendamento => {
+        const startDate = new Date(agendamento.data_agendamento);
+        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // +1 hora
+
+        const formatDate = (date) => {
+          return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        };
+
+        icsContent += `
+BEGIN:VEVENT
+UID:os-${agendamento.id}@nsitecnologia.com
+DTSTART:${formatDate(startDate)}
+DTEND:${formatDate(endDate)}
+SUMMARY:OS ${agendamento.numero_os} - ${agendamento.tipo_servico}
+DESCRIPTION:Cliente: ${agendamento.solicitante_nome}\\nTécnico: ${agendamento.tecnico_nome}\\nPrioridade: ${agendamento.prioridade}\\nStatus: ${agendamento.status}${agendamento.observacoes_agendamento ? '\\n\\nObservações: ' + agendamento.observacoes_agendamento : ''}
+LOCATION:NSI Tecnologia
+STATUS:CONFIRMED
+CATEGORIES:NSI,OS,${agendamento.prioridade.toUpperCase()}
+END:VEVENT`;
+      });
+
+      icsContent += `
+END:VCALENDAR`;
+
+      // Configurar headers para download
+      const filename = id 
+        ? `os-${agendamentos[0].numero_os}.ics`
+        : `agenda-nsi-${new Date().toISOString().split('T')[0]}.ics`;
+      
+      res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(icsContent);
+
+    } catch (err) {
+      console.error('Erro ao exportar agenda:', err);
+      res.status(500).send('Erro ao exportar agenda');
     }
   },
 

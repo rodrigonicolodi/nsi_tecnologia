@@ -1,0 +1,171 @@
+<% layout = 'layout' %>
+<% titulo = 'Agenda de Atendimentos' %>
+
+<div class="container">
+  <h2>Agenda de Atendimentos</h2>
+
+  <!-- Estatísticas -->
+  <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+    <div class="stat-card" style="background: #e3f2fd; padding: 20px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 2em; color: #1976d2;">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div style="font-size: 1.5em; font-weight: bold; color: #1976d2;">
+        <%= totalAgendamentos %>
+      </div>
+      <div style="color: #666;">Total de Agendamentos</div>
+    </div>
+
+    <div class="stat-card" style="background: #fff3e0; padding: 20px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 2em; color: #f57c00;">
+        <i class="fas fa-calendar-day"></i>
+      </div>
+      <div style="font-size: 1.5em; font-weight: bold; color: #f57c00;">
+        <%= agendamentosHoje %>
+      </div>
+      <div style="color: #666;">Hoje (<%= hoje %>)</div>
+    </div>
+
+    <div class="stat-card" style="background: #ffebee; padding: 20px; border-radius: 8px; text-align: center;">
+      <div style="font-size: 2em; color: #d32f2f;">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div style="font-size: 1.5em; font-weight: bold; color: #d32f2f;">
+        <%= agendamentosPassados %>
+      </div>
+      <div style="color: #666;">Agendamentos Passados</div>
+    </div>
+  </div>
+
+  <% if (typeof erro !== 'undefined' && erro) { %>
+    <div class="erro" style="background: #ffebee; color: #d32f2f; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+      <%= erro %>
+    </div>
+  <% } %>
+
+  <!-- Botões de ação -->
+  <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+    <a href="/os/listar" class="btn btn-azul">
+      <i class="fas fa-list"></i> Listar OS
+    </a>
+    <a href="/os/nova" class="btn btn-azul">
+      <i class="fas fa-plus"></i> Nova OS
+    </a>
+  </div>
+
+  <% if (Object.keys(agendamentosPorData).length === 0) { %>
+    <div style="text-align: center; padding: 40px; color: #666;">
+      <i class="fas fa-calendar-times" style="font-size: 3em; margin-bottom: 15px;"></i>
+      <h3>Nenhum agendamento encontrado</h3>
+      <p>Crie uma nova OS e agende um atendimento para ver aqui.</p>
+      <a href="/os/nova" class="btn btn-azul">
+        <i class="fas fa-plus"></i> Criar Nova OS
+      </a>
+    </div>
+  <% } else { %>
+    <!-- Lista de agendamentos por data -->
+    <% Object.keys(agendamentosPorData).sort((a, b) => {
+      return new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-'));
+    }).forEach(data => { %>
+      <div class="agenda-dia" style="margin-bottom: 30px;">
+        <h3 style="background: #0077cc; color: white; padding: 15px; margin: 0; border-radius: 5px 5px 0 0; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-calendar-day"></i>
+          <%= data %>
+          <span style="background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 15px; font-size: 0.8em;">
+            <%= agendamentosPorData[data].length %> agendamento<%= agendamentosPorData[data].length > 1 ? 's' : '' %>
+          </span>
+        </h3>
+        
+        <div class="agendamentos-lista" style="border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; overflow: hidden;">
+          <% agendamentosPorData[data].forEach(agendamento => { %>
+            <div class="agendamento-item" style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: <%= agendamento.ehHoje ? '#e8f5e8' : agendamento.ehPassado ? '#fff5f5' : 'white' %>;">
+              <div style="flex: 1;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                  <strong style="color: #0077cc;"><%= agendamento.numero_os %></strong>
+                  <span class="status <%= agendamento.status === 'concluida' ? 'verde' : 'laranja' %>" style="padding: 3px 8px; border-radius: 12px; font-size: 0.8em;">
+                    <%= agendamento.status %>
+                  </span>
+                  <% if (agendamento.ehHoje) { %>
+                    <span style="background: #4caf50; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8em;">
+                      <i class="fas fa-star"></i> Hoje
+                    </span>
+                  <% } else if (agendamento.ehPassado) { %>
+                    <span style="background: #f44336; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8em;">
+                      <i class="fas fa-clock"></i> Passado
+                    </span>
+                  <% } %>
+                </div>
+                
+                <div style="color: #666; margin-bottom: 5px;">
+                  <i class="fas fa-user"></i> <strong>Cliente:</strong> <%= agendamento.solicitante_nome %>
+                </div>
+                
+                <div style="color: #666; margin-bottom: 5px;">
+                  <i class="fas fa-tools"></i> <strong>Serviço:</strong> <%= agendamento.tipo_servico %>
+                </div>
+                
+                <div style="color: #666; margin-bottom: 5px;">
+                  <i class="fas fa-user-cog"></i> <strong>Técnico:</strong> <%= agendamento.tecnico_nome %>
+                </div>
+                
+                <% if (agendamento.observacoes_agendamento) { %>
+                  <div style="color: #666; font-style: italic;">
+                    <i class="fas fa-comment"></i> <%= agendamento.observacoes_agendamento %>
+                  </div>
+                <% } %>
+              </div>
+              
+              <div style="text-align: right; margin-left: 20px;">
+                <div style="font-size: 1.2em; font-weight: bold; color: #0077cc; margin-bottom: 5px;">
+                  <i class="fas fa-clock"></i> <%= agendamento.horaFormatada %>
+                </div>
+                
+              <div style="display: flex; gap: 5px;">
+                <a href="/os/exibir/<%= agendamento.id %>" class="btn btn-acao btn-azul" title="Exibir OS" style="padding: 5px 8px;">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="/os/editar/<%= agendamento.id %>" class="btn btn-acao btn-azul" title="Editar OS" style="padding: 5px 8px;">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="/os/cupom/<%= agendamento.id %>" class="btn btn-acao btn-laranja" title="Imprimir Cupom" target="_blank" style="padding: 5px 8px;">
+                  <i class="fas fa-print"></i>
+                </a>
+                <a href="/os/agenda/exportar/<%= agendamento.id %>" class="btn btn-acao btn-azul" title="Baixar .ics para este agendamento" style="padding: 5px 8px;">
+                  <i class="fas fa-download"></i>
+                </a>
+                <%
+                  const eventTitle = encodeURIComponent(`OS ${agendamento.numero_os} - ${agendamento.tipo_servico}`);
+                  const eventDetails = encodeURIComponent(`Cliente: ${agendamento.solicitante_nome}\\nTécnico: ${agendamento.tecnico_nome}\\nPrioridade: ${agendamento.prioridade}\\nStatus: ${agendamento.status}${agendamento.observacoes_agendamento ? '\\n\\nObservações: ' + agendamento.observacoes_agendamento : ''}`);
+                  const startTime = new Date(agendamento.data_agendamento).toISOString().replace(/[-:]|\.\d{3}/g, '');
+                  const endTime = new Date(new Date(agendamento.data_agendamento).getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]|\.\d{3}/g, ''); // +1 hour
+                  const googleCalendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&details=${eventDetails}&dates=${startTime}/${endTime}&location=${encodeURIComponent('NSI Tecnologia')}`;
+                %>
+                <a href="<%= googleCalendarLink %>" class="btn btn-acao btn-azul" target="_blank" title="Adicionar ao Google Calendar" style="padding: 5px 8px;">
+                  <i class="fab fa-google"></i>
+                </a>
+              </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    <% }) %>
+  <% } %>
+</div>
+
+<style>
+.stats-grid .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.agendamento-item:hover {
+  background: #f8f9fa !important;
+  transition: background 0.3s ease;
+}
+
+.agendamento-item:last-child {
+  border-bottom: none;
+}
+</style>

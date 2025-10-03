@@ -17,12 +17,13 @@ router.post('/atualizar/:id', osController.atualizarOS); // ← ajustado aqui
 router.get('/finalizar/:id', osController.finalizarOS);
 router.post('/finalizar/:id', osController.processarFinalizacao);
 
-// Imprimir OS
+// Exibir e Imprimir OS
 router.get('/exibir/:id', osController.exibirOS);
 router.get('/imprimir/:id', osController.imprimirOS);
 router.get('/cupom/:id', osController.cupomOS);
 
-// Exibir
-router.get('/exibir/:id', osController.exibirOS);
+// Agenda
+router.get('/agenda', osController.agendaOS);
+router.get('/agenda/exportar/:id?', osController.exportarAgenda);
 
 module.exports = router;

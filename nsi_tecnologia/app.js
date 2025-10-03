@@ -101,7 +101,7 @@ app.use((err, req, res, next) => {
   console.error('🚨 Erro capturado:', err);
   res.status(500).render('erro', {
     titulo: 'Erro interno do servidor',
-    erro: err.message,
+    mensagem: err.message,
     layout: false
   });
 });
