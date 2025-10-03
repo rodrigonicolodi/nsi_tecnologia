@@ -36,7 +36,9 @@ module.exports = {
         problema_informado,
         valor_servico,
         desconto,
-        acrescimos
+        acrescimos,
+        data_agendamento,
+        observacoes_agendamento
       } = req.body;
 
       // Validações básicas
@@ -79,8 +81,10 @@ module.exports = {
           acrescimos,
           valor_total,
           status,
-          data_abertura
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aberta', NOW())
+          data_abertura,
+          data_agendamento,
+          observacoes_agendamento
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aberta', NOW(), ?, ?)
       `, [
         numero_os,
         solicitante_id,
@@ -91,7 +95,9 @@ module.exports = {
         valor_servico_clean,
         desconto_clean,
         acrescimos_clean,
-        valor_total
+        valor_total,
+        data_agendamento || null,
+        observacoes_agendamento || null
       ]);
 
       res.redirect('/os/listar?sucesso=Ordem de serviço criada com sucesso!');
@@ -138,7 +144,8 @@ module.exports = {
 
     try {
       let sql = `
-        SELECT os.*, s.nome AS solicitante, r.nome AS responsavel
+        SELECT os.*, s.nome AS solicitante, r.nome AS responsavel,
+               os.data_agendamento, os.observacoes_agendamento
         FROM ordens_servico os
         JOIN pessoas s ON os.solicitante_id = s.id
         JOIN pessoas r ON os.responsavel_id = r.id
@@ -254,16 +261,18 @@ module.exports = {
   // Atualiza OS no banco
   atualizarOS: async (req, res) => {
     const id = req.params.id;
-    const {
-      solicitante_id,
-      responsavel_id,
-      tipo_servico,
-      prioridade,
-      problema_informado,
-      valor_servico,
-      desconto,
-      acrescimos
-    } = req.body;
+      const {
+        solicitante_id,
+        responsavel_id,
+        tipo_servico,
+        prioridade,
+        problema_informado,
+        valor_servico,
+        desconto,
+        acrescimos,
+        data_agendamento,
+        observacoes_agendamento
+      } = req.body;
 
     // Tratar valores vazios para campos decimais - mais flexível
     const valor_servico_clean = valor_servico && valor_servico.toString().trim() !== '' && !isNaN(parseFloat(valor_servico)) ? parseFloat(valor_servico) : 0;

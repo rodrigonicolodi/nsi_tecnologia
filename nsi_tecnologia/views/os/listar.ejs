@@ -54,6 +54,7 @@
           <th>Tipo</th>
           <th>Prioridade</th>
           <th>Status</th>
+          <th>Agendamento</th>
           <th>Valor Total</th>
           <th>Ações</th>
         </tr>
@@ -70,6 +71,18 @@
               <span class="status <%= os.status === 'concluida' ? 'verde' : 'laranja' %>">
                 <%= os.status %>
               </span>
+            </td>
+            <td>
+              <% if (os.data_agendamento) { %>
+                <small style="color: #0077cc;">
+                  <i class="fas fa-calendar"></i> 
+                  <%= new Date(os.data_agendamento).toLocaleDateString('pt-BR') %><br>
+                  <i class="fas fa-clock"></i> 
+                  <%= new Date(os.data_agendamento).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) %>
+                </small>
+              <% } else { %>
+                <span style="color: #999; font-style: italic;">Sem agendamento</span>
+              <% } %>
             </td>
             <td>R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></td>
             <td>
