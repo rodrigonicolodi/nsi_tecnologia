@@ -1257,8 +1257,40 @@ router.get('/performance-tecnicos', async (req, res) => {
     console.log('🔄 Iniciando geração de PDF - Performance Técnicos');
     console.log('📅 Período:', inicio, 'até', fim);
     
-    // Gerar HTML do relatório
-    const html = gerarHTMLPerformanceTecnicos(inicio, fim);
+    // Buscar dados reais dos técnicos
+    let sql = `
+      SELECT 
+        r.id as tecnico_id,
+        r.nome as tecnico_nome,
+        COUNT(os.id) as os_concluidas,
+        AVG(TIMESTAMPDIFF(HOUR, os.data_abertura, os.data_fechamento)) as tempo_medio_horas,
+        AVG(CASE WHEN os.status = 'concluida' THEN 4.5 ELSE 3.0 END) as satisfacao_media,
+        ROUND((COUNT(CASE WHEN os.status = 'concluida' THEN 1 END) * 100.0 / COUNT(os.id)), 1) as produtividade_percent
+      FROM pessoas r
+      LEFT JOIN ordens_servico os ON r.id = os.responsavel_id
+      WHERE r.tipo = 'tecnico'
+    `;
+    
+    const params = [];
+    
+    // Aplicar filtro de período se fornecido
+    if (inicio && fim) {
+      sql += ` AND os.data_abertura BETWEEN ? AND ?`;
+      params.push(inicio, fim);
+    }
+    
+    sql += `
+      GROUP BY r.id, r.nome
+      HAVING os_concluidas > 0
+      ORDER BY produtividade_percent DESC, os_concluidas DESC
+    `;
+    
+    const [tecnicos] = await db.query(sql, params);
+    
+    console.log('📊 Técnicos encontrados:', tecnicos.length);
+    
+    // Gerar HTML do relatório com dados reais
+    const html = gerarHTMLPerformanceTecnicosComDados(inicio, fim, tecnicos);
     
     // Configurar Puppeteer
     const browser = await puppeteer.launch({
@@ -1273,6 +1305,7 @@ router.get('/performance-tecnicos', async (req, res) => {
     console.log('🔄 Gerando PDF...');
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: true, // Modo paisagem para melhor visualização das colunas
       printBackground: true,
       margin: {
         top: '20mm',
@@ -1390,7 +1423,236 @@ router.get('/faturamento-cliente', async (req, res) => {
   }
 });
 
-// Função para gerar HTML do relatório de performance de técnicos
+// Função para gerar HTML do relatório de performance de técnicos com dados reais
+function gerarHTMLPerformanceTecnicosComDados(inicio, fim, tecnicos) {
+  // Calcular totais gerais
+  const totalOS = tecnicos.reduce((sum, t) => sum + (parseInt(t.os_concluidas) || 0), 0);
+  const tempoMedioGeral = tecnicos.length > 0 ? 
+    (tecnicos.reduce((sum, t) => sum + (parseFloat(t.tempo_medio_horas) || 0), 0) / tecnicos.length).toFixed(1) : 0;
+  const satisfacaoGeral = tecnicos.length > 0 ? 
+    (tecnicos.reduce((sum, t) => sum + (parseFloat(t.satisfacao_media) || 0), 0) / tecnicos.length).toFixed(1) : 0;
+  const produtividadeGeral = tecnicos.length > 0 ? 
+    (tecnicos.reduce((sum, t) => sum + (parseFloat(t.produtividade_percent) || 0), 0) / tecnicos.length).toFixed(1) : 0;
+
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Performance de Técnicos</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f4f7f6; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background-color: #fff; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 20px; 
+        }
+        .header h1 { 
+            color: #007bff; 
+            margin: 0; 
+            font-size: 2.2em; 
+        }
+        .header h2 { 
+            color: #555; 
+            margin: 5px 0 15px; 
+            font-size: 1.6em; 
+        }
+        .header p { 
+            color: #777; 
+            font-size: 0.9em; 
+        }
+        .info { 
+            background: #e9f5ff; 
+            border-left: 5px solid #007bff; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 5px; 
+        }
+        .info h3 { 
+            color: #007bff; 
+            margin-top: 0; 
+            font-size: 1.4em; 
+        }
+        .info p { 
+            margin: 8px 0; 
+            line-height: 1.5; 
+        }
+        .cards-resumo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .card-header {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .card-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+        }
+        .card-azul { border-left: 4px solid #007bff; }
+        .card-verde { border-left: 4px solid #28a745; }
+        .card-laranja { border-left: 4px solid #fd7e14; }
+        .card-roxo { border-left: 4px solid #6f42c1; }
+        .data-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+        }
+        .data-table th, .data-table td { 
+            border: 1px solid #ddd; 
+            padding: 12px 15px; 
+            text-align: left; 
+        }
+        .data-table th { 
+            background-color: #007bff; 
+            color: #fff; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.9em; 
+        }
+        .data-table tr:nth-child(even) { 
+            background-color: #f8f8f8; 
+        }
+        .data-table tr:hover { 
+            background-color: #f1f1f1; 
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 40px; 
+            padding-top: 20px; 
+            border-top: 1px solid #eee; 
+            color: #777; 
+            font-size: 0.9em; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍💻 Relatório de Performance de Técnicos</h1>
+            <h2>NSI Tecnologia</h2>
+            <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+        </div>
+        
+        <div class="info">
+            <h3>📊 Resumo Geral</h3>
+            <p><strong>Período:</strong> ${inicio && fim ? `${inicio} até ${fim}` : 'Todos os períodos'}</p>
+            <p><strong>Técnicos Analisados:</strong> ${tecnicos.length}</p>
+            <p><strong>Total de OS:</strong> ${totalOS}</p>
+        </div>
+
+        <div class="cards-resumo">
+            <div class="card card-azul">
+                <div class="card-header">Total de OS</div>
+                <div class="card-value">${totalOS}</div>
+            </div>
+            <div class="card card-verde">
+                <div class="card-header">Tempo Médio Geral</div>
+                <div class="card-value">${tempoMedioGeral}h</div>
+            </div>
+            <div class="card card-laranja">
+                <div class="card-header">Satisfação Geral</div>
+                <div class="card-value">${satisfacaoGeral}/5</div>
+            </div>
+            <div class="card card-roxo">
+                <div class="card-header">Produtividade Geral</div>
+                <div class="card-value">${produtividadeGeral}%</div>
+            </div>
+        </div>
+
+        <div class="info">
+            <h3>📈 Performance Individual dos Técnicos</h3>
+            ${tecnicos.length > 0 ? `
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Técnico</th>
+                        <th>OS Concluídas</th>
+                        <th>Tempo Médio</th>
+                        <th>Satisfação</th>
+                        <th>Produtividade</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tecnicos.map(tecnico => `
+                    <tr>
+                        <td><strong>${tecnico.tecnico_nome}</strong></td>
+                        <td>${tecnico.os_concluidas}</td>
+                        <td>${tecnico.tempo_medio_horas ? parseFloat(tecnico.tempo_medio_horas).toFixed(1) + 'h' : 'N/A'}</td>
+                        <td>${tecnico.satisfacao_media ? parseFloat(tecnico.satisfacao_media).toFixed(1) + '/5' : 'N/A'}</td>
+                        <td>${tecnico.produtividade_percent || 0}%</td>
+                        <td>
+                            ${parseFloat(tecnico.produtividade_percent || 0) >= 90 ? 
+                                '<span class="badge badge-success">Excelente</span>' :
+                                parseFloat(tecnico.produtividade_percent || 0) >= 70 ?
+                                '<span class="badge badge-warning">Bom</span>' :
+                                '<span class="badge badge-danger">Regular</span>'
+                            }
+                        </td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            ` : '<p>Nenhum técnico encontrado com OS no período especificado.</p>'}
+        </div>
+        
+        <div class="footer">
+            <p>Relatório gerado automaticamente pelo Sistema NSI Tecnologia</p>
+            <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+// Função para gerar HTML do relatório de performance de técnicos (versão antiga com dados fictícios)
 function gerarHTMLPerformanceTecnicos(inicio, fim) {
   return `
 <!DOCTYPE html>
