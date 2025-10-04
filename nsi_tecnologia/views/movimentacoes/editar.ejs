@@ -1,35 +1,35 @@
 <% layout = 'layout' %>
 <% titulo = 'Editar Movimentação' %>
 
-<div class="container formulario-container">
+<div class="container">
   <h2>Editar Movimentação</h2>
 
   <% if (erro) { %>
     <p class="erro"><%= erro %></p>
   <% } %>
 
-  <form method="POST" action="/movimentacoes/editar/<%= movimentacao.id %>" class="formulario">
+  <form method="POST" action="/movimentacoes/editar/<%= movimentacao.id %>">
 
-    <div class="form-group">
-      <label for="tipo">Tipo</label>
-      <select name="tipo" id="tipo" class="form-control" required>
+    <div class="campo">
+      <label for="tipo">Tipo:</label>
+      <select name="tipo" id="tipo" required>
         <option value="entrada" <%= movimentacao.tipo === 'entrada' ? 'selected' : '' %>>Entrada</option>
         <option value="saida" <%= movimentacao.tipo === 'saida' ? 'selected' : '' %>>Saída</option>
       </select>
     </div>
 
-    <div class="form-group">
-      <label for="produto_id">Produto</label>
-      <select name="produto_id" id="produto_id" class="form-control" required>
+    <div class="campo">
+      <label for="produto_id">Produto:</label>
+      <select name="produto_id" id="produto_id" required>
         <% produtos.forEach(p => { %>
           <option value="<%= p.id %>" <%= p.id === movimentacao.produto_id ? 'selected' : '' %>><%= p.nome %></option>
         <% }) %>
       </select>
     </div>
 
-    <div class="form-group">
-      <label for="pessoa_id">Pessoa</label>
-      <select name="pessoa_id" id="pessoa_id" class="form-control">
+    <div class="campo">
+      <label for="pessoa_id">Pessoa:</label>
+      <select name="pessoa_id" id="pessoa_id">
         <option value="">-- Nenhuma --</option>
         <% pessoas.forEach(p => { %>
           <option value="<%= p.id %>" <%= p.id === movimentacao.pessoa_id ? 'selected' : '' %>><%= p.nome %></option>
@@ -37,23 +37,23 @@
       </select>
     </div>
 
-    <div class="form-group">
-      <label for="quantidade">Quantidade</label>
-      <input type="number" name="quantidade" id="quantidade" class="form-control" value="<%= movimentacao.quantidade %>" required>
+    <div class="campo">
+      <label for="quantidade">Quantidade:</label>
+      <input type="number" name="quantidade" id="quantidade" value="<%= movimentacao.quantidade %>" required>
     </div>
 
-    <div class="form-group">
-      <label for="observacao">Observação</label>
-      <textarea name="observacao" id="observacao" class="form-control" rows="3"><%= movimentacao.observacao %></textarea>
+    <div class="campo">
+      <label for="observacao">Observação:</label>
+      <textarea name="observacao" id="observacao" rows="3"><%= movimentacao.observacao %></textarea>
     </div>
 
-<div class="form-actions">
-  <button type="submit" class="btn btn-azul">
-    <i class="fas fa-save"></i> Salvar Alterações
-  </button>
-  <a href="/movimentacoes" class="btn btn-azul">
-    <i class="fas fa-arrow-left"></i> Cancelar
-  </a>
-</div>
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+      <button type="submit" class="btn btn-azul">
+        <i class="fas fa-save"></i> Salvar Alterações
+      </button>
+      <a href="/movimentacoes" class="btn btn-azul">
+        <i class="fas fa-arrow-left"></i> Cancelar
+      </a>
+    </div>
   </form>
 </div>

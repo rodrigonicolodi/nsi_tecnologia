@@ -1,38 +1,36 @@
 <% layout = 'layout' %>
 <% titulo = 'Detalhes do Produto' %>
 
-<div class="container">
-  <h2>Detalhes do Produto</h2>
+<div style="padding: 20px !important; max-width: none !important; margin: 0 !important; width: 100% !important;">
+  <h2 style="text-align: left !important;">Detalhes do Produto</h2>
 
-  <div class="detalhes-produto">
-    <table>
-      <tr><th>Nome</th><td><%= produto.nome || '-' %></td></tr>
-      <tr><th>Código</th><td><%= produto.codigo || '-' %></td></tr>
-      <tr><th>Categoria</th><td><%= produto.categoria || '-' %></td></tr>
-      <tr><th>Marca</th><td><%= produto.marca || '-' %></td></tr>
-      <tr><th>Modelo</th><td><%= produto.modelo || '-' %></td></tr>
-      <tr><th>Unidade</th><td><%= produto.unidade || '-' %></td></tr>
-      <tr><th>Custo</th><td>R$ <%= Number(produto.custo || 0).toFixed(2) %></td></tr>
-      <tr><th>Preço de Venda</th><td>R$ <%= Number(produto.preco_venda || 0).toFixed(2) %></td></tr>
-      <tr><th>Lucro</th><td>R$ <%= Number((produto.preco_venda || 0) - (produto.custo || 0)).toFixed(2) %></td></tr>
-      <tr><th>Estoque Atual</th><td><%= produto.estoque_atual ?? '-' %></td></tr>
-      <tr><th>Estado</th><td>
-        <span class="status <%= produto.estado === 'novo' ? 'verde' : 'laranja' %>" style="padding: 5px 10px; border-radius: 12px;">
-          <%= produto.estado === 'novo' ? 'Novo' : 'Usado' %>
-        </span>
-      </td></tr>
-      <tr><th>Status</th><td><%= produto.status || '-' %></td></tr>
-      <tr><th>Descrição Técnica</th><td><%= produto.descricao_tecnica || '-' %></td></tr>
-      <tr><th>Criado em</th><td><%= produto.criado_em ? produto.criado_em.toLocaleString() : '-' %></td></tr>
-    </table>
-  <div class="detalhes-produto">
-    <table>
-    <!-- conteúdo da tabela -->
-    </table>
+  <div style="background: white !important; padding: 20px !important; border-radius: 8px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; text-align: left !important; width: 100% !important; max-width: none !important; margin: 0 !important;">
+    <p><strong>Nome:</strong> <%= produto.nome || '—' %></p>
+    <p><strong>Código:</strong> <%= produto.codigo || '—' %></p>
+    <p><strong>Categoria:</strong> <%= produto.categoria || '—' %></p>
+    <p><strong>Marca:</strong> <%= produto.marca || '—' %></p>
+    <p><strong>Modelo:</strong> <%= produto.modelo || '—' %></p>
+    <p><strong>Unidade:</strong> <%= produto.unidade || '—' %></p>
+    <p><strong>Custo:</strong> R$ <%= Number(produto.custo || 0).toFixed(2) %></p>
+    <p><strong>Preço de Venda:</strong> R$ <%= Number(produto.preco_venda || 0).toFixed(2) %></p>
+    <p><strong>Lucro:</strong> R$ <%= Number((produto.preco_venda || 0) - (produto.custo || 0)).toFixed(2) %></p>
+    <p><strong>Estoque Atual:</strong> <%= produto.estoque_atual ?? '—' %></p>
+    <p><strong>Estado:</strong> 
+      <span class="status <%= produto.estado === 'novo' ? 'verde' : 'laranja' %>" style="padding: 5px 10px; border-radius: 12px;">
+        <%= produto.estado === 'novo' ? 'Novo' : 'Usado' %>
+      </span>
+    </p>
+    <p><strong>Status:</strong> <%= produto.status || '—' %></p>
+    <p><strong>Descrição Técnica:</strong> <%= produto.descricao_tecnica || '—' %></p>
+    <p><strong>Criado em:</strong> <%= produto.criado_em ? produto.criado_em.toLocaleString() : '—' %></p>
   </div>
-  <div class="botoes-voltar">
+
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
     <a href="/estoque" class="btn btn-azul">
       <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+    <a href="/estoque/editar/<%= produto.id %>" class="btn btn-azul">
+      <i class="fas fa-edit"></i> Editar
     </a>
   </div>
 </div>

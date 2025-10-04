@@ -1,10 +1,10 @@
 <% layout = 'layout' %>
 <% titulo = 'Detalhes do Lançamento Financeiro' %>
 
-<div class="container">
-  <h2><%= titulo %></h2>
+<div style="padding: 20px !important; max-width: none !important; margin: 0 !important; width: 100% !important;">
+  <h2 style="text-align: left !important;"><%= titulo %></h2>
 
-  <div class="dados-box">
+  <div style="background: white !important; padding: 20px !important; border-radius: 8px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; text-align: left !important; width: 100% !important; max-width: none !important; margin: 0 !important;">
     <p><strong>Tipo:</strong> <%= lancamento.tipo || '—' %></p>
     <p><strong>Pessoa:</strong> <%= lancamento.pessoa_nome || '—' %></p>
     <p><strong>Caixa:</strong> <%= lancamento.caixa_nome || '—' %></p>

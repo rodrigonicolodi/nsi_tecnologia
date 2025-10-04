@@ -1,10 +1,10 @@
 <% layout = 'layout' %>
 <% titulo = 'Detalhes da Movimentação' %>
 
-<div class="container">
-  <h2><%= titulo %></h2>
+<div style="padding: 20px !important; max-width: none !important; margin: 0 !important; width: 100% !important;">
+  <h2 style="text-align: left !important;"><%= titulo %></h2>
 
-  <div class="card">
+  <div style="background: white !important; padding: 20px !important; border-radius: 8px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; text-align: left !important; width: 100% !important; max-width: none !important; margin: 0 !important;">
     <p><strong>Data:</strong> <%= movimentacao.data ? new Date(movimentacao.data).toLocaleDateString() : '—' %></p>
     <p><strong>Tipo:</strong> <%= movimentacao.tipo || '—' %></p>
     <p><strong>Produto:</strong> <%= movimentacao.produto_nome || '—' %></p>
@@ -13,8 +13,8 @@
     <p><strong>Observação:</strong> <%= movimentacao.observacao || '—' %></p>
   </div>
 
-  <div style="margin-top: 20px;">
-    <a href="/movimentacoes" class="btn btn-azul btn-voltar">
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
+    <a href="/movimentacoes" class="btn btn-azul">
       <i class="fas fa-arrow-left"></i> Voltar
     </a>
   </div>

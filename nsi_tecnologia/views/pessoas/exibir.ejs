@@ -1,14 +1,14 @@
 <% layout = 'layout' %>
 <% titulo = 'Dados da Pessoa' %>
 
-<div class="container">
-  <h2>Dados da Pessoa</h2>
+<div style="padding: 20px !important; max-width: none !important; margin: 0 !important; width: 100% !important;">
+  <h2 style="text-align: left !important;">Dados da Pessoa</h2>
 
 <a href="/pessoas" class="btn-acao btn-azul">
   <i class="fas fa-arrow-left"></i>
 </a>
 
-  <div class="dados-box">
+  <div style="background: white !important; padding: 20px !important; border-radius: 8px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; text-align: left !important; width: 100% !important; max-width: none !important; margin: 0 !important;">
     <p><strong>Tipo:</strong> <%= pessoa.tipo %></p>
     <p><strong>Nome:</strong> <%= pessoa.nome %></p>
     <p><strong>Razão Social:</strong> <%= pessoa.razao_social %></p>
@@ -20,6 +20,7 @@
     <p><strong>Estado Civil:</strong> <%= pessoa.estado_civil %></p>
     <p><strong>Profissão:</strong> <%= pessoa.profissao %></p>
     <p><strong>Email:</strong> <%= pessoa.email %></p>
+    <p><strong>Código do País:</strong> <%= pessoa.codigo_pais || '+55' %></p>
     <p><strong>Telefone/Celular:</strong> <%= pessoa.telefone || pessoa.celular || pessoa.whatsapp %></p>
     <p><strong>CEP:</strong> <%= pessoa.cep %></p>
     <p><strong>Endereço:</strong> <%= pessoa.endereco %>, <%= pessoa.numero %> - <%= pessoa.complemento %></p>

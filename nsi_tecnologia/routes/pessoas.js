@@ -159,14 +159,14 @@ router.post('/novo', async (req, res) => {
         data_nascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
-        observacoes, status
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        observacoes, status, codigo_pais
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         tipo, nome, razao_social, nome_fantasia, documento, rg_ie,
         dataNascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
-        observacoes, status
+        observacoes, status, codigo_pais
       ]
     );
     res.redirect('/pessoas');
@@ -201,14 +201,14 @@ router.post('/editar/:id', async (req, res) => {
         data_nascimento = ?, sexo = ?, estado_civil = ?, profissao = ?, email = ?,
         telefone = ?, celular = ?, whatsapp = ?, cep = ?, endereco = ?, numero = ?,
         complemento = ?, bairro = ?, cidade = ?, uf = ?, pais = ?, contato_responsavel = ?,
-        observacoes = ?, status = ?
+        observacoes = ?, status = ?, codigo_pais = ?
       WHERE id = ?`,
       [
         tipo, nome, razao_social, nome_fantasia, documento, rg_ie,
         dataNascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
-        observacoes, status, id
+        observacoes, status, codigo_pais, id
       ]
     );
 

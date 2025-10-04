@@ -1,16 +1,22 @@
 <% layout = 'layout' %>
 <% titulo = 'Detalhes da OS' %>
 
-<div class="container">
-  <h2>Ordem de Serviço Nº <%= os.numero_os || os.id %></h2>
+<div style="padding: 20px !important; max-width: none !important; margin: 0 !important; width: 100% !important;">
+  <h2 style="text-align: left !important;">Ordem de Serviço Nº <%= os.numero_os || os.id %></h2>
 
-  <div class="dados-os">
+  <div style="background: white !important; padding: 20px !important; border-radius: 8px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; text-align: left !important; width: 100% !important; max-width: none !important; margin: 0 !important;">
     <p><strong>Cliente:</strong> <%= os.solicitante_nome %></p>
     <p><strong>Técnico:</strong> <%= os.responsavel_nome %></p>
     <p><strong>Data de abertura:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></p>
     <p><strong>Tipo de serviço:</strong> <%= os.tipo_servico %></p>
     <p><strong>Prioridade:</strong> <%= os.prioridade %></p>
     <p><strong>Status:</strong> <%= os.status %></p>
+    <% if (os.data_agendamento) { %>
+      <p><strong>Data do Agendamento:</strong> <%= new Date(os.data_agendamento).toLocaleDateString('pt-BR') %> às <%= new Date(os.data_agendamento).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) %></p>
+    <% } %>
+    <% if (os.observacoes_agendamento) { %>
+      <p><strong>Observações do Agendamento:</strong> <%= os.observacoes_agendamento %></p>
+    <% } %>
     <p><strong>Problema informado:</strong> <%= os.problema_informado %></p>
     <p><strong>Valor dos Serviços:</strong> R$ <%= parseFloat(os.valor_servico || 0).toFixed(2) %></p>
     <p><strong>Desconto:</strong> R$ <%= parseFloat(os.desconto || 0).toFixed(2) %></p>
@@ -18,10 +24,12 @@
     <p><strong>Valor Total:</strong> R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></p>
   </div>
 
-  <div style="margin-top: 20px;">
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
     <a href="/os/imprimir/<%= os.id %>" target="_blank" class="btn btn-azul">
       <i class="fas fa-print"></i> Imprimir OS
     </a>
-    <a href="/os/listar" class="btn btn-azul">← Voltar</a>
+    <a href="/os/listar" class="btn btn-azul">
+      <i class="fas fa-arrow-left"></i> Voltar
+    </a>
   </div>
 </div>
