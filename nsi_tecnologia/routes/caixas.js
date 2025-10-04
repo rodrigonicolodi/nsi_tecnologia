@@ -342,7 +342,7 @@ router.post('/transferir', async (req, res) => {
 router.get('/historico', async (req, res) => {
   try {
     const { pagina = 1, busca = '' } = req.query;
-    const limite = 20;
+    const limite = 10;
     const offset = (pagina - 1) * limite;
 
     let sql = `

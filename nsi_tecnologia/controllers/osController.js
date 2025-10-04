@@ -139,7 +139,7 @@ module.exports = {
   // Lista todas as OS com filtros e JOIN
   listarOS: async (req, res) => {
     const { busca = '', status = '', prioridade = '', pagina = 1 } = req.query;
-    const limite = 20;
+    const limite = 10;
     const offset = (pagina - 1) * limite;
 
     try {
