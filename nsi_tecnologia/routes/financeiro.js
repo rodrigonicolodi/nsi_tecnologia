@@ -522,7 +522,7 @@ router.post('/parcelar/:id', async (req, res) => {
 
 // 💰 Relatório de Contas a Receber
 router.get('/contas-receber', async (req, res) => {
-  const { busca = '', status_vencimento = 'todas', pagina = 1 } = req.query;
+  const { busca = '', status_vencimento = 'pendentes', pagina = 1 } = req.query;
     const limite = 10;
   const offset = (pagina - 1) * limite;
 

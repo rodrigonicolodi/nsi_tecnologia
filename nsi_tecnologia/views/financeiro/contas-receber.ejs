@@ -71,7 +71,7 @@
         <option value="vencidas" <%= status_vencimento === 'vencidas' ? 'selected' : '' %>>Vencidas</option>
         <option value="vencendo_hoje" <%= status_vencimento === 'vencendo_hoje' ? 'selected' : '' %>>Vence Hoje</option>
         <option value="vencendo_7_dias" <%= status_vencimento === 'vencendo_7_dias' ? 'selected' : '' %>>Vence em 7 dias</option>
-        <option value="pendentes" <%= status_vencimento === 'pendentes' ? 'selected' : '' %>>Pendentes</option>
+        <option value="pendentes" <%= (status_vencimento === 'pendentes' || !status_vencimento) ? 'selected' : '' %>>Pendentes</option>
         <option value="quitadas" <%= status_vencimento === 'quitadas' ? 'selected' : '' %>>Quitadas</option>
       </select>
     </div>
