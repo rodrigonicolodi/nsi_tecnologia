@@ -8,10 +8,10 @@
     <p class="erro"><%= erro %></p>
   <% } %>
 
-  <form method="POST" action="/movimentacoes/editar/<%= movimentacao.id %>">
+  <form method="POST" action="/movimentacoes/editar/<%= movimentacao.id %>" class="form-coluna">
 
     <div class="campo">
-      <label for="tipo">Tipo:</label>
+      <label for="tipo">Tipo</label>
       <select name="tipo" id="tipo" required>
         <option value="entrada" <%= movimentacao.tipo === 'entrada' ? 'selected' : '' %>>Entrada</option>
         <option value="saida" <%= movimentacao.tipo === 'saida' ? 'selected' : '' %>>Saída</option>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="campo">
-      <label for="produto_id">Produto:</label>
+      <label for="produto_id">Produto</label>
       <select name="produto_id" id="produto_id" required>
         <% produtos.forEach(p => { %>
           <option value="<%= p.id %>" <%= p.id === movimentacao.produto_id ? 'selected' : '' %>><%= p.nome %></option>
@@ -28,7 +28,7 @@
     </div>
 
     <div class="campo">
-      <label for="pessoa_id">Pessoa:</label>
+      <label for="pessoa_id">Pessoa</label>
       <select name="pessoa_id" id="pessoa_id">
         <option value="">-- Nenhuma --</option>
         <% pessoas.forEach(p => { %>
@@ -38,12 +38,12 @@
     </div>
 
     <div class="campo">
-      <label for="quantidade">Quantidade:</label>
+      <label for="quantidade">Quantidade</label>
       <input type="number" name="quantidade" id="quantidade" value="<%= movimentacao.quantidade %>" required>
     </div>
 
     <div class="campo">
-      <label for="observacao">Observação:</label>
+      <label for="observacao">Observação</label>
       <textarea name="observacao" id="observacao" rows="3"><%= movimentacao.observacao %></textarea>
     </div>
 
