@@ -166,8 +166,14 @@
             </td>
             <td class="contato">
               <% if (l.telefone) { %>
-                <a href="tel:<%= l.telefone %>" title="Ligar">
-                  <i class="fas fa-phone"></i>
+                <%
+                  const codigoPais = l.codigo_pais || '+55';
+                  const telefoneLimpo = l.telefone.replace(/\D/g, '');
+                  const codigoLimpo = codigoPais.replace('+', '').replace(/\D/g, '');
+                  const whatsappNumber = codigoLimpo + telefoneLimpo;
+                %>
+                <a href="javascript:void(0)" onclick="abrirWhatsApp('<%= whatsappNumber %>')" title="WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
                 </a>
               <% } %>
               <% if (l.email) { %>
@@ -196,7 +202,9 @@
                   </button>
                 </form>
               <% } else { %>
-                <span class="status-quitado">Quitado</span>
+                <a href="/financeiro/recibo/<%= l.id %>" class="btn btn-acao btn-azul" title="Imprimir Recibo" target="_blank">
+                  <i class="fas fa-receipt"></i>
+                </a>
               <% } %>
             </td>
           </tr>
@@ -404,6 +412,14 @@
   color: #0056b3;
 }
 
+.contato a[title="WhatsApp"] {
+  color: #25D366 !important;
+}
+
+.contato a[title="WhatsApp"]:hover {
+  color: #128C7E !important;
+}
+
 .parcela-info {
   background-color: #e9ecef;
   padding: 2px 6px;
@@ -449,3 +465,18 @@
   }
 }
 </style>
+
+<script>
+function abrirWhatsApp(numero) {
+  const numeroLimpo = numero.replace(/\D/g, '');
+  console.log('Número para WhatsApp:', numeroLimpo);
+  
+  // Tentar abrir o aplicativo diretamente
+  const link = document.createElement('a');
+  link.href = `whatsapp://send?phone=${numeroLimpo}`;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+</script>

@@ -27,5 +27,10 @@
     <a href="/financeiro/editar/<%= lancamento.id %>" class="btn btn-azul">
       <i class="fas fa-edit"></i> Editar
     </a>
+    <% if (lancamento.status === 'pago') { %>
+      <a href="/financeiro/recibo/<%= lancamento.id %>" class="btn btn-verde" target="_blank">
+        <i class="fas fa-receipt"></i> Imprimir Recibo
+      </a>
+    <% } %>
   </div>
 </div>

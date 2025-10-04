@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recibo de Pagamento - <%= lancamento.id %></title>
+  <link rel="stylesheet" href="/css/cupom-print.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .recibo-container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .recibo-header {
+      text-align: center;
+      padding: 15px;
+      border-bottom: 2px solid #0077cc;
+    }
+    
+    .recibo-header h1 {
+      color: #0077cc;
+      margin: 0;
+      font-size: 20px;
+    }
+    
+    .recibo-content {
+      padding: 20px;
+    }
+    
+    .recibo-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .info-item {
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    
+    .info-label {
+      font-weight: bold;
+      color: #666;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    
+    .info-value {
+      font-size: 14px;
+      margin-top: 3px;
+    }
+    
+    .recibo-details {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    
+    .recibo-details h3 {
+      margin: 0 0 10px 0;
+      color: #0077cc;
+      font-size: 16px;
+    }
+    
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .detail-value {
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .recibo-footer {
+      text-align: center;
+      padding: 15px;
+      border-top: 2px solid #0077cc;
+      margin-top: 20px;
+    }
+    
+    .recibo-footer p {
+      margin: 3px 0;
+      color: #666;
+      font-size: 13px;
+    }
+    
+    .btn-group {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      margin: 0 10px;
+      background: #0077cc;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .btn:hover {
+      background: #0056a3;
+    }
+    
+    .btn-verde {
+      background: #28a745;
+    }
+    
+    .btn-verde:hover {
+      background: #1e7e34;
+    }
+    
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      .recibo-container {
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+  </style>
+  <script>
+    const reciboPrint = {
+      print: function() {
+        window.print();
+      },
+      
+      preview: function() {
+        // Lógica de preview se necessário
+        this.print();
+      },
+      
+      optimizeText: function() {
+        // Otimizar texto para impressão
+        const elements = document.querySelectorAll('.detail-value, .info-value');
+        elements.forEach(el => {
+          if (el.textContent.length > 30) {
+            el.style.fontSize = '12px';
+          }
+        });
+      },
+      
+      adjustFontSize: function(width) {
+        if (width < 768) {
+          document.body.style.fontSize = '14px';
+        }
+      }
+    };
+  </script>
+</head>
+<body>
+  <div class="recibo-container no-print">
+    <div class="btn-group">
+      <button onclick="reciboPrint.preview()" class="btn btn-azul">
+        <i class="fas fa-eye"></i> Visualizar
+      </button>
+      <button onclick="reciboPrint.print()" class="btn btn-verde">
+        <i class="fas fa-print"></i> Imprimir
+      </button>
+    </div>
+  </div>
+
+  <div class="recibo-container">
+    <div class="recibo-header">
+      <h1>💰 RECIBO DE PAGAMENTO</h1>
+      <p>NSI Tecnologia - Sistema de Gestão</p>
+    </div>
+
+    <div class="recibo-content">
+      <div class="recibo-info">
+        <div class="info-item">
+          <div class="info-label">Número do Recibo</div>
+          <div class="info-value">#<%= lancamento.id %></div>
+        </div>
+        
+        <div class="info-item">
+          <div class="info-label">Data de Quitação</div>
+          <div class="info-value">
+            <%= lancamento.data_quitacao ? new Date(lancamento.data_quitacao).toLocaleDateString('pt-BR') : '-' %>
+          </div>
+        </div>
+        
+        <div class="info-item">
+          <div class="info-label">Cliente</div>
+          <div class="info-value"><%= lancamento.pessoa_nome || '-' %></div>
+        </div>
+        
+        <div class="info-item">
+          <div class="info-label">Caixa de Quitação</div>
+          <div class="info-value"><%= lancamento.caixa_quitacao_nome || '-' %></div>
+        </div>
+      </div>
+
+      <div class="recibo-details">
+        <h3>📋 Detalhes do Pagamento</h3>
+        
+        <div class="detail-row">
+          <span class="detail-label">Descrição:</span>
+          <span class="detail-value"><%= lancamento.descricao || '-' %></span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="detail-label">Valor Pago:</span>
+          <span class="detail-value">R$ <%= parseFloat(lancamento.valor).toFixed(2) %></span>
+        </div>
+        
+        <% if (lancamento.total_parcelas > 1) { %>
+          <div class="detail-row">
+            <span class="detail-label">Parcela:</span>
+            <span class="detail-value"><%= lancamento.parcela_atual || 1 %>/<%= lancamento.total_parcelas || 1 %></span>
+          </div>
+        <% } %>
+        
+        <% if (lancamento.ordem_servico_id) { %>
+          <div class="detail-row">
+            <span class="detail-label">Ordem de Serviço:</span>
+            <span class="detail-value">#<%= lancamento.ordem_servico_id %></span>
+          </div>
+        <% } %>
+        
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value" style="color: #28a745; font-weight: bold;">QUITADO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="recibo-footer">
+      <p><strong>Este recibo comprova o pagamento efetuado.</strong></p>
+      <p>NSI Tecnologia - Sistema de Gestão</p>
+      <p>Recibo gerado em: <%= new Date().toLocaleDateString('pt-BR') %> às <%= new Date().toLocaleTimeString('pt-BR') %></p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      reciboPrint.optimizeText();
+      reciboPrint.adjustFontSize(window.innerWidth);
+    });
+  </script>
+</body>
+</html>

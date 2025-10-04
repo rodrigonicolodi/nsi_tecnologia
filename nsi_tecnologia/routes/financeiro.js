@@ -344,7 +344,8 @@ router.post('/quitar/:id', async (req, res) => {
     await db.query(`
       UPDATE financeiro
       SET status = 'pago',
-          caixa_quitacao_id = ?
+          caixa_quitacao_id = ?,
+          data_quitacao = NOW()
       WHERE id = ?
     `, [parseInt(caixa_quitacao_id), id]);
 
@@ -352,6 +353,44 @@ router.post('/quitar/:id', async (req, res) => {
   } catch (erro) {
     console.error('Erro ao quitar lançamento:', erro);
     res.redirect('/financeiro?erro=Erro ao quitar lançamento.');
+  }
+});
+
+// 🧾 Imprimir recibo de pagamento
+router.get('/recibo/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [lancamentos] = await db.query(`
+      SELECT f.id, f.valor, f.descricao, f.status, f.parcela_atual, f.total_parcelas,
+             f.ordem_servico_id, f.data_quitacao,
+             p.nome AS pessoa_nome,
+             c.nome AS caixa_quitacao_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c ON f.caixa_quitacao_id = c.id
+      WHERE f.id = ? AND f.status = 'pago'
+    `, [id]);
+
+    if (lancamentos.length === 0) {
+      return res.status(404).render('erro', {
+        titulo: 'Recibo não encontrado',
+        mensagem: 'Lançamento não encontrado ou não foi quitado.',
+        layout: false
+      });
+    }
+
+    res.render('financeiro/recibo', {
+      titulo: 'Recibo de Pagamento',
+      lancamento: lancamentos[0],
+      layout: false
+    });
+  } catch (erro) {
+    console.error('Erro ao gerar recibo:', erro);
+    res.status(500).render('erro', {
+      titulo: 'Erro ao gerar recibo',
+      mensagem: 'Erro interno do servidor.',
+      layout: false
+    });
   }
 });
 
@@ -490,7 +529,7 @@ router.get('/contas-receber', async (req, res) => {
   let sql = `
     SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
            f.parcela_atual, f.total_parcelas, f.parcela_pai_id,
-           p.nome AS pessoa_nome, p.telefone, p.email,
+           p.nome AS pessoa_nome, p.telefone, p.email, p.codigo_pais,
            c1.nome AS caixa_origem_nome,
            c2.nome AS caixa_quitacao_nome,
            CASE 
