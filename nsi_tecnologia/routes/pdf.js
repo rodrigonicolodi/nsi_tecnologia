@@ -107,7 +107,7 @@ function gerarHTMLFinanceiro(inicio, fim, status) {
         
         <div class="footer">
             <p>NSI Tecnologia - Todos os direitos reservados.</p>
-            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+            <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
         </div>
     </div>
 </body>
@@ -344,7 +344,7 @@ function gerarHTMLServicosProdutos(mes, ano, resultados, detalhes) {
         
         <div class="footer">
             <p>NSI Tecnologia - Todos os direitos reservados.</p>
-            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+            <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
         </div>
     </div>
 </body>
@@ -611,7 +611,7 @@ function gerarHTMLOSComDados(inicio, fim, status, busca, prioridade, ordens, tot
         
         <div class="footer">
             <p>NSI Tecnologia - Todos os direitos reservados.</p>
-            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+            <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
         </div>
     </div>
 </body>
@@ -713,7 +713,7 @@ function gerarHTMLOS(inicio, fim, status, busca, prioridade) {
         
         <div class="footer">
             <p>NSI Tecnologia - Todos os direitos reservados.</p>
-            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+            <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
         </div>
     </div>
 </body>
@@ -846,6 +846,7 @@ router.get('/financeiro', async (req, res) => {
     console.log('🔄 Gerando PDF...');
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: true, // Modo paisagem para melhor visualização das colunas
       printBackground: true,
       preferCSSPageSize: true,
       margin: {
@@ -990,6 +991,7 @@ router.get('/estoque', async (req, res) => {
     console.log('🔄 Gerando PDF...');
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: true, // Modo paisagem para melhor visualização das colunas
       printBackground: true,
       preferCSSPageSize: true,
       margin: {
@@ -1000,9 +1002,9 @@ router.get('/estoque', async (req, res) => {
       }
     });
     console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
-
+    
     await browser.close();
-
+    
     // Enviar PDF
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="relatorio_estoque.pdf"');
@@ -1105,6 +1107,7 @@ router.get('/os', async (req, res) => {
     console.log('🔄 Gerando PDF...');
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: true, // Modo paisagem para melhor visualização das colunas
       printBackground: true,
       preferCSSPageSize: true,
       margin: {
@@ -1215,6 +1218,7 @@ router.get('/servicos-produtos', async (req, res) => {
     console.log('🔄 Gerando PDF...');
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: true, // Modo paisagem para melhor visualização das colunas
       printBackground: true,
       preferCSSPageSize: true,
       margin: {
@@ -1738,7 +1742,7 @@ function gerarHTMLFaturamentoClienteComDados(inicio, fim, clientes, totais) {
         
         <div class="footer">
             <p>NSI Tecnologia - Todos os direitos reservados.</p>
-            <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+            <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
         </div>
     </div>
 </body>
@@ -2179,12 +2183,23 @@ router.get('/contas-receber', async (req, res) => {
                 width: 100%; 
                 border-collapse: collapse; 
                 margin-top: 15px; 
+                table-layout: fixed; /* Força larguras fixas das colunas */
             }
             .data-table th, .data-table td { 
                 border: 1px solid #ddd; 
                 padding: 10px 12px; 
                 text-align: left; 
+                word-wrap: break-word; /* Quebra palavras longas */
+                overflow-wrap: break-word; /* Suporte adicional para quebra */
             }
+            /* Larguras específicas para cada coluna */
+            .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 15%; } /* Cliente */
+            .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 20%; } /* Descrição */
+            .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 10%; } /* Valor */
+            .data-table th:nth-child(4), .data-table td:nth-child(4) { width: 10%; } /* Parcelas */
+            .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 10%; } /* Vencimento */
+            .data-table th:nth-child(6), .data-table td:nth-child(6) { width: 10%; } /* Status */
+            .data-table th:nth-child(7), .data-table td:nth-child(7) { width: 25%; } /* Contato - mais espaço */
             .data-table th { 
                 background-color: #007bff; 
                 color: #fff; 
@@ -2320,7 +2335,7 @@ router.get('/contas-receber', async (req, res) => {
             
             <div class="footer">
                 <p>NSI Tecnologia - Todos os direitos reservados.</p>
-                <p>Contato: (XX) XXXX-XXXX | email@nsitecnologia.com.br</p>
+                <p>Contato: (54) 98128-3447 | nsi@nsitecnologia.com.br</p>
             </div>
         </div>
     </body>
@@ -2339,6 +2354,7 @@ router.get('/contas-receber', async (req, res) => {
     console.log('🔄 Gerando PDF...');
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: true, // Modo paisagem para melhor visualização das colunas
       printBackground: true,
       preferCSSPageSize: true,
       margin: {
@@ -2349,9 +2365,9 @@ router.get('/contas-receber', async (req, res) => {
       }
     });
     console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
-
+    
     await browser.close();
-
+    
     // Enviar PDF
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="relatorio_contas_receber.pdf"');
