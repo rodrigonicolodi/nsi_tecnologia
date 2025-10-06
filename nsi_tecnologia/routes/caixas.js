@@ -277,22 +277,49 @@ router.post('/transferir', async (req, res) => {
       });
     }
 
-    // Verificar saldo do caixa de origem
-    const [saldoOrigem] = await db.query(`
+    // Verificar saldo do caixa de origem - Queries separadas para evitar duplicação
+    const [caixaInfo] = await db.query('SELECT valor_inicial FROM caixas WHERE id = ?', [caixa_origem_id]);
+    
+    const [financeiroData] = await db.query(`
       SELECT 
-        c.valor_inicial 
-          + COALESCE(SUM(CASE WHEN f.tipo = 'receber' AND f.descricao NOT LIKE 'Transferência%' THEN f.valor ELSE 0 END), 0)
-          - COALESCE(SUM(CASE WHEN f.tipo = 'pagar' AND f.descricao NOT LIKE 'Transferência%' THEN f.valor ELSE 0 END), 0)
-          + COALESCE(SUM(CASE WHEN t.caixa_destino_id = c.id THEN t.valor ELSE 0 END), 0)
-          - COALESCE(SUM(CASE WHEN t.caixa_origem_id = c.id THEN t.valor ELSE 0 END), 0) AS saldo_atual
-      FROM caixas c
-      LEFT JOIN financeiro f ON f.caixa_quitacao_id = c.id AND f.status = 'pago'
-      LEFT JOIN transferencias_caixas t ON (t.caixa_origem_id = c.id OR t.caixa_destino_id = c.id)
-      WHERE c.id = ?
-      GROUP BY c.id
+        SUM(CASE WHEN tipo = 'receber' THEN valor ELSE 0 END) AS recebido,
+        SUM(CASE WHEN tipo = 'pagar' THEN valor ELSE 0 END) AS pago
+      FROM financeiro 
+      WHERE caixa_quitacao_id = ? AND status = 'pago'
+    `, [caixa_origem_id]);
+    
+    const [transferenciasRecebidas] = await db.query(`
+      SELECT COALESCE(SUM(valor), 0) AS total 
+      FROM transferencias_caixas 
+      WHERE caixa_destino_id = ?
+    `, [caixa_origem_id]);
+    
+    const [transferenciasEnviadas] = await db.query(`
+      SELECT COALESCE(SUM(valor), 0) AS total 
+      FROM transferencias_caixas 
+      WHERE caixa_origem_id = ?
     `, [caixa_origem_id]);
 
-    const saldoAtual = parseFloat(saldoOrigem[0].saldo_atual);
+    // Calcular saldo atual
+    const valorInicial = parseFloat(caixaInfo[0].valor_inicial);
+    const recebido = parseFloat(financeiroData[0].recebido) || 0;
+    const pago = parseFloat(financeiroData[0].pago) || 0;
+    const transferenciasRecebidasTotal = parseFloat(transferenciasRecebidas[0].total) || 0;
+    const transferenciasEnviadasTotal = parseFloat(transferenciasEnviadas[0].total) || 0;
+    
+    const saldoAtual = valorInicial + recebido - pago + transferenciasRecebidasTotal - transferenciasEnviadasTotal;
+    
+    // Debug: Log dos valores calculados
+    console.log('🔍 DEBUG Transferência:');
+    console.log('Caixa Origem ID:', caixa_origem_id);
+    console.log('Valor Inicial:', valorInicial);
+    console.log('Recebido:', recebido);
+    console.log('Pago:', pago);
+    console.log('Transferências Recebidas:', transferenciasRecebidasTotal);
+    console.log('Transferências Enviadas:', transferenciasEnviadasTotal);
+    console.log('Saldo Calculado:', saldoAtual);
+    console.log('Valor Transferência:', valorNumerico);
+    
     if (saldoAtual < valorNumerico) {
       const [caixas] = await db.query('SELECT id, nome, ativo FROM caixas WHERE ativo = true ORDER BY nome');
       return res.render('caixas/transferir', {

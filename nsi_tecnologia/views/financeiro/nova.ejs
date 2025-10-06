@@ -71,7 +71,7 @@
 
     <div class="campo">
       <label>Vencimento da 1ª Parcela:</label>
-      <input type="date" name="vencimento" id="vencimento" required>
+      <input type="date" name="vencimento" id="vencimento" value="<%= new Date().toISOString().split('T')[0] %>" required>
     </div>
 
     <div class="campo">
