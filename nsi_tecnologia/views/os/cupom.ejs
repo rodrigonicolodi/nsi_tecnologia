@@ -170,7 +170,7 @@
       <h3>📋 Informações da OS</h3>
       <div class="info-item"><strong>Número:</strong> <%= os.numero_os || os.id %></div>
       <div class="info-item"><strong>Cliente:</strong> <%= os.cliente_nome || 'N/D' %></div>
-      <div class="info-item"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
+      <div class="info-item"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString('pt-BR') : 'N/D' %></div>
       <div class="info-item"><strong>Status:</strong> <%= os.status || 'N/D' %></div>
       <div class="info-item"><strong>Valor Total:</strong> R$ <%= parseFloat(os.valor_total || 0).toFixed(2) %></div>
     </div>
@@ -189,7 +189,7 @@
     <div class="cupom-linha"></div>
 
     <div class="cupom-cliente"><strong>Cliente:</strong> <%= os.cliente_nome || 'N/D' %></div>
-    <div class="cupom-cliente"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString() : 'N/D' %></div>
+    <div class="cupom-cliente"><strong>Data:</strong> <%= os.data_abertura ? new Date(os.data_abertura).toLocaleDateString('pt-BR') : 'N/D' %></div>
     <div class="cupom-cliente"><strong>Status:</strong> <%= os.status || 'N/D' %></div>
 
     <div class="cupom-linha"></div>
