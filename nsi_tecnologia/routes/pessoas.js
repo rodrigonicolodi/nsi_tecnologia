@@ -146,12 +146,15 @@ router.post('/novo', async (req, res) => {
     data_nascimento, sexo, estado_civil, profissao, email,
     telefone, celular, whatsapp, cep, endereco, numero,
     complemento, bairro, cidade, uf, pais, contato_responsavel,
-    observacoes, status
+    observacoes, status, codigo_pais
   } = req.body;
 
   try {
     // Tratar data_nascimento vazia
     const dataNascimento = data_nascimento && data_nascimento.trim() !== '' ? data_nascimento : null;
+    
+    // Tratar codigo_pais vazio
+    const codigoPais = codigo_pais || '+55';
 
     await db.query(
       `INSERT INTO pessoas (
@@ -166,7 +169,7 @@ router.post('/novo', async (req, res) => {
         dataNascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
-        observacoes, status, codigo_pais
+        observacoes, status, codigoPais
       ]
     );
     res.redirect('/pessoas');
@@ -188,12 +191,15 @@ router.post('/editar/:id', async (req, res) => {
     data_nascimento, sexo, estado_civil, profissao, email,
     telefone, celular, whatsapp, cep, endereco, numero,
     complemento, bairro, cidade, uf, pais, contato_responsavel,
-    observacoes, status
+    observacoes, status, codigo_pais
   } = req.body;
 
   try {
     // Tratar data_nascimento vazia
     const dataNascimento = data_nascimento && data_nascimento.trim() !== '' ? data_nascimento : null;
+    
+    // Tratar codigo_pais vazio
+    const codigoPais = codigo_pais || '+55';
 
     await db.query(
       `UPDATE pessoas SET
@@ -208,7 +214,7 @@ router.post('/editar/:id', async (req, res) => {
         dataNascimento, sexo, estado_civil, profissao, email,
         telefone, celular, whatsapp, cep, endereco, numero,
         complemento, bairro, cidade, uf, pais, contato_responsavel,
-        observacoes, status, codigo_pais, id
+        observacoes, status, codigoPais, id
       ]
     );
 
