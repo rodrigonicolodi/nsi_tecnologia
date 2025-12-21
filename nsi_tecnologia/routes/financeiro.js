@@ -4,7 +4,7 @@ const db = require('../db');
 
 // 📄 Listagem com filtros e paginação
 router.get('/', async (req, res) => {
-  const { busca = '', tipo = '', status = 'pendente', pagina = 1 } = req.query;
+  const { busca = '', tipo = '', status = 'pendente', caixa_id = '', pagina = 1 } = req.query;
   const limite = 10;
   const offset = (pagina - 1) * limite;
 
@@ -37,23 +37,45 @@ router.get('/', async (req, res) => {
     params.push(status);
   }
 
+  if (caixa_id) {
+    sql += ' AND f.caixa_id = ?';
+    params.push(caixa_id);
+  }
+
   sql += ' ORDER BY f.vencimento DESC LIMIT ? OFFSET ?';
   params.push(limite, offset);
 
   try {
     const [lancamentos] = await db.query(sql, params);
-    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true ORDER BY nome');
 
-    const countParams = [...params.slice(0, params.length - 2)];
-    const countSql = `
+    const countParams = [];
+    let countSql = `
       SELECT COUNT(*) AS total
       FROM financeiro f
       LEFT JOIN pessoas p ON f.pessoa_id = p.id
       WHERE 1 = 1
-      ${busca ? ' AND (f.descricao LIKE ? OR p.nome LIKE ?)' : ''}
-      ${tipo ? ' AND f.tipo = ?' : ''}
-      ${status ? ' AND f.status = ?' : ''}
     `;
+
+    if (busca) {
+      countSql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)';
+      countParams.push(`%${busca}%`, `%${busca}%`);
+    }
+
+    if (tipo) {
+      countSql += ' AND f.tipo = ?';
+      countParams.push(tipo);
+    }
+
+    if (status) {
+      countSql += ' AND f.status = ?';
+      countParams.push(status);
+    }
+
+    if (caixa_id) {
+      countSql += ' AND f.caixa_id = ?';
+      countParams.push(caixa_id);
+    }
 
     const [totalResult] = await db.query(countSql, countParams);
     const totalPaginas = Math.ceil(totalResult[0].total / limite);
@@ -65,6 +87,7 @@ router.get('/', async (req, res) => {
       busca,
       tipo,
       status,
+      caixa_id,
       pagina: Number(pagina),
       totalPaginas,
       erro: req.query.erro || null,
@@ -79,6 +102,7 @@ router.get('/', async (req, res) => {
       busca,
       tipo,
       status,
+      caixa_id,
       pagina: 1,
       totalPaginas: 0,
       erro: 'Erro ao carregar lançamentos.',

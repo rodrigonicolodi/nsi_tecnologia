@@ -876,11 +876,193 @@ router.get('/financeiro', async (req, res) => {
   }
 });
 
-// Rota para PDF de lançamentos (redireciona para financeiro)
+// Rota para PDF de lançamentos (filtros da listagem)
 router.get('/lancamentos', async (req, res) => {
-  // Redireciona para a rota de financeiro com os mesmos parâmetros
-  const queryString = new URLSearchParams(req.query).toString();
-  res.redirect(`/pdf/financeiro?${queryString}`);
+  try {
+    console.log('📄 Exportando PDF de lançamentos...');
+    console.log('Parâmetros:', req.query);
+    
+    const { busca = '', tipo = '', status = '', caixa_id = '' } = req.query;
+    
+    let sql = `
+      SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
+             f.parcela_atual, f.total_parcelas, f.parcela_pai_id,
+             p.nome AS pessoa_nome,
+             c1.nome AS caixa_origem_nome,
+             c2.nome AS caixa_quitacao_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+      LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
+      WHERE 1 = 1
+    `;
+    const params = [];
+
+    if (busca) {
+      sql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)';
+      params.push(`%${busca}%`, `%${busca}%`);
+    }
+
+    if (tipo) {
+      sql += ' AND f.tipo = ?';
+      params.push(tipo);
+    }
+
+    if (status) {
+      sql += ' AND f.status = ?';
+      params.push(status);
+    }
+
+    if (caixa_id) {
+      sql += ' AND f.caixa_id = ?';
+      params.push(caixa_id);
+    }
+
+    sql += ' ORDER BY f.vencimento DESC';
+
+    const [lancamentos] = await db.query(sql, params);
+
+    // Buscar nome do caixa selecionado se houver
+    let caixaNome = 'Todos os caixas';
+    if (caixa_id) {
+      const [caixas] = await db.query('SELECT nome FROM caixas WHERE id = ?', [caixa_id]);
+      if (caixas.length > 0) {
+        caixaNome = caixas[0].nome;
+      }
+    }
+
+    // Calcular totais
+    const totalReceber = lancamentos
+      .filter(l => l.tipo === 'receber')
+      .reduce((sum, l) => sum + parseFloat(l.valor || 0), 0);
+    
+    const totalPagar = lancamentos
+      .filter(l => l.tipo === 'pagar')
+      .reduce((sum, l) => sum + parseFloat(l.valor || 0), 0);
+
+    // Gerar HTML
+    const html = `<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório de Lançamentos Financeiros</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .content { padding: 20px; }
+            .filtros { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+            .filtros p { margin: 5px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #007bff; color: white; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f8f9fa; }
+            .tipo-receber { color: green; font-weight: bold; }
+            .tipo-pagar { color: red; font-weight: bold; }
+            .status-pago { color: green; font-weight: bold; }
+            .status-pendente { color: orange; font-weight: bold; }
+            .status-cancelado { color: red; font-weight: bold; }
+            .totais { margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 5px; }
+            .totais h3 { margin-top: 0; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>💰 Relatório de Lançamentos Financeiros</h1>
+            <p>NSI Tecnologia</p>
+            <p>Relatório gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+        </div>
+        <div class="content">
+            <div class="filtros">
+                <h3>Filtros Aplicados:</h3>
+                <p><strong>Busca:</strong> ${busca || 'Todos'}</p>
+                <p><strong>Tipo:</strong> ${tipo === 'receber' ? 'A Receber' : tipo === 'pagar' ? 'A Pagar' : 'Todos os tipos'}</p>
+                <p><strong>Status:</strong> ${status === 'pendente' ? 'Pendente' : status === 'pago' ? 'Pago' : status === 'cancelado' ? 'Cancelado' : 'Todos os status'}</p>
+                <p><strong>Caixa:</strong> ${caixaNome}</p>
+            </div>
+
+            <h3>Lançamentos (${lancamentos.length} encontrados):</h3>
+            ${lancamentos.length > 0 ? `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Pessoa</th>
+                        <th>Caixa</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Parcelas</th>
+                        <th>Vencimento</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${lancamentos.map(lanc => `
+                    <tr>
+                        <td class="tipo-${lanc.tipo || 'pagar'}">${lanc.tipo === 'receber' ? 'A Receber' : 'A Pagar'}</td>
+                        <td>${lanc.pessoa_nome || '-'}</td>
+                        <td>${lanc.caixa_origem_nome || '-'}</td>
+                        <td>${lanc.descricao || '-'}</td>
+                        <td>R$ ${parseFloat(lanc.valor || 0).toFixed(2)}</td>
+                        <td>${lanc.total_parcelas > 1 ? `${lanc.parcela_atual}/${lanc.total_parcelas}` : 'À Vista'}</td>
+                        <td>${lanc.vencimento ? new Date(lanc.vencimento).toLocaleDateString('pt-BR') : '-'}</td>
+                        <td class="status-${lanc.status || 'pendente'}">${lanc.status === 'pago' ? 'Pago' : lanc.status === 'pendente' ? 'Pendente' : lanc.status === 'cancelado' ? 'Cancelado' : '-'}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="totais">
+                <h3>Resumo Financeiro:</h3>
+                <p><strong>Total a Receber:</strong> R$ ${totalReceber.toFixed(2)}</p>
+                <p><strong>Total a Pagar:</strong> R$ ${totalPagar.toFixed(2)}</p>
+                <p><strong>Saldo:</strong> R$ ${(totalReceber - totalPagar).toFixed(2)}</p>
+            </div>
+            ` : '<p>Nenhum lançamento encontrado com os filtros aplicados.</p>'}
+        </div>
+    </body>
+    </html>`;
+    
+    // Configurar Puppeteer
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    // Gerar PDF
+    console.log('🔄 Gerando PDF...');
+    const pdf = await page.pdf({
+      format: 'A4',
+      landscape: true,
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      }
+    });
+    console.log('✅ PDF gerado, tamanho:', pdf.length, 'bytes');
+    
+    await browser.close();
+    
+    // Enviar PDF
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="lancamentos_financeiros.pdf"');
+    res.setHeader('Content-Length', pdf.length);
+    res.setHeader('Cache-Control', 'no-cache');
+    res.end(pdf);
+    
+  } catch (error) {
+    console.error('❌ Erro ao gerar PDF de lançamentos:', error);
+    res.status(500).json({
+      error: 'Erro interno do servidor ao gerar PDF',
+      details: error.message
+    });
+  }
 });
 
 // Rota para PDF de estoque

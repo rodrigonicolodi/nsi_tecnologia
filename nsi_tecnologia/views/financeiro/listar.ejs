@@ -41,13 +41,23 @@
     </div>
 
     <div class="campo">
+      <label for="caixa_id">Caixa:</label>
+      <select name="caixa_id" id="caixa_id">
+        <option value="">Todos os caixas</option>
+        <% (caixas || []).forEach(c => { %>
+          <option value="<%= c.id %>" <%= caixa_id == c.id ? 'selected' : '' %>><%= c.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
       <button type="submit" class="btn btn-azul">
         <i class="fas fa-filter"></i> Filtrar
       </button>
     </div>
 
     <div class="campo">
-      <a href="/pdf/lancamentos?busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>" class="btn btn-vermelho" target="_blank">
+      <a href="/pdf/lancamentos?busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>&caixa_id=<%= encodeURIComponent(caixa_id || '') %>" class="btn btn-vermelho" target="_blank">
         <i class="fas fa-file-pdf"></i> Exportar PDF
       </a>
     </div>
@@ -174,7 +184,7 @@
   <% if (totalPaginas > 1) { %>
     <div class="paginacao">
       <% for (let i = 1; i <= totalPaginas; i++) { %>
-        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca) %>&tipo=<%= encodeURIComponent(tipo) %>&status=<%= encodeURIComponent(status) %>"
+        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>&caixa_id=<%= encodeURIComponent(caixa_id || '') %>"
            class="btn-pagina <%= pagina === i ? 'ativo' : '' %>">
           <%= i %>
         </a>
