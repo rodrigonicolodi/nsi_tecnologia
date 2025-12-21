@@ -39,12 +39,18 @@ app.use(expressLayouts);
 app.set('layout', 'layout');
 
 // 🧠 Sessão
+// Configuração de cookie: por padrão usa secure=false para funcionar em HTTP/proxy
+// Configure FORCE_SECURE_COOKIE=true apenas se o Integrador usar HTTPS direto
+const cookieSecure = process.env.FORCE_SECURE_COOKIE === 'true';
+
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'default-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: cookieSecure, // false por padrão (funciona em HTTP/proxy)
+    httpOnly: true,
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 }));
