@@ -951,10 +951,13 @@ router.get('/parcelas/:id', async (req, res) => {
     const parcelasPagas = parcelas.filter(p => p.status === 'pago').length;
     const parcelasPendentes = parcelas.filter(p => p.status === 'pendente').length;
 
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true ORDER BY nome');
+
     res.render('financeiro/parcelas', {
       titulo: 'Parcelas do Lançamento',
       lancamentoPrincipal,
       parcelas,
+      caixas,
       totalValor,
       parcelasPagas,
       parcelasPendentes,

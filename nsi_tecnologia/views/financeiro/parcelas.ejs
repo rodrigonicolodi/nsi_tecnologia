@@ -81,8 +81,10 @@
               <% if (parcela.status === 'pendente') { %>
                 <form action="/financeiro/quitar/<%= parcela.id %>" method="POST" style="display: inline;">
                   <select name="caixa_quitacao_id" class="input-pequeno" required>
-                    <option value="">Selecione</option>
-                    <!-- Aqui você pode adicionar as opções de caixas se necessário -->
+                    <option value="">Caixa</option>
+                    <% (caixas || []).forEach(c => { %>
+                      <option value="<%= c.id %>"><%= c.nome %></option>
+                    <% }) %>
                   </select>
                   <button type="submit" class="btn btn-acao btn-verde" title="Quitar">
                     <i class="fas fa-check-circle"></i>
@@ -99,16 +101,10 @@
   </div>
 
   <!-- Botões de ação -->
-  <div style="margin-top: 20px; display: flex; gap: 10px;">
+  <div style="margin-top: 20px;">
     <a href="/financeiro" class="btn btn-azul">
       <i class="fas fa-arrow-left"></i> Voltar para Lista
     </a>
-    
-    <% if (parcelasPagas < totalParcelas) { %>
-      <button class="btn btn-verde" onclick="quitarTodasParcelas()">
-        <i class="fas fa-check-double"></i> Quitar Todas as Parcelas
-      </button>
-    <% } %>
   </div>
 </div>
 
@@ -162,13 +158,3 @@
   font-style: italic;
 }
 </style>
-
-<script>
-function quitarTodasParcelas() {
-  if (confirm('Tem certeza que deseja quitar todas as parcelas pendentes?')) {
-    // Implementar lógica para quitar todas as parcelas
-    alert('Funcionalidade em desenvolvimento');
-  }
-}
-</script>
-
