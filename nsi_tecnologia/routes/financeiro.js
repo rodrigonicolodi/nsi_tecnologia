@@ -4,9 +4,31 @@ const db = require('../db');
 
 // 📄 Listagem com filtros e paginação
 router.get('/', async (req, res) => {
-  const { busca = '', tipo = '', status = 'pendente', caixa_id = '', pagina = 1 } = req.query;
+  const { busca = '', tipo = '', status = 'pendente', pagina = 1 } = req.query;
+  // Verificar se caixa_id foi passado explicitamente na query
+  const caixa_id = req.query.caixa_id !== undefined ? req.query.caixa_id : undefined;
   const limite = 10;
   const offset = (pagina - 1) * limite;
+
+  try {
+    // Buscar caixas disponíveis
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true ORDER BY nome');
+    
+    // Se caixa_id não foi fornecido na query (primeira carga), buscar o ID do "Sicredi PJ" como padrão
+    // Se foi passado como string vazia (usuário selecionou "Todos"), não filtrar
+    let caixaIdFiltro = caixa_id;
+    if (caixa_id === undefined) {
+      // Primeira carga: aplicar padrão "Sicredi PJ"
+      const [caixaPadrao] = await db.query("SELECT id FROM caixas WHERE nome = 'Sicredi PJ' AND ativo = true LIMIT 1");
+      if (caixaPadrao.length > 0) {
+        caixaIdFiltro = caixaPadrao[0].id.toString();
+      } else {
+        caixaIdFiltro = '';
+      }
+    } else if (caixa_id === '') {
+      // Usuário selecionou "Todos os caixas": não filtrar
+      caixaIdFiltro = '';
+    }
 
   let sql = `
     SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
@@ -37,17 +59,15 @@ router.get('/', async (req, res) => {
     params.push(status);
   }
 
-  if (caixa_id) {
+  if (caixaIdFiltro) {
     sql += ' AND f.caixa_id = ?';
-    params.push(caixa_id);
+    params.push(caixaIdFiltro);
   }
 
   sql += ' ORDER BY f.vencimento DESC LIMIT ? OFFSET ?';
   params.push(limite, offset);
 
-  try {
     const [lancamentos] = await db.query(sql, params);
-    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true ORDER BY nome');
 
     const countParams = [];
     let countSql = `
@@ -72,9 +92,9 @@ router.get('/', async (req, res) => {
       countParams.push(status);
     }
 
-    if (caixa_id) {
+    if (caixaIdFiltro) {
       countSql += ' AND f.caixa_id = ?';
-      countParams.push(caixa_id);
+      countParams.push(caixaIdFiltro);
     }
 
     const [totalResult] = await db.query(countSql, countParams);
@@ -87,7 +107,7 @@ router.get('/', async (req, res) => {
       busca,
       tipo,
       status,
-      caixa_id,
+      caixa_id: caixa_id || '', // Passar vazio quando não fornecido, o EJS tratará o padrão
       pagina: Number(pagina),
       totalPaginas,
       erro: req.query.erro || null,
@@ -95,14 +115,15 @@ router.get('/', async (req, res) => {
     });
   } catch (erro) {
     console.error('Erro ao buscar lançamentos:', erro);
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true ORDER BY nome');
     res.render('financeiro/listar', {
       titulo: 'Lançamentos Financeiros',
       lancamentos: [],
-      caixas: [],
+      caixas: caixas || [],
       busca,
       tipo,
       status,
-      caixa_id,
+      caixa_id: '',
       pagina: 1,
       totalPaginas: 0,
       erro: 'Erro ao carregar lançamentos.',

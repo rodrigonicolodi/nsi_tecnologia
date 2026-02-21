@@ -44,8 +44,18 @@
       <label for="caixa_id">Caixa:</label>
       <select name="caixa_id" id="caixa_id">
         <option value="">Todos os caixas</option>
+        <% 
+          // Se não há caixa_id selecionado, usar "Sicredi PJ" como padrão
+          let caixaIdSelecionado = caixa_id || '';
+          if (!caixaIdSelecionado) {
+            const caixaPadrao = (caixas || []).find(c => c.nome === 'Sicredi PJ');
+            if (caixaPadrao) {
+              caixaIdSelecionado = caixaPadrao.id;
+            }
+          }
+        %>
         <% (caixas || []).forEach(c => { %>
-          <option value="<%= c.id %>" <%= caixa_id == c.id ? 'selected' : '' %>><%= c.nome %></option>
+          <option value="<%= c.id %>" <%= caixaIdSelecionado == c.id ? 'selected' : '' %>><%= c.nome %></option>
         <% }) %>
       </select>
     </div>

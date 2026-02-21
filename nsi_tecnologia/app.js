@@ -61,6 +61,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// 🔐 Proteção global: exige login em todas as rotas exceto login e raiz
+// CRÍTICO: Sem isso, /financeiro, /pessoas, /os etc. ficavam acessíveis sem senha!
+const rotasPublicas = ['/login', '/'];
+app.use((req, res, next) => {
+  if (rotasPublicas.includes(req.path)) return next();
+  if (req.session && req.session.usuario) return next();
+  return res.redirect('/login');
+});
+
 // 🖼️ Configuração de views
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
