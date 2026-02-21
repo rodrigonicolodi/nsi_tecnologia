@@ -4,7 +4,7 @@ const db = require('../db');
 
 // 📄 Listagem com filtros e paginação
 router.get('/', async (req, res) => {
-  const { busca = '', tipo = '', status = 'pendente', pagina = 1 } = req.query;
+  const { busca = '', tipo = '', status = 'pendente', pagina = 1, data_inicio = '', data_fim = '', caixa_quitacao_id = '' } = req.query;
   // Verificar se caixa_id foi passado explicitamente na query
   const caixa_id = req.query.caixa_id !== undefined ? req.query.caixa_id : undefined;
   const limite = 10;
@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
 
   let sql = `
     SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
-           f.parcela_atual, f.total_parcelas, f.parcela_pai_id,
+           f.parcela_atual, f.total_parcelas, f.parcela_pai_id, f.data_quitacao,
            p.nome AS pessoa_nome,
            c1.nome AS caixa_origem_nome,
            c2.nome AS caixa_quitacao_nome
@@ -62,6 +62,20 @@ router.get('/', async (req, res) => {
   if (caixaIdFiltro) {
     sql += ' AND f.caixa_id = ?';
     params.push(caixaIdFiltro);
+  }
+
+  if (data_inicio) {
+    sql += ' AND DATE(f.vencimento) >= ?';
+    params.push(data_inicio);
+  }
+  if (data_fim) {
+    sql += ' AND DATE(f.vencimento) <= ?';
+    params.push(data_fim);
+  }
+
+  if (caixa_quitacao_id) {
+    sql += ' AND f.caixa_quitacao_id = ?';
+    params.push(caixa_quitacao_id);
   }
 
   sql += ' ORDER BY f.vencimento DESC LIMIT ? OFFSET ?';
@@ -96,6 +110,18 @@ router.get('/', async (req, res) => {
       countSql += ' AND f.caixa_id = ?';
       countParams.push(caixaIdFiltro);
     }
+    if (data_inicio) {
+      countSql += ' AND DATE(f.vencimento) >= ?';
+      countParams.push(data_inicio);
+    }
+    if (data_fim) {
+      countSql += ' AND DATE(f.vencimento) <= ?';
+      countParams.push(data_fim);
+    }
+    if (caixa_quitacao_id) {
+      countSql += ' AND f.caixa_quitacao_id = ?';
+      countParams.push(caixa_quitacao_id);
+    }
 
     const [totalResult] = await db.query(countSql, countParams);
     const totalPaginas = Math.ceil(totalResult[0].total / limite);
@@ -107,7 +133,10 @@ router.get('/', async (req, res) => {
       busca,
       tipo,
       status,
-      caixa_id: caixa_id || '', // Passar vazio quando não fornecido, o EJS tratará o padrão
+      caixa_id: caixa_id || '',
+      caixa_quitacao_id: caixa_quitacao_id || '',
+      data_inicio: data_inicio || '',
+      data_fim: data_fim || '',
       pagina: Number(pagina),
       totalPaginas,
       erro: req.query.erro || null,
@@ -124,6 +153,9 @@ router.get('/', async (req, res) => {
       tipo,
       status,
       caixa_id: '',
+      caixa_quitacao_id: '',
+      data_inicio: data_inicio || '',
+      data_fim: data_fim || '',
       pagina: 1,
       totalPaginas: 0,
       erro: 'Erro ao carregar lançamentos.',
@@ -214,6 +246,12 @@ router.post('/novo', async (req, res) => {
         total_parcelas: numParcelas,
         parcela_pai_id: parcelaPaiId
       };
+
+      // Se status = pago, já quitar: dar baixa no caixa (caixa_quitacao_id + data_quitacao)
+      if (status === 'pago') {
+        lancamento.caixa_quitacao_id = parseInt(caixa_id);
+        lancamento.data_quitacao = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      }
 
       // Se for a primeira parcela, salvar e obter o ID para usar como parcela_pai_id
       if (i === 1) {
@@ -567,7 +605,7 @@ router.post('/parcelar/:id', async (req, res) => {
 
 // 💰 Relatório de Contas a Receber
 router.get('/contas-receber', async (req, res) => {
-  const { busca = '', status_vencimento = 'pendentes', pagina = 1 } = req.query;
+  const { busca = '', status_vencimento = 'pendentes', pagina = 1, data_inicio = '', data_fim = '' } = req.query;
     const limite = 10;
   const offset = (pagina - 1) * limite;
 
@@ -611,14 +649,23 @@ router.get('/contas-receber', async (req, res) => {
     }
   }
 
+  if (data_inicio) {
+    sql += ' AND DATE(f.vencimento) >= ?';
+    params.push(data_inicio);
+  }
+  if (data_fim) {
+    sql += ' AND DATE(f.vencimento) <= ?';
+    params.push(data_fim);
+  }
+
   sql += ' ORDER BY f.vencimento ASC LIMIT ? OFFSET ?';
   params.push(limite, offset);
 
   try {
     const [lancamentos] = await db.query(sql, params);
 
-    // Calcular totais
-    const [totais] = await db.query(`
+    // Calcular totais (com mesmos filtros)
+    let totaisSql = `
       SELECT 
         COUNT(*) as total_lancamentos,
         SUM(CASE WHEN f.vencimento < CURDATE() AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencidas,
@@ -627,8 +674,21 @@ router.get('/contas-receber', async (req, res) => {
         SUM(CASE WHEN f.status = 'pendente' THEN f.valor ELSE 0 END) as total_pendentes,
         SUM(CASE WHEN f.status = 'pago' THEN f.valor ELSE 0 END) as total_quitadas
       FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
       WHERE f.tipo = 'receber'
-    `);
+    `;
+    const totaisParams = [];
+    if (busca) { totaisSql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)'; totaisParams.push(`%${busca}%`, `%${busca}%`); }
+    if (status_vencimento && status_vencimento !== 'todas') {
+      if (status_vencimento === 'vencidas') totaisSql += ' AND f.vencimento < CURDATE() AND f.status = "pendente"';
+      else if (status_vencimento === 'vencendo_hoje') totaisSql += ' AND f.vencimento = CURDATE() AND f.status = "pendente"';
+      else if (status_vencimento === 'vencendo_7_dias') totaisSql += ' AND f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = "pendente"';
+      else if (status_vencimento === 'pendentes') totaisSql += ' AND f.status = "pendente"';
+      else if (status_vencimento === 'quitadas') totaisSql += ' AND f.status = "pago"';
+    }
+    if (data_inicio) { totaisSql += ' AND DATE(f.vencimento) >= ?'; totaisParams.push(data_inicio); }
+    if (data_fim) { totaisSql += ' AND DATE(f.vencimento) <= ?'; totaisParams.push(data_fim); }
+    const [totais] = await db.query(totaisSql, totaisParams);
 
     // Contar total de páginas
     let countSql = `
@@ -657,6 +717,8 @@ router.get('/contas-receber', async (req, res) => {
         countSql += ' AND f.status = "pago"';
       }
     }
+    if (data_inicio) { countSql += ' AND DATE(f.vencimento) >= ?'; countParams.push(data_inicio); }
+    if (data_fim) { countSql += ' AND DATE(f.vencimento) <= ?'; countParams.push(data_fim); }
 
     const [countResult] = await db.query(countSql, countParams);
     const totalPaginas = Math.ceil(countResult[0].total / limite);
@@ -670,6 +732,8 @@ router.get('/contas-receber', async (req, res) => {
       caixas,
       busca,
       status_vencimento,
+      data_inicio: data_inicio || '',
+      data_fim: data_fim || '',
       pagina: parseInt(pagina),
       totalPaginas,
       erro: req.query.erro,
@@ -684,6 +748,161 @@ router.get('/contas-receber', async (req, res) => {
       caixas: [],
       busca: '',
       status_vencimento: 'todas',
+      data_inicio: '',
+      data_fim: '',
+      pagina: 1,
+      totalPaginas: 0,
+      erro: 'Erro ao carregar dados.',
+      sucesso: null
+    });
+  }
+});
+
+// 💸 Relatório de Contas a Pagar (mesmo padrão de Contas a Receber)
+router.get('/contas-pagar', async (req, res) => {
+  const { busca = '', status_vencimento = 'pendentes', pagina = 1, data_inicio = '', data_fim = '' } = req.query;
+  const limite = 10;
+  const offset = (pagina - 1) * limite;
+
+  let sql = `
+    SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
+           f.parcela_atual, f.total_parcelas, f.parcela_pai_id,
+           p.nome AS pessoa_nome, p.telefone, p.email, p.codigo_pais,
+           c1.nome AS caixa_origem_nome,
+           c2.nome AS caixa_quitacao_nome,
+           CASE 
+             WHEN f.vencimento < CURDATE() AND f.status = 'pendente' THEN 'vencida'
+             WHEN f.vencimento = CURDATE() AND f.status = 'pendente' THEN 'vencendo_hoje'
+             WHEN f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = 'pendente' THEN 'vencendo_7_dias'
+             WHEN f.status = 'pendente' THEN 'pendente'
+             ELSE 'quitada'
+           END AS status_vencimento_real
+    FROM financeiro f
+    LEFT JOIN pessoas p ON f.pessoa_id = p.id
+    LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+    LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
+    WHERE f.tipo = 'pagar'
+  `;
+  const params = [];
+
+  if (busca) {
+    sql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)';
+    params.push(`%${busca}%`, `%${busca}%`);
+  }
+
+  if (status_vencimento && status_vencimento !== 'todas') {
+    if (status_vencimento === 'vencidas') {
+      sql += ' AND f.vencimento < CURDATE() AND f.status = "pendente"';
+    } else if (status_vencimento === 'vencendo_hoje') {
+      sql += ' AND f.vencimento = CURDATE() AND f.status = "pendente"';
+    } else if (status_vencimento === 'vencendo_7_dias') {
+      sql += ' AND f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = "pendente"';
+    } else if (status_vencimento === 'pendentes') {
+      sql += ' AND f.status = "pendente"';
+    } else if (status_vencimento === 'quitadas') {
+      sql += ' AND f.status = "pago"';
+    }
+  }
+
+  if (data_inicio) {
+    sql += ' AND DATE(f.vencimento) >= ?';
+    params.push(data_inicio);
+  }
+  if (data_fim) {
+    sql += ' AND DATE(f.vencimento) <= ?';
+    params.push(data_fim);
+  }
+
+  sql += ' ORDER BY f.vencimento ASC LIMIT ? OFFSET ?';
+  params.push(limite, offset);
+
+  try {
+    const [lancamentos] = await db.query(sql, params);
+
+    let totaisSqlPagar = `
+      SELECT 
+        COUNT(*) as total_lancamentos,
+        SUM(CASE WHEN f.vencimento < CURDATE() AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencidas,
+        SUM(CASE WHEN f.vencimento = CURDATE() AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencendo_hoje,
+        SUM(CASE WHEN f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = 'pendente' THEN f.valor ELSE 0 END) as total_vencendo_7_dias,
+        SUM(CASE WHEN f.status = 'pendente' THEN f.valor ELSE 0 END) as total_pendentes,
+        SUM(CASE WHEN f.status = 'pago' THEN f.valor ELSE 0 END) as total_quitadas
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      WHERE f.tipo = 'pagar'
+    `;
+    const totaisParamsPagar = [];
+    if (busca) { totaisSqlPagar += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)'; totaisParamsPagar.push(`%${busca}%`, `%${busca}%`); }
+    if (status_vencimento && status_vencimento !== 'todas') {
+      if (status_vencimento === 'vencidas') totaisSqlPagar += ' AND f.vencimento < CURDATE() AND f.status = "pendente"';
+      else if (status_vencimento === 'vencendo_hoje') totaisSqlPagar += ' AND f.vencimento = CURDATE() AND f.status = "pendente"';
+      else if (status_vencimento === 'vencendo_7_dias') totaisSqlPagar += ' AND f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = "pendente"';
+      else if (status_vencimento === 'pendentes') totaisSqlPagar += ' AND f.status = "pendente"';
+      else if (status_vencimento === 'quitadas') totaisSqlPagar += ' AND f.status = "pago"';
+    }
+    if (data_inicio) { totaisSqlPagar += ' AND DATE(f.vencimento) >= ?'; totaisParamsPagar.push(data_inicio); }
+    if (data_fim) { totaisSqlPagar += ' AND DATE(f.vencimento) <= ?'; totaisParamsPagar.push(data_fim); }
+    const [totais] = await db.query(totaisSqlPagar, totaisParamsPagar);
+
+    let countSql = `
+      SELECT COUNT(*) as total
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      WHERE f.tipo = 'pagar'
+    `;
+    const countParams = [];
+
+    if (busca) {
+      countSql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)';
+      countParams.push(`%${busca}%`, `%${busca}%`);
+    }
+
+    if (status_vencimento && status_vencimento !== 'todas') {
+      if (status_vencimento === 'vencidas') {
+        countSql += ' AND f.vencimento < CURDATE() AND f.status = "pendente"';
+      } else if (status_vencimento === 'vencendo_hoje') {
+        countSql += ' AND f.vencimento = CURDATE() AND f.status = "pendente"';
+      } else if (status_vencimento === 'vencendo_7_dias') {
+        countSql += ' AND f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = "pendente"';
+      } else if (status_vencimento === 'pendentes') {
+        countSql += ' AND f.status = "pendente"';
+      } else if (status_vencimento === 'quitadas') {
+        countSql += ' AND f.status = "pago"';
+      }
+    }
+    if (data_inicio) { countSql += ' AND DATE(f.vencimento) >= ?'; countParams.push(data_inicio); }
+    if (data_fim) { countSql += ' AND DATE(f.vencimento) <= ?'; countParams.push(data_fim); }
+
+    const [countResult] = await db.query(countSql, countParams);
+    const totalPaginas = Math.ceil(countResult[0].total / limite);
+
+    const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
+
+    res.render('financeiro/contas-pagar', {
+      titulo: 'Relatório - Contas a Pagar',
+      lancamentos,
+      totais: totais[0],
+      caixas,
+      busca,
+      status_vencimento,
+      data_inicio: data_inicio || '',
+      data_fim: data_fim || '',
+      pagina: parseInt(pagina),
+      totalPaginas,
+      erro: req.query.erro,
+      sucesso: req.query.sucesso
+    });
+  } catch (error) {
+    console.error('Erro ao carregar contas a pagar:', error);
+    res.render('financeiro/contas-pagar', {
+      titulo: 'Relatório - Contas a Pagar',
+      lancamentos: [],
+      totais: {},
+      caixas: [],
+      busca: '',
+      status_vencimento: 'todas',
+      data_inicio: '',
+      data_fim: '',
       pagina: 1,
       totalPaginas: 0,
       erro: 'Erro ao carregar dados.',

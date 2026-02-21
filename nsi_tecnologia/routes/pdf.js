@@ -882,7 +882,7 @@ router.get('/lancamentos', async (req, res) => {
     console.log('📄 Exportando PDF de lançamentos...');
     console.log('Parâmetros:', req.query);
     
-    const { busca = '', tipo = '', status = '', caixa_id = '' } = req.query;
+    const { busca = '', tipo = '', status = '', caixa_id = '', data_inicio = '', data_fim = '' } = req.query;
     
     let sql = `
       SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
@@ -916,6 +916,14 @@ router.get('/lancamentos', async (req, res) => {
     if (caixa_id) {
       sql += ' AND f.caixa_id = ?';
       params.push(caixa_id);
+    }
+    if (data_inicio) {
+      sql += ' AND DATE(f.vencimento) >= ?';
+      params.push(data_inicio);
+    }
+    if (data_fim) {
+      sql += ' AND DATE(f.vencimento) <= ?';
+      params.push(data_fim);
     }
 
     sql += ' ORDER BY f.vencimento DESC';
@@ -978,6 +986,7 @@ router.get('/lancamentos', async (req, res) => {
                 <p><strong>Tipo:</strong> ${tipo === 'receber' ? 'A Receber' : tipo === 'pagar' ? 'A Pagar' : 'Todos os tipos'}</p>
                 <p><strong>Status:</strong> ${status === 'pendente' ? 'Pendente' : status === 'pago' ? 'Pago' : status === 'cancelado' ? 'Cancelado' : 'Todos os status'}</p>
                 <p><strong>Caixa:</strong> ${caixaNome}</p>
+                <p><strong>Período:</strong> ${data_inicio || '-'} até ${data_fim || '-'}</p>
             </div>
 
             <h3>Lançamentos (${lancamentos.length} encontrados):</h3>
@@ -1064,6 +1073,81 @@ router.get('/lancamentos', async (req, res) => {
     });
   }
 });
+
+// Função auxiliar para gerar PDF de contas (receber ou pagar)
+async function gerarPDFContas(tipo, req, res) {
+  const { busca = '', status_vencimento = '', data_inicio = '', data_fim = '' } = req.query;
+
+  let sql = `
+    SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao,
+           f.parcela_atual, f.total_parcelas, p.nome AS pessoa_nome,
+           c1.nome AS caixa_origem_nome, c2.nome AS caixa_quitacao_nome
+    FROM financeiro f
+    LEFT JOIN pessoas p ON f.pessoa_id = p.id
+    LEFT JOIN caixas c1 ON f.caixa_id = c1.id
+    LEFT JOIN caixas c2 ON f.caixa_quitacao_id = c2.id
+    WHERE f.tipo = ?
+  `;
+  const params = [tipo];
+
+  if (busca) {
+    sql += ' AND (f.descricao LIKE ? OR p.nome LIKE ?)';
+    params.push(`%${busca}%`, `%${busca}%`);
+  }
+  if (status_vencimento && status_vencimento !== 'todas') {
+    if (status_vencimento === 'vencidas') sql += ' AND f.vencimento < CURDATE() AND f.status = "pendente"';
+    else if (status_vencimento === 'vencendo_hoje') sql += ' AND f.vencimento = CURDATE() AND f.status = "pendente"';
+    else if (status_vencimento === 'vencendo_7_dias') sql += ' AND f.vencimento BETWEEN DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND f.status = "pendente"';
+    else if (status_vencimento === 'pendentes') sql += ' AND f.status = "pendente"';
+    else if (status_vencimento === 'quitadas') sql += ' AND f.status = "pago"';
+  }
+  if (data_inicio) { sql += ' AND DATE(f.vencimento) >= ?'; params.push(data_inicio); }
+  if (data_fim) { sql += ' AND DATE(f.vencimento) <= ?'; params.push(data_fim); }
+  sql += ' ORDER BY f.vencimento ASC';
+
+  const [lancamentos] = await db.query(sql, params);
+  const titulo = tipo === 'receber' ? 'Contas a Receber' : 'Contas a Pagar';
+  const colunaPessoa = tipo === 'receber' ? 'Cliente' : 'Fornecedor';
+
+  const totalPendente = lancamentos.filter(l => l.status === 'pendente').reduce((s, l) => s + parseFloat(l.valor || 0), 0);
+  const totalQuitado = lancamentos.filter(l => l.status === 'pago').reduce((s, l) => s + parseFloat(l.valor || 0), 0);
+
+  const html = `<!DOCTYPE html>
+  <html lang="pt-BR">
+  <head><meta charset="UTF-8"><title>${titulo}</title>
+  <style>body{font-family:Arial,sans-serif;margin:20px;}.header{text-align:center;margin-bottom:30px;}
+  table{width:100%;border-collapse:collapse;margin-top:20px;font-size:0.9em;}
+  th,td{border:1px solid #ddd;padding:8px;text-align:left;}th{background-color:#007bff;color:white;}
+  tr:nth-child(even){background-color:#f8f9fa;}.valor-pagar{color:#dc3545;}.valor-receber{color:#28a745;}
+  .totais{margin-top:20px;padding:15px;background:#e9ecef;border-radius:5px;}</style></head>
+  <body>
+  <div class="header"><h1>💸 ${titulo}</h1><p>NSI Tecnologia - ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p></div>
+  <div class="filtros"><p><strong>Busca:</strong> ${busca || 'Todos'}</p><p><strong>Status:</strong> ${status_vencimento || 'Todos'}</p><p><strong>Período:</strong> ${data_inicio || '-'} até ${data_fim || '-'}</p></div>
+  <table><thead><tr><th>${colunaPessoa}</th><th>Descrição</th><th>Valor</th><th>Parcelas</th><th>Vencimento</th><th>Status</th></tr></thead>
+  <tbody>${lancamentos.map(l => `
+  <tr><td>${l.pessoa_nome || '-'}</td><td>${l.descricao || '-'}</td>
+  <td class="valor-${tipo}">R$ ${parseFloat(l.valor || 0).toFixed(2)}</td>
+  <td>${l.total_parcelas > 1 ? `${l.parcela_atual}/${l.total_parcelas}` : 'À Vista'}</td>
+  <td>${l.vencimento ? new Date(l.vencimento).toLocaleDateString('pt-BR') : '-'}</td>
+  <td>${l.status || '-'}</td></tr>`).join('')}</tbody></table>
+  <div class="totais"><p><strong>Total Pendente:</strong> R$ ${totalPendente.toFixed(2)}</p><p><strong>Total Quitado:</strong> R$ ${totalQuitado.toFixed(2)}</p></div>
+  </body></html>`;
+
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  const page = await browser.newPage();
+  await page.setContent(html, { waitUntil: 'networkidle0' });
+  const pdf = await page.pdf({ format: 'A4', landscape: true, printBackground: true, margin: { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' } });
+  await browser.close();
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="relatorio_${tipo === 'receber' ? 'contas_receber' : 'contas_pagar'}.pdf"`);
+  res.setHeader('Content-Length', pdf.length);
+  res.setHeader('Cache-Control', 'no-cache');
+  res.end(pdf);
+}
+
+router.get('/contas-receber', (req, res, next) => gerarPDFContas('receber', req, res).catch(next));
+router.get('/contas-pagar', (req, res, next) => gerarPDFContas('pagar', req, res).catch(next));
 
 // Rota para PDF de estoque
 router.get('/estoque', async (req, res) => {

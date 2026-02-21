@@ -96,6 +96,52 @@ router.get('/consulta', async (req, res) => {
   }
 });
 
+// Conferência de caixa - guia rápido do que foi lancado/quitado (para acerto quando não bate)
+router.get('/conferir/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data_inicio = '', data_fim = '' } = req.query;
+
+  try {
+    const [[caixa]] = await db.query('SELECT id, nome, valor_inicial FROM caixas WHERE id = ?', [id]);
+    if (!caixa) return res.redirect('/caixas/consulta?erro=Caixa não encontrado');
+
+    let sql = `
+      SELECT f.id, f.tipo, f.valor, f.vencimento, f.status, f.descricao, f.data_quitacao,
+             p.nome AS pessoa_nome
+      FROM financeiro f
+      LEFT JOIN pessoas p ON f.pessoa_id = p.id
+      WHERE f.caixa_quitacao_id = ? AND f.status = 'pago'
+    `;
+    const params = [id];
+    if (data_inicio) { sql += ' AND DATE(f.data_quitacao) >= ?'; params.push(data_inicio); }
+    if (data_fim) { sql += ' AND DATE(f.data_quitacao) <= ?'; params.push(data_fim); }
+    sql += ' ORDER BY f.data_quitacao DESC, f.id DESC';
+
+    const [lancamentos] = await db.query(sql, params);
+
+    const totalRecebido = lancamentos.filter(l => l.tipo === 'receber').reduce((s, l) => s + parseFloat(l.valor || 0), 0);
+    const totalPago = lancamentos.filter(l => l.tipo === 'pagar').reduce((s, l) => s + parseFloat(l.valor || 0), 0);
+    const valorInicial = parseFloat(caixa.valor_inicial || 0);
+    const saldo = valorInicial + totalRecebido - totalPago;
+
+    res.render('caixas/conferir', {
+      caixa,
+      lancamentos,
+      totalRecebido,
+      totalPago,
+      valorInicial,
+      saldo,
+      data_inicio: data_inicio || '',
+      data_fim: data_fim || '',
+      titulo: `Conferência - ${caixa.nome}`,
+      usuario: req.session.usuario || {}
+    });
+  } catch (erro) {
+    console.error('Erro ao conferir caixa:', erro);
+    res.redirect('/caixas/consulta?erro=Erro ao carregar conferência');
+  }
+});
+
 // Rota para criar novo caixa (nova.ejs)
 router.get('/novo', (req, res) => {
   res.render('caixas/nova', {

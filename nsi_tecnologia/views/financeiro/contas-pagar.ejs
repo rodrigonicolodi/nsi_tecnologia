@@ -1,8 +1,8 @@
 <% layout = 'layout' %>
-<% titulo = 'Relatório - Contas a Receber' %>
+<% titulo = 'Relatório - Contas a Pagar' %>
 
-<div class="container">
-  <h2>💰 Relatório - Contas a Receber</h2>
+<div class="container contas-pagar">
+  <h2>💸 Relatório - Contas a Pagar</h2>
 
   <!-- 📊 Cards de Resumo -->
   <div class="cards-resumo">
@@ -58,10 +58,10 @@
   </div>
 
   <!-- 🔍 Filtros -->
-  <form method="GET" action="/financeiro/contas-receber" class="filtros">
+  <form method="GET" action="/financeiro/contas-pagar" class="filtros">
     <div class="campo">
       <label for="busca">Buscar:</label>
-      <input type="text" name="busca" id="busca" placeholder="Descrição ou cliente" value="<%= busca %>">
+      <input type="text" name="busca" id="busca" placeholder="Descrição ou fornecedor" value="<%= busca %>">
     </div>
 
     <div class="campo">
@@ -93,7 +93,7 @@
     </div>
 
     <div class="campo">
-      <a href="/pdf/contas-receber?busca=<%= encodeURIComponent(busca || '') %>&status_vencimento=<%= encodeURIComponent(status_vencimento || '') %>&data_inicio=<%= encodeURIComponent(data_inicio || '') %>&data_fim=<%= encodeURIComponent(data_fim || '') %>" class="btn btn-vermelho" target="_blank">
+      <a href="/pdf/contas-pagar?busca=<%= encodeURIComponent(busca || '') %>&status_vencimento=<%= encodeURIComponent(status_vencimento || '') %>&data_inicio=<%= encodeURIComponent(data_inicio || '') %>&data_fim=<%= encodeURIComponent(data_fim || '') %>" class="btn btn-vermelho" target="_blank">
         <i class="fas fa-file-pdf"></i> Exportar PDF
       </a>
     </div>
@@ -110,7 +110,7 @@
     <table class="tabela">
       <thead>
         <tr>
-          <th>Cliente</th>
+          <th>Fornecedor</th>
           <th>Descrição</th>
           <th>Valor</th>
           <th>Parcelas</th>
@@ -128,7 +128,7 @@
               <strong><%= l.pessoa_nome || '-' %></strong>
             </td>
             <td><%= l.descricao || '-' %></td>
-            <td class="valor">
+            <td class="valor valor-pagar">
               <strong>R$ <%= parseFloat(l.valor).toFixed(2) %></strong>
             </td>
             <td>
@@ -203,7 +203,7 @@
               <% if (l.status === 'pendente') { %>
                 <form action="/financeiro/quitar/<%= l.id %>" method="POST" style="display: inline-block; margin-top: 5px;">
                   <select name="caixa_quitacao_id" class="input-pequeno" required>
-                    <% caixas.forEach(c => { %>
+                    <% (caixas || []).forEach(c => { %>
                       <option value="<%= c.id %>"><%= c.nome %></option>
                     <% }) %>
                   </select>
@@ -219,9 +219,9 @@
             </td>
           </tr>
         <% }) %>
-        <% if (lancamentos.length === 0) { %>
+        <% if ((lancamentos || []).length === 0) { %>
           <tr>
-            <td colspan="9">Nenhuma conta a receber encontrada.</td>
+            <td colspan="9">Nenhuma conta a pagar encontrada.</td>
           </tr>
         <% } %>
       </tbody>
@@ -302,6 +302,11 @@
 .card-verde { border-left: 4px solid #28a745; }
 .card-verde .card-header i { color: #28a745; }
 
+/* Contas a pagar: valor em vermelho (saída) */
+.contas-pagar .valor-pagar {
+  color: #dc3545;
+}
+
 /* Filtros */
 .filtros {
   display: flex;
@@ -347,7 +352,6 @@
 
 .valor {
   font-weight: bold;
-  color: #28a745;
 }
 
 .data-vencimento.vencida {
@@ -479,9 +483,6 @@
 <script>
 function abrirWhatsApp(numero) {
   const numeroLimpo = numero.replace(/\D/g, '');
-  console.log('Número para WhatsApp:', numeroLimpo);
-  
-  // Tentar abrir o aplicativo diretamente
   const link = document.createElement('a');
   link.href = `whatsapp://send?phone=${numeroLimpo}`;
   link.style.display = 'none';

@@ -61,8 +61,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🔐 Proteção global: exige login em todas as rotas exceto login e raiz
-// CRÍTICO: Sem isso, /financeiro, /pessoas, /os etc. ficavam acessíveis sem senha!
+// 🔐 SEGURANÇA - Proteção global de login
+// Todas as rotas abaixo exigem sessão. Só rotasPublicas são acessíveis sem login.
+// ⚠️ CUIDADO: NÃO adicionar telas do sistema em rotasPublicas. Só login, recuperar-senha, etc.
+// Novos routers DEVEM ser montados ABAIXO deste middleware para ficarem protegidos.
 const rotasPublicas = ['/login', '/'];
 app.use((req, res, next) => {
   if (rotasPublicas.includes(req.path)) return next();
@@ -74,7 +76,7 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// 🚦 Uso das rotas
+// 🚦 Rotas (todas protegidas pelo middleware acima; montar novos routers aqui)
 app.use('/', authRouter);
 app.use('/usuarios', usuariosRouter);
 app.use('/pessoas', pessoasRoutes);

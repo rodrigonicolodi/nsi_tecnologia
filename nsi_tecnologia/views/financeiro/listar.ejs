@@ -4,13 +4,22 @@
 <div class="container">
   <h2>Lançamentos Financeiros</h2>
 
-<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
   <a href="/financeiro/novo" class="btn btn-azul">
     <i class="fas fa-plus-circle"></i> Novo Lançamento
   </a>
-
   <a href="/caixas/consulta" class="btn btn-azul">
     <i class="fas fa-search"></i> Consulta de Caixas
+  </a>
+  <% 
+    const hoje = new Date();
+    const trintaDiasAtras = new Date(hoje);
+    trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+    const dataInicio30 = trintaDiasAtras.toISOString().split('T')[0];
+    const dataFimHoje = hoje.toISOString().split('T')[0];
+  %>
+  <a href="/financeiro?status=pago&data_inicio=<%= dataInicio30 %>&data_fim=<%= dataFimHoje %>" class="btn btn-azul" title="Conferir quitações dos últimos 30 dias">
+    <i class="fas fa-check-double"></i> Conferir Quitações
   </a>
 </div>
 
@@ -41,7 +50,27 @@
     </div>
 
     <div class="campo">
-      <label for="caixa_id">Caixa:</label>
+      <label for="data_inicio">Data de:</label>
+      <input type="date" name="data_inicio" id="data_inicio" value="<%= data_inicio || '' %>">
+    </div>
+
+    <div class="campo">
+      <label for="data_fim">Data até:</label>
+      <input type="date" name="data_fim" id="data_fim" value="<%= data_fim || '' %>">
+    </div>
+
+    <div class="campo">
+      <label for="caixa_quitacao_id">Quitado em caixa:</label>
+      <select name="caixa_quitacao_id" id="caixa_quitacao_id">
+        <option value="">Todos</option>
+        <% (caixas || []).forEach(c => { %>
+          <option value="<%= c.id %>" <%= caixa_quitacao_id == c.id ? 'selected' : '' %>><%= c.nome %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="caixa_id">Caixa (origem):</label>
       <select name="caixa_id" id="caixa_id">
         <option value="">Todos os caixas</option>
         <% 
@@ -67,7 +96,7 @@
     </div>
 
     <div class="campo">
-      <a href="/pdf/lancamentos?busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>&caixa_id=<%= encodeURIComponent(caixa_id || '') %>" class="btn btn-vermelho" target="_blank">
+      <a href="/pdf/lancamentos?busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>&caixa_id=<%= encodeURIComponent(caixa_id || '') %>&caixa_quitacao_id=<%= encodeURIComponent(caixa_quitacao_id || '') %>&data_inicio=<%= encodeURIComponent(data_inicio || '') %>&data_fim=<%= encodeURIComponent(data_fim || '') %>" class="btn btn-vermelho" target="_blank">
         <i class="fas fa-file-pdf"></i> Exportar PDF
       </a>
     </div>
@@ -96,7 +125,7 @@
       </thead>
       <tbody>
         <% (lancamentos || []).forEach(l => { %>
-          <tr>
+          <tr class="<%= l.status === 'pago' ? 'linha-quitada' : 'linha-pendente' %>">
             <td><%= l.tipo || '-' %></td>
             <td><%= l.pessoa_nome || '-' %></td>
             <td><%= l.caixa_origem_nome || '-' %></td>
@@ -194,7 +223,7 @@
   <% if (totalPaginas > 1) { %>
     <div class="paginacao">
       <% for (let i = 1; i <= totalPaginas; i++) { %>
-        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>&caixa_id=<%= encodeURIComponent(caixa_id || '') %>"
+        <a href="?pagina=<%= i %>&busca=<%= encodeURIComponent(busca || '') %>&tipo=<%= encodeURIComponent(tipo || '') %>&status=<%= encodeURIComponent(status || '') %>&caixa_id=<%= encodeURIComponent(caixa_id || '') %>&caixa_quitacao_id=<%= encodeURIComponent(caixa_quitacao_id || '') %>&data_inicio=<%= encodeURIComponent(data_inicio || '') %>&data_fim=<%= encodeURIComponent(data_fim || '') %>"
            class="btn-pagina <%= pagina === i ? 'ativo' : '' %>">
           <%= i %>
         </a>

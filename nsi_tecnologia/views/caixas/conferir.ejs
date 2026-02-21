@@ -1,0 +1,100 @@
+<% layout = 'layout' %>
+<% titulo = 'Conferência de Caixa' %>
+
+<div class="container">
+  <h2>💰 Conferência - <%= caixa.nome %></h2>
+  <p class="subtitulo">Guia rápido do que foi quitado neste caixa (para acerto quando valores não batem)</p>
+
+  <div style="margin-bottom: 20px;">
+    <a href="/caixas/consulta" class="btn btn-azul"><i class="fas fa-arrow-left"></i> Voltar à Consulta</a>
+    <a href="/financeiro?status=pago&caixa_quitacao_id=<%= caixa.id %>" class="btn btn-verde"><i class="fas fa-list"></i> Ver no Financeiro</a>
+  </div>
+
+  <!-- Resumo -->
+  <div class="resumo-caixa">
+    <div class="resumo-item">
+      <span class="resumo-label">Valor Inicial</span>
+      <span class="resumo-valor">R$ <%= parseFloat(valorInicial || 0).toFixed(2) %></span>
+    </div>
+    <div class="resumo-item positivo">
+      <span class="resumo-label">+ Recebido</span>
+      <span class="resumo-valor">R$ <%= parseFloat(totalRecebido || 0).toFixed(2) %></span>
+    </div>
+    <div class="resumo-item negativo">
+      <span class="resumo-label">− Pago</span>
+      <span class="resumo-valor">R$ <%= parseFloat(totalPago || 0).toFixed(2) %></span>
+    </div>
+    <div class="resumo-item saldo">
+      <span class="resumo-label">= Saldo</span>
+      <span class="resumo-valor">R$ <%= parseFloat(saldo || 0).toFixed(2) %></span>
+    </div>
+  </div>
+
+  <!-- Filtro por período -->
+  <form method="GET" action="/caixas/conferir/<%= caixa.id %>" class="filtros-conferencia">
+    <div class="campo">
+      <label>Data de:</label>
+      <input type="date" name="data_inicio" value="<%= data_inicio || '' %>">
+    </div>
+    <div class="campo">
+      <label>Data até:</label>
+      <input type="date" name="data_fim" value="<%= data_fim || '' %>">
+    </div>
+    <button type="submit" class="btn btn-azul"><i class="fas fa-filter"></i> Filtrar</button>
+  </form>
+
+  <!-- Lista de lançamentos quitados -->
+  <div class="table-wrapper">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Data Quitação</th>
+          <th>Tipo</th>
+          <th>Pessoa</th>
+          <th>Descrição</th>
+          <th>Valor</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (lancamentos || []).forEach(l => { %>
+          <tr>
+            <td><%= l.data_quitacao ? new Date(l.data_quitacao).toLocaleDateString('pt-BR') : '-' %></td>
+            <td><span class="tipo-badge tipo-<%= l.tipo %>"><%= l.tipo === 'receber' ? 'Receber' : 'Pagar' %></span></td>
+            <td><%= l.pessoa_nome || '-' %></td>
+            <td><%= l.descricao || '-' %></td>
+            <td class="valor-<%= l.tipo %>"><strong>R$ <%= parseFloat(l.valor || 0).toFixed(2) %></strong></td>
+            <td><a href="/financeiro/exibir/<%= l.id %>" class="btn btn-acao btn-azul" title="Ver"><i class="fas fa-eye"></i></a></td>
+          </tr>
+        <% }) %>
+        <% if ((lancamentos || []).length === 0) { %>
+          <tr><td colspan="6">Nenhum lançamento quitado neste caixa.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.subtitulo { color: #666; margin-bottom: 20px; font-size: 0.95em; }
+.resumo-caixa {
+  display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 25px;
+  padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #007bff;
+}
+.resumo-item { display: flex; flex-direction: column; gap: 4px; }
+.resumo-label { font-size: 0.85em; color: #666; }
+.resumo-valor { font-size: 1.2em; font-weight: bold; }
+.resumo-item.positivo .resumo-valor { color: #28a745; }
+.resumo-item.negativo .resumo-valor { color: #dc3545; }
+.resumo-item.saldo .resumo-valor { font-size: 1.4em; color: #007bff; }
+.filtros-conferencia { display: flex; gap: 15px; align-items: end; margin-bottom: 20px; flex-wrap: wrap; }
+.filtros-conferencia .campo { display: flex; flex-direction: column; gap: 4px; }
+.filtros-conferencia label { font-size: 0.9em; font-weight: 600; }
+.tipo-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
+.tipo-receber { background: #d4edda; color: #155724; }
+.tipo-pagar { background: #f8d7da; color: #721c24; }
+.valor-receber { color: #28a745; }
+.valor-pagar { color: #dc3545; }
+.btn-verde { background: #28a745; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn-verde:hover { background: #218838; color: white; }
+</style>

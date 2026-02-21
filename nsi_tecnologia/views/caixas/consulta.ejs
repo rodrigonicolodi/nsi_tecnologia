@@ -7,6 +7,20 @@
     max-height: 500px;
     margin: 0 auto;
   }
+  .btn-conferir {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 4px 10px;
+    font-size: 0.8em;
+    background: #28a745;
+    color: white !important;
+    border-radius: 4px;
+    text-decoration: none;
+  }
+  .btn-conferir:hover {
+    background: #218838;
+    color: white !important;
+  }
 </style>
 
 <div class="container">
@@ -46,6 +60,7 @@
       somaSaldo += saldo;
 
       return {
+        id: c.id,
         nome: c.nome,
         ativo: c.ativo,
         inicial,
@@ -71,7 +86,12 @@
       <% if (caixasFormatados.length > 0) { %>
         <% caixasFormatados.forEach(c => { %>
           <tr>
-            <td><%= c.nome %></td>
+            <td>
+              <%= c.nome %>
+              <a href="/caixas/conferir/<%= c.id %>" class="btn-conferir" title="Ver o que foi quitado neste caixa">
+                <i class="fas fa-search-dollar"></i> Conferir
+              </a>
+            </td>
             <td><%= c.ativo ? 'Ativo' : 'Inativo' %></td>
             <td>R$ <%= c.inicial.toFixed(2) %></td>
             <td>R$ <%= c.recebido.toFixed(2) %></td>
