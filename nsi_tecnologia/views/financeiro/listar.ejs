@@ -176,12 +176,12 @@
     <i class="fas fa-edit"></i>
   </a>
   <% if (l.status === 'pago') { %>
-    <a href="/financeiro/recibo/<%= l.id %>" class="btn btn-acao btn-verde" title="Imprimir Recibo" target="_blank">
+    <a href="/financeiro/recibo/<%= l.id %>" class="btn btn-acao btn-azul" title="Imprimir Recibo" target="_blank">
       <i class="fas fa-receipt"></i>
     </a>
   <% } %>
   <% if (l.total_parcelas > 1) { %>
-    <a href="/financeiro/parcelas/<%= l.parcela_pai_id || l.id %>" class="btn btn-acao btn-verde" title="Ver Parcelas">
+    <a href="/financeiro/parcelas/<%= l.parcela_pai_id || l.id %>" class="btn btn-acao btn-azul" title="Ver Parcelas">
       <i class="fas fa-list"></i>
     </a>
   <% } else { %>
@@ -200,7 +200,7 @@
           <option value="<%= c.id %>"><%= c.nome %></option>
         <% }) %>
       </select>
-      <button type="submit" class="btn btn-acao btn-verde" title="Quitar">
+      <button type="submit" class="btn btn-acao btn-azul" title="Quitar">
         <i class="fas fa-check-circle"></i>
       </button>
     </form>
