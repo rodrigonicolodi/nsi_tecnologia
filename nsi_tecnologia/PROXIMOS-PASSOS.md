@@ -13,18 +13,46 @@ Atualize este arquivo sempre que uma etapa for concluída.
 - CI no GitHub Actions: a cada push na `develop`, testa se o sistema instala e sobe.
 - Deploy automático pronto, **mas desligado** (`deploy.yml` + `scripts/deploy-remote.sh`).
 - `CLAUDE.md` com as regras do projeto para o Claude Code.
+- Notebook: tudo enviado ao GitHub; primeiro CI passou ✅.
+
+## ⚠️ Descoberto em 22/10/2026
+- **PCs podem ter alterações nunca commitadas.** No PC de casa, ao trocar para a
+  `develop`, apareceram 6 arquivos modificados: `app.js`, `routes/financeiro.js`,
+  `views/financeiro/editar.ejs`, `views/financeiro/exibir.ejs`, `views/os/editar.ejs`,
+  `views/os/exibir.ejs`. Provavelmente foram publicados na produção pelo cPanel
+  sem commit. **Nunca descartar** (nada de checkout/restore/reset/stash).
+- **A produção pode ter código que não está no GitHub.** Publicar a versão do
+  GitHub por cima apagaria essas alterações.
+- **`npm ci` falha no PC de casa compilando o `bcrypt`** (nativo). Solução proposta:
+  trocar por `bcryptjs` (100% JS, mesmo formato de hash, senhas atuais continuam válidas).
 
 ## 🔜 A fazer (em ordem)
 
-### 1. Atualizar os outros PCs
+### 1. Salvar no GitHub o que só existe nos PCs
+- [ ] PC de casa: revisar `git diff --stat` dos 6 arquivos; se forem mudanças reais,
+  commit na `develop` + push
+- [ ] PC do escritório: `git status` **antes** de trocar de branch; se houver código
+  modificado, commit + push primeiro
+
+### 2. Trocar bcrypt por bcryptjs
+- [ ] Em `routes/auth.js` e `routes/usuarios.js` (só usam `hash` e `compare` com `await`);
+  tirar `bcrypt` do `package.json`; testar que hash antigo do bcrypt é aceito.
+
+### 3. Atualizar os outros PCs
 - [ ] PC de casa
 - [ ] PC do escritório
 
-Em cada um: conferir `git status` (nada de código pendente), apagar a pasta
-`node_modules` e rodar `git fetch`, `git switch develop`, `npm ci`.
-**Não apagar o `.env`.**
+Em cada um (com o Cursor fechado, para evitar erro EPERM): `git fetch`,
+`git switch develop`, `npm ci`. **Não apagar o `.env`.**
 
-### 2. Configurar o deploy automático
+### 4. Conferir produção × GitHub (ANTES de ligar o deploy)
+- [ ] Usuário baixa pelo cPanel um `.zip` da pasta do app, **sem `node_modules` e sem `.env`**
+  (só download, não altera nada).
+- [ ] Comparar com a `develop` arquivo por arquivo e trazer para o GitHub o que só
+  existe na produção.
+- Até isso ser feito: publicar pelo cPanel **só os arquivos alterados**, nunca a pasta inteira.
+
+### 5. Configurar o deploy automático (só depois do passo 4)
 Passo a passo em `deploy-instructions.md`. Primeiro, anotar no painel do
 Integrator (**Setup Node.js App**), só olhando:
 - [ ] pasta do app (Application root)
@@ -36,7 +64,7 @@ Depois: chave SSH, secrets e variáveis no GitHub, ambiente `production` com
 aprovação manual, proteção da `main` e, por fim, `DEPLOY_ENABLED=true`.
 A primeira publicação deve ser acompanhada.
 
-### 3. Banco de desenvolvimento
+### 6. Banco de desenvolvimento
 Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dados reais).
 - [ ] Confirmar qual banco a produção usa: o do Integrator ou o antigo da Locaweb
   (houve migração; pode haver dois).
@@ -44,10 +72,9 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
 - [ ] Trocar o `.env` dos 3 PCs para o banco novo.
 - [ ] Versionar a estrutura do banco (arquivo `.sql` só com o schema, sem dados).
 
-### 4. Melhorias no código (sem tocar em produção)
+### 7. Melhorias no código (sem tocar em produção)
 - [ ] Aviso vermelho na tela quando o sistema roda no PC conectado ao banco de produção.
 - [ ] Tratar as 56 vulnerabilidades do `npm audit` (3 críticas), testando com calma.
-- [ ] Remover `bcryptjs` (instalado, mas não usado).
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.
 - [ ] `SESSION_SECRET` tem valor padrão fixo no `app.js` se faltar no `.env`.
 - [ ] Criar os primeiros testes automáticos (o Jest está instalado, mas não há testes).
