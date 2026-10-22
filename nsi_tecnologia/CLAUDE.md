@@ -3,6 +3,9 @@
 Sistema de gestão (OS, pessoas, estoque, financeiro, caixas, relatórios, PDF) em
 Node.js + Express 4 + EJS (express-ejs-layouts) + MySQL (mysql2/promise).
 
+**Situação atual e pendências: ver `PROXIMOS-PASSOS.md`** (mantenha-o atualizado
+ao concluir etapas).
+
 ## Regras de segurança (obrigatórias)
 - **Produção tem dados reais.** Nunca conectar, consultar ou alterar banco de
   produção nem acessar o servidor sem pedido explícito do usuário naquela hora.
