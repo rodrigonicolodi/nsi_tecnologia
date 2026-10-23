@@ -110,9 +110,24 @@ Integrator (**Setup Node.js App**), só olhando:
 - ⚠️ No mesmo painel há **outro app**, `controle_nsitecnologia` (porta 61911,
   `applications/controle_nsitecnologia`) — **não mexer nele**.
 
-Depois: chave SSH, secrets e variáveis no GitHub, ambiente `production` com
-aprovação manual, proteção da `main` e, por fim, `DEPLOY_ENABLED=true`.
-A primeira publicação deve ser acompanhada.
+Feito em 23/10/2026 (notebook):
+- [x] Chave SSH `github_deploy_nsi` (ed25519, sem senha) gerada no PC, pública importada
+  e **autorizada** no cPanel (SSH Access → Manage SSH Keys). Cópia local apagada.
+- [x] Secrets no GitHub: `SSH_PRIVATE_KEY`, `SSH_HOST` (`sistema.nsitecnologia.com.br`),
+  `SSH_USER` (`rodri6000`). `SSH_PORT` não precisa (porta 22).
+- [x] Login do Git no notebook trocado para **código de dispositivo**
+  (`git config --global credential.gitHubAuthModes device`) — o antivírus bloqueava o
+  login pelo navegador. Se acontecer nos outros PCs, usar o mesmo comando.
+
+**Continuar daqui (PC de casa):**
+- [ ] Secret `SSH_KNOWN_HOSTS`: rodar no PC `ssh-keyscan -p 22 sistema.nsitecnologia.com.br`
+  (só lê a identidade pública do servidor) e colar a saída como secret.
+- [ ] Variables (aba **Variables**, ao lado de Secrets): `APP_DIR` =
+  `/home/rodri6000/applications/nsi_tecnologia`, `APP_URL` = `https://sistema.nsitecnologia.com.br`.
+  (`RESTART_METHOD` e `PM2_NAME` já têm padrão certo no script; não criar `NODEVENV_ACTIVATE`.)
+- [ ] Ambiente `production` com aprovação manual (Settings → Environments).
+- [ ] Proteção da `main` (exigir PR + CI passando).
+- [ ] Por último, variável `DEPLOY_ENABLED` = `true`. A primeira publicação deve ser acompanhada.
 
 ### 6. Banco de desenvolvimento
 Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dados reais).
