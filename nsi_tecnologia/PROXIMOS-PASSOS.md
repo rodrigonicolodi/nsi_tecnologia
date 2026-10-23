@@ -119,15 +119,29 @@ Feito em 23/10/2026 (notebook):
   (`git config --global credential.gitHubAuthModes device`) — o antivírus bloqueava o
   login pelo navegador. Se acontecer nos outros PCs, usar o mesmo comando.
 
-**Continuar daqui (PC de casa):**
-- [ ] Secret `SSH_KNOWN_HOSTS`: rodar no PC `ssh-keyscan -p 22 sistema.nsitecnologia.com.br`
-  (só lê a identidade pública do servidor) e colar a saída como secret.
-- [ ] Variables (aba **Variables**, ao lado de Secrets): `APP_DIR` =
-  `/home/rodri6000/applications/nsi_tecnologia`, `APP_URL` = `https://sistema.nsitecnologia.com.br`.
+Feito em 23/10/2026 (PC de casa):
+- [x] Secret `SSH_KNOWN_HOSTS` (saída do `ssh-keyscan -p 22 sistema.nsitecnologia.com.br`:
+  chaves rsa, ecdsa e ed25519). Agora são 4 secrets.
+- [x] Variables (conferido por print): `APP_DIR` = `/home/rodri6000/applications/nsi_tecnologia`,
+  `APP_URL` = `https://sistema.nsitecnologia.com.br`.
   (`RESTART_METHOD` e `PM2_NAME` já têm padrão certo no script; não criar `NODEVENV_ACTIVATE`.)
-- [ ] Ambiente `production` com aprovação manual (Settings → Environments).
-- [ ] Proteção da `main` (exigir PR + CI passando).
+- [x] Ambiente `production` (conferido pela API do GitHub): Required reviewers
+  `rodrigonicolodi`, sem "Prevent self-review", só a `main` publica; bypass do admin ligado.
+
+- [x] Proteção da `main` (classic rule; conferido pela API: protegida, check `teste` obrigatório):
+  exige PR **sem** "Require approvals" (ninguém aprova o próprio PR); bypass do admin liberado.
+
+**Continuar daqui:**
+- [ ] ⚠️ **O repositório no GitHub é público** (descoberto em 23/10/2026): o código é visível
+  a todos — sem senhas nele, mas o `SESSION_SECRET` padrão do `app.js` também fica visível.
+  Antes de ligar o deploy, conferir no cPanel se o `.env` **da produção** tem a linha
+  `SESSION_SECRET=` com valor próprio (não mostrar o valor a ninguém). Avaliar deixar o
+  repositório privado (atenção: no plano grátis, privado perde a aprovação manual do ambiente e a proteção da `main`).
 - [ ] Por último, variável `DEPLOY_ENABLED` = `true`. A primeira publicação deve ser acompanhada.
+
+**Como publicar com o deploy ligado:** trabalhar na `develop` → no GitHub, abrir PR
+`develop` → `main` → teste verde → **Merge** → o deploy espera → **Review deployments →
+Approve and deploy**.
 
 ### 6. Banco de desenvolvimento
 Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dados reais).
@@ -138,6 +152,13 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
 - [ ] Versionar a estrutura do banco (arquivo `.sql` só com o schema, sem dados).
 
 ### 7. Melhorias no código (sem tocar em produção)
+- [ ] ⚠️ **Trocar o Node 23.1.0 do servidor por uma versão LTS** (Node 22 ≥ 22.23.4 ou
+  Node 24 ≥ 24.22.1). O Node 23 está sem suporte desde 2025, então **não recebe correções de
+  segurança**, como a da falha do Brotli (CVE-2026-111497, corrigida em 21/10/2026).
+  O risco direto no nosso sistema é baixo: o servidor não usa `fetch` nem descompacta Brotli,
+  e o Express 4 não decodifica Brotli. Mesmo assim, o Node 23 vai acumular falhas sem correção.
+  Antes, ver no painel do Integrator quais versões existem; testar no PC e no CI
+  (`ci.yml`) antes de trocar na produção.
 - [ ] Aviso vermelho na tela quando o sistema roda no PC conectado ao banco de produção.
 - [ ] Tratar as 56 vulnerabilidades do `npm audit` (3 críticas), testando com calma.
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.
