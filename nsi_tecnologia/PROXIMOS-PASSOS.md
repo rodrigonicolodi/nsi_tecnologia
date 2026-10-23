@@ -87,3 +87,96 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
 - Publicação ainda é manual pelo cPanel até o deploy automático ser ligado:
   nunca enviar `node_modules` nem o `.env` do PC.
 - Nada de mexer em banco ou servidor de produção sem decisão explícita do usuário.
+
+---
+
+# 📋 Comandos — guia rápido
+
+> 🥇 **Regra de ouro: chegou no PC → `git pull`. Terminou → `git push`.**
+> Os PCs não conversam entre si; tudo passa pelo GitHub.
+
+## 🟢 Ao começar a trabalhar (sempre)
+```bash
+git status        # 1ª linha deve ser "On branch develop"
+git pull          # recebe o que foi feito nos outros PCs
+npm ci            # SÓ se o pull trouxe package.json ou package-lock.json
+```
+⚠️ Se aparecer `On branch main` → `git switch develop` antes de mexer em qualquer coisa.
+
+## 🧪 Testar no PC
+```bash
+npm start         # abre em http://localhost:3000 — parar com Ctrl+C
+```
+⚠️ **O `.env` aponta para o BANCO DE PRODUÇÃO**: olhar à vontade, mas não cadastrar,
+editar ou excluir dados de teste.
+
+## 🔴 Ao terminar (nunca sair sem isso)
+```bash
+git status                      # confere o que mudou (nunca deve aparecer .env)
+git add -A
+git commit -m "o que foi feito"
+git push                        # envia para o GitHub
+```
+Ou peça ao Claude: **"faça o commit e o push do que fizemos"**.
+
+## 🔍 Conferir se o PC está igual ao GitHub
+```bash
+git fetch
+git status
+```
+| Mensagem | Significa | Fazer |
+|---|---|---|
+| `up to date` + `nothing to commit` | igual ✅ | nada |
+| `Your branch is behind` | falta receber | `git pull` |
+| `Your branch is ahead` | falta enviar | `git push` |
+| arquivos em vermelho | alterações sem commit | commit + push |
+
+Trabalho esquecido (os dois devem voltar **vazios**):
+```bash
+git log --oneline origin/main..main    # commits nunca enviados
+git stash list                         # alterações guardadas e esquecidas
+```
+
+## 🚀 Publicar na produção (manual, até ligar o deploy automático)
+1. Pergunte ao Claude: **"quais arquivos mudaram desde a última publicação?"**
+2. cPanel → Gerenciador de Arquivos → subir **só esses arquivos**, na mesma pasta.
+3. Mudou `routes/`, `controllers/` ou `app.js` → **reiniciar o app** no painel
+   (Setup Node.js App). Só `views/` ou `public/` → costuma aparecer na hora.
+4. ⚠️ **Na 1ª publicação de `routes/auth.js` ou `routes/usuarios.js`**: antes, rodar
+   **"Run NPM Install"** no painel, para o servidor instalar o `bcryptjs`.
+   Sem isso o login da produção quebra.
+
+❌ Nunca subir `node_modules` nem o `.env` do PC. Nunca subir a pasta inteira.
+
+## 🏢 PC do escritório (1ª vez — ainda está na `main` antiga)
+**Primeiro só olhar** (não altera nada) e mandar o print:
+```bash
+git status
+git log --oneline origin/main..main
+git stash list
+```
+- ⚠️ Lá o `.gitignore` antigo **esconde arquivos novos de `public/`**: eles só
+  aparecem depois de trocar para a `develop`.
+- **Tudo limpo** (nothing to commit + os outros dois vazios):
+  ```bash
+  git fetch
+  git switch develop
+  npm ci
+  ```
+- **Com alterações** → não trocar de branch; pedir ajuda para salvar primeiro.
+- ⚠️ Erro **"would be overwritten"** no `git switch` → **não forçar**: o escritório
+  tem versões próprias de arquivos que já estão no GitHub; comparar antes.
+
+## 🆘 Deu erro?
+- `EPERM` no `npm ci` → fechar terminais com `npm start` rodando, apagar a pasta
+  `node_modules` e rodar `npm ci` de novo.
+- Push pede login → janela do GitHub: **"Sign in with your browser"**.
+  ❌ Nunca digitar a senha no terminal nem na aba "Token" (não funciona e bloqueia a conta).
+- Qualquer mensagem estranha → **parar e mostrar ao Claude** antes de continuar.
+
+## ⛔ Comandos que APAGAM trabalho — não usar sem ajuda
+```bash
+git checkout -- <arquivo>     git restore <arquivo>     git reset --hard
+git clean                     git stash drop            git push --force
+```
+Também não apagar a pasta do projeto nem o `.env`.
