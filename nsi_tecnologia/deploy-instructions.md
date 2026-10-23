@@ -32,12 +32,13 @@ Depois, em **Actions → Deploy produção**, clique em **Review deployments →
 ## Configuração única (servidor + GitHub)
 Feita uma vez só. Até lá o deploy fica desligado.
 
-### 1. Descobrir dados no painel do Integrator (só olhar)
-Em **Setup Node.js App**, anote:
-- **Application root** (ex.: `applications/nsi_tecnologia`) → caminho completo `APP_DIR`, ex.: `/home/rodri6000/applications/nsi_tecnologia`
-- o **comando "source ... activate"** que aparece no topo → `NODEVENV_ACTIVATE` (só o caminho do arquivo `activate`)
-- a **versão do Node** (para alinhar com o teste, que usa a 22)
-- como você reinicia hoje: botão **Restart** do painel → `passenger`; PM2 → `pm2`
+### 1. Dados do servidor (levantados em 23/10/2026)
+O painel é o **Integrator Node.js** (não o "Setup Node.js App" padrão do cPanel) e roda o app com **PM2 global** (`/bin/pm2`).
+- `APP_DIR`: `/home/rodri6000/applications/nsi_tecnologia`
+- Node **v23.1.0** (o teste usa a mesma)
+- Nome no PM2: **`nsi_tecnologia`** (`pm2 list`) → reinício com `pm2 restart nsi_tecnologia`
+- No mesmo servidor roda **outro app**, `controle_nsitecnologia` — o deploy não mexe nele.
+- `NODEVENV_ACTIVATE`: não existe nesse painel (deixar vazio, se `node`/`npm` funcionarem pelo SSH)
 
 ### 2. Criar chave SSH só para o GitHub
 No cPanel → **Acesso SSH → Gerenciar chaves SSH → Gerar nova chave** (nome `github_deploy`, sem senha).
@@ -60,9 +61,9 @@ Repositório → **Settings → Secrets and variables → Actions**.
 |---|---|
 | `APP_DIR` | `/home/rodri6000/applications/nsi_tecnologia` |
 | `APP_URL` | `https://sistema.nsitecnologia.com.br` |
-| `RESTART_METHOD` | `passenger` ou `pm2` |
-| `NODEVENV_ACTIVATE` | caminho do `activate` do passo 1 |
-| `PM2_NAME` | `nsi-tecnologia` (só se usar PM2) |
+| `RESTART_METHOD` | `pm2` (padrão) |
+| `NODEVENV_ACTIVATE` | não criar (o painel Integrator não usa) |
+| `PM2_NAME` | `nsi_tecnologia` (padrão) |
 | `DEPLOY_ENABLED` | `true` — **criar por último**, liga o deploy |
 
 ### 4. Exigir aprovação
@@ -74,7 +75,7 @@ Repositório → **Settings → Secrets and variables → Actions**.
 ## Voltar uma versão manualmente
 Os backups ficam em `~/backups/nsi_tecnologia/AAAAMMDD-HHMMSS.tar.gz`. Para restaurar o último:
 ```bash
-APP_DIR=/home/rodri6000/applications/nsi_tecnologia RESTART_METHOD=passenger \
+APP_DIR=/home/rodri6000/applications/nsi_tecnologia RESTART_METHOD=pm2 \
   bash ~/applications/nsi_tecnologia/scripts/deploy-remote.sh rollback
 ```
 

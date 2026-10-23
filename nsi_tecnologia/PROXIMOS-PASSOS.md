@@ -76,15 +76,39 @@ app com um `pm2` próprio (global) ou com o do projeto; se for o do projeto, adi
 `pm2` ao `package.json` antes.
 
 ### 5. Configurar o deploy automático (passo 4 ✅ — pode seguir)
-Já sabido pela comparação: Node **23.1.0** no servidor (o CI testa com a 22 — alinhar),
+Já sabido pela comparação: Node **23.1.0** no servidor (CI alinhado para 23.1.0 em 23/10/2026),
 porta 61910, processo gerenciado pelo painel do Integrator (`app.yaml`/`start.json`).
 Falta o print da tela **Setup Node.js App** e o acesso ao cPanel (recuperado em 23/10/2026).
 Passo a passo em `deploy-instructions.md`. Primeiro, anotar no painel do
 Integrator (**Setup Node.js App**), só olhando:
-- [ ] pasta do app (Application root)
-- [ ] versão do Node do servidor (o CI usa a 22)
-- [ ] caminho do `activate` do nodevenv
-- [ ] como o app é reiniciado hoje (botão Restart do painel ou PM2)
+- [x] pasta do app: `applications/nsi_tecnologia` (provável `/home/rodri6000/applications/nsi_tecnologia`)
+- [x] versão do Node do servidor: **v23.1.0** (igual ao CI) — conferido no painel em 23/10/2026
+- [ ] caminho do `node`/`npm` no servidor (o painel **não é** o "Setup Node.js App" do
+  cPanel, e sim o **"Integrator Node.js"**, próprio da Integrator; talvez não exista `activate`)
+- [ ] como o app é reiniciado hoje (chave liga/desliga do painel? aba **Deploy** do painel?)
+  Suporte da Integrator (23/10/2026): o painel **opera com PM2** (e lê o `app.yaml`) —
+  o `tmp/restart.txt` do script **não serve**. Via PuTTY (SSH `rodri6000@sistema.nsitecnologia.com.br`):
+  `which pm2` → `/bin/pm2` (**global** — tirar `pm2` do `package.json` não quebra nada);
+  `pm2 list` → processo **`nsi_tecnologia`** (id 0, online). Script e instruções já
+  ajustados para `pm2 restart nsi_tecnologia`.
+- [x] `node`/`npm`: o script pergunta ao PM2 qual Node roda o app (`pm2 jlist`) e usa
+  o `npm` da mesma pasta; o log do deploy mostra a versão usada.
+- [x] SSH: `sistema.nsitecnologia.com.br`, porta **22**, usuário `rodri6000`
+  (sessão "NSI" salva no PuTTY do notebook).
+- ✅ **Decidido (23/10/2026): usar o nosso script** (`deploy.yml` + `deploy-remote.sh`),
+  que tem backup e volta automática. O Git do painel fica sem uso.
+- Alternativa oferecida pela Integrator (não escolhida): deploy por Git do próprio painel
+  ([wiki](https://wiki.integrator.com.br/index.php?title=Realizando_Deploy_via_Git_com_Node.js)).
+  Com "Repositório Git: Automático" (já marcado), um push na `master` do repositório
+  do servidor desliga o app, roda o NPM, troca os arquivos e religa. Suporte: arquivos
+  que só existem no servidor (`.env` etc.) são **mantidos** por padrão.
+  Não tem backup/rollback. O código fica na subpasta `nsi_tecnologia/` do nosso repo.
+  Caminho do repositório: ícone **?** ao lado do app na aba Aplicativos.
+- Tela de edição do app (23/10/2026): Index `app.js`, modo **Produção**, memória 128 MB,
+  **nenhuma variável de ambiente no painel** (o sistema lê o `.env` da pasta do app —
+  o deploy já preserva o `.env`). Opção "Repositório Git: Automático" marcada (ver o que faz).
+- ⚠️ No mesmo painel há **outro app**, `controle_nsitecnologia` (porta 61911,
+  `applications/controle_nsitecnologia`) — **não mexer nele**.
 
 Depois: chave SSH, secrets e variáveis no GitHub, ambiente `production` com
 aprovação manual, proteção da `main` e, por fim, `DEPLOY_ENABLED=true`.
@@ -104,6 +128,9 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.
 - [ ] `SESSION_SECRET` tem valor padrão fixo no `app.js` se faltar no `.env`.
 - [ ] Criar os primeiros testes automáticos (o Jest está instalado, mas não há testes).
+- [ ] **O sistema às vezes cai na produção** e precisava ser reiniciado (motivo do contato
+  com o suporte). Investigar pelo `stdout.log`: suspeitas são a memória de só **128 MB**
+  (o Puppeteer/Chrome do PDF consome muito) e erros não tratados ou queda da conexão com o banco.
 
 ## ⚠️ Lembretes
 - Publicação ainda é manual pelo cPanel até o deploy automático ser ligado:

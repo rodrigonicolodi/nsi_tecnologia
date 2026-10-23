@@ -11,8 +11,8 @@ set -euo pipefail
 
 ACAO="${1:-deploy}"
 : "${APP_DIR:?APP_DIR não definido}"
-RESTART_METHOD="${RESTART_METHOD:-passenger}"   # passenger | pm2 | none
-PM2_NAME="${PM2_NAME:-nsi-tecnologia}"
+RESTART_METHOD="${RESTART_METHOD:-pm2}"   # pm2 (painel Integrator Node.js) | passenger | none
+PM2_NAME="${PM2_NAME:-nsi_tecnologia}"   # nome no `pm2 list` do servidor
 DEPLOY_SHA="${DEPLOY_SHA:-desconhecido}"
 
 TRABALHO="$HOME/deploy_nsi"
@@ -21,6 +21,19 @@ MANTER_BACKUPS=10
 
 log() { echo "[deploy $(date '+%F %T')] $*"; }
 
+# Caminho do node que o PM2 usa para este app (a versão escolhida no painel Integrator)
+node_do_pm2() {
+  command -v pm2 >/dev/null && command -v node >/dev/null || return 0
+  pm2 jlist 2>/dev/null | node -e '
+    let s = "";
+    process.stdin.on("data", d => s += d).on("end", () => {
+      try {
+        const app = JSON.parse(s).find(a => a.name === process.argv[1]);
+        if (app) console.log(app.pm2_env.exec_interpreter || "");
+      } catch (e) {}
+    });' "$PM2_NAME" || true
+}
+
 ativar_node() {
   if [ -n "${NODEVENV_ACTIVATE:-}" ]; then
     if [ -f "$NODEVENV_ACTIVATE" ]; then
@@ -28,6 +41,11 @@ ativar_node() {
     else
       log "AVISO: NODEVENV_ACTIVATE não encontrado: $NODEVENV_ACTIVATE"
     fi
+  fi
+  local interp
+  interp="$(node_do_pm2)"
+  if [ "${interp#/}" != "$interp" ] && [ -x "$(dirname "$interp")/npm" ]; then
+    export PATH="$(dirname "$interp"):$PATH"
   fi
   command -v npm >/dev/null || { log "ERRO: npm não encontrado no servidor"; exit 1; }
   log "Node $(node -v), npm $(npm -v)"

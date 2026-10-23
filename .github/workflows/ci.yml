@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 23.1.0  # mesma versão do servidor (start.json do Integrator)
           cache: npm
           cache-dependency-path: nsi_tecnologia/package-lock.json
 
