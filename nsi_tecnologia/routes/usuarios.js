@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const bcrypt = require('bcrypt'); // Adicionado para criptografar senha
+const bcrypt = require('bcryptjs'); // Criptografa senhas (JS puro, mesmo formato do bcrypt)
 
 function somenteAdmin(req, res, next) {
   if (req.session.usuario && req.session.usuario.nivel === 'admin') return next();

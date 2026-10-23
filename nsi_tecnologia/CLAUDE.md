@@ -40,4 +40,5 @@ DB_HOST=127.0.0.1 DB_NAME=nao_existe DB_USER=x DB_PASSWORD=x PORT=3001 node app.
 - `develop` = trabalho do dia a dia. `main` = o que está em produção.
 - Publicar = merge de `develop` em `main`; o GitHub Actions testa e, após
   aprovação manual no GitHub, publica no Integrator (ver `deploy-instructions.md`).
-- Nunca enviar `node_modules` para o servidor (o bcrypt é nativo e muda por sistema).
+- Nunca enviar `node_modules` para o servidor (o servidor instala as próprias dependências).
+- Evitar dependências nativas (que compilam C++): o `bcrypt` foi trocado por `bcryptjs` por isso.

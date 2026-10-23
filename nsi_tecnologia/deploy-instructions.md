@@ -79,6 +79,6 @@ APP_DIR=/home/rodri6000/applications/nsi_tecnologia RESTART_METHOD=passenger \
 ```
 
 ## ⚠️ Nunca
-- enviar `node_modules` para o servidor (o bcrypt é compilado por sistema operacional);
+- enviar `node_modules` para o servidor (o servidor instala as próprias dependências);
 - enviar o `.env` de um PC para o servidor;
 - commitar `.env`.

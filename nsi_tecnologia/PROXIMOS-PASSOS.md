@@ -33,13 +33,14 @@ Atualize este arquivo sempre que uma etapa for concluída.
   financeiro, títulos das telas de OS, link da OS corrigido) + 5 arquivos de `public/`
   que o `.gitignore` antigo escondia (`notifications.js`, `loading.js`, `validation.js`,
   `cupom-print.js/.css`), usados no layout e na impressão do cupom. Revisado e testado.
-- [ ] PC de casa: conferir ainda `git log --oneline origin/main..main` e `git stash list`
+- [x] PC de casa: `git log --oneline origin/main..main` e `git stash list` vazios — 100% salvo
 - [ ] PC do escritório: `git status` **antes** de trocar de branch; se houver código
   modificado, commit + push primeiro
 
 ### 2. Trocar bcrypt por bcryptjs
-- [ ] Em `routes/auth.js` e `routes/usuarios.js` (só usam `hash` e `compare` com `await`);
-  tirar `bcrypt` do `package.json`; testar que hash antigo do bcrypt é aceito.
+- [x] Feito: `routes/auth.js` e `routes/usuarios.js` usam `bcryptjs`; `bcrypt` removido do
+  `package.json`. Testado: bcryptjs aceita hashes antigos (`$2a$`/`$2b$`) e recusa senha errada.
+  Não sobrou nenhuma dependência que precise compilar.
 
 ### 3. Atualizar os outros PCs
 - [ ] PC de casa
