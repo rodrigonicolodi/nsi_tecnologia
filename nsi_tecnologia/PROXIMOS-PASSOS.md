@@ -75,7 +75,7 @@ Em cada um (com o Cursor fechado, para evitar erro EPERM): `git fetch`,
 app com um `pm2` próprio (global) ou com o do projeto; se for o do projeto, adicionar
 `pm2` ao `package.json` antes.
 
-### 5. Configurar o deploy automático (passo 4 ✅ — pode seguir)
+### 5. Configurar o deploy automático ✅ (concluído e 1ª publicação feita em 23/10/2026)
 Já sabido pela comparação: Node **23.1.0** no servidor (CI alinhado para 23.1.0 em 23/10/2026),
 porta 61910, processo gerenciado pelo painel do Integrator (`app.yaml`/`start.json`).
 Falta o print da tela **Setup Node.js App** e o acesso ao cPanel (recuperado em 23/10/2026).
@@ -139,8 +139,10 @@ Feito em 23/10/2026 (PC de casa):
 - [x] Variável `DEPLOY_ENABLED` = `true` (23/10/2026, conferida por print). **Deploy ligado.**
   Sozinha ela não publica nada: o deploy só roda num merge na `main` (ou pelo botão
   "Run workflow") e ainda espera a aprovação.
-- [ ] **1ª publicação, acompanhada** (o sistema só é usado pelo Rodrigo, então qualquer horário
-  serve; o app fica alguns segundos fora do ar ao reiniciar). O que vai: botão "Quitar" azul
+- [x] **1ª publicação pelo deploy automático (23/10/2026)** — PR #1 `develop` → `main`
+  (merge `054974f`), aprovada no ambiente `production`. Run 40029909215: todas as etapas ok,
+  deploy em 7 s, volta automática não acionada, `/login` respondendo 200.
+  (O sistema só é usado pelo Rodrigo, então qualquer horário serve para publicar.) O que vai: botão "Quitar" azul
   (`parcelas.ejs`), formatação do `app.js` e documentação. Como o `package-lock.json` muda, o
   servidor roda `npm install`, que remove `escpos` e `pm2` do projeto (sem uso; o `pm2` do
   servidor é o global `/bin/pm2`). Ficar de olho: se a versão do `puppeteer` mudar, o
@@ -176,8 +178,7 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
   (o Puppeteer/Chrome do PDF consome muito) e erros não tratados ou queda da conexão com o banco.
 
 ## ⚠️ Lembretes
-- Publicação ainda é manual pelo cPanel até o deploy automático ser ligado:
-  nunca enviar `node_modules` nem o `.env` do PC.
+- Publicar só pelo deploy automático (PR `develop` → `main`), nunca pelo cPanel.
 - Nada de mexer em banco ou servidor de produção sem decisão explícita do usuário.
 
 ---
@@ -229,15 +230,19 @@ git log --oneline origin/main..main    # commits nunca enviados
 git stash list                         # alterações guardadas e esquecidas
 ```
 
-## 🚀 Publicar na produção (manual, até ligar o deploy automático)
-1. Pergunte ao Claude: **"quais arquivos mudaram desde a última publicação?"**
-2. cPanel → Gerenciador de Arquivos → subir **só esses arquivos**, na mesma pasta.
-3. Mudou `routes/`, `controllers/` ou `app.js` → **reiniciar o app** no painel
-   (Setup Node.js App). Só `views/` ou `public/` → costuma aparecer na hora.
-4. Se mudou `package.json`: rodar **"Run NPM Install"** no painel antes de reiniciar.
-   (O `bcryptjs` já está instalado na produção — conferido em 23/10/2026.)
+## 🚀 Publicar na produção (deploy automático, desde 23/10/2026)
+1. Tudo enviado para a `develop` (commit + push) e com o teste verde no GitHub.
+2. Abrir https://github.com/rodrigonicolodi/nsi_tecnologia/compare/main...develop →
+   **Create pull request**.
+3. Com os checks verdes → **Merge pull request** (o normal, sem a setinha) → **Confirm merge**.
+   ⚠️ **Nunca clicar em "Delete branch"** (apagaria a `develop`).
+4. Aba **Actions** → "Deploy produção" → **Review deployments** → marcar `production` →
+   **Approve and deploy**. Leva de 1 a 3 minutos; se falhar, volta sozinho ao backup.
+5. Entrar no sistema e conferir.
+6. No PC, alinhar a `develop` com a `main`: `git pull origin main` e depois `git push`.
 
-❌ Nunca subir `node_modules` nem o `.env` do PC. Nunca subir a pasta inteira.
+❌ Não publicar mais pelo cPanel: o que for alterado à mão no servidor é sobrescrito na próxima publicação.
+Os backups de cada deploy ficam no servidor em `~/backups/nsi_tecnologia` (os 10 últimos).
 
 ## 🏢 PC novo ou que estava parado (1ª vez na `develop`)
 _(Usado no PC do escritório em 23/10/2026; serve para qualquer PC que ainda esteja na `main`.)_
