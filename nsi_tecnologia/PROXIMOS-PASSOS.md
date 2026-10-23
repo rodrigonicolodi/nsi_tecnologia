@@ -139,7 +139,8 @@ Feito em 23/10/2026 (PC de casa):
 - [x] Variável `DEPLOY_ENABLED` = `true` (23/10/2026, conferida por print). **Deploy ligado.**
   Sozinha ela não publica nada: o deploy só roda num merge na `main` (ou pelo botão
   "Run workflow") e ainda espera a aprovação.
-- [ ] **1ª publicação, acompanhada e fora do horário de uso.** O que vai: botão "Quitar" azul
+- [ ] **1ª publicação, acompanhada** (o sistema só é usado pelo Rodrigo, então qualquer horário
+  serve; o app fica alguns segundos fora do ar ao reiniciar). O que vai: botão "Quitar" azul
   (`parcelas.ejs`), formatação do `app.js` e documentação. Como o `package-lock.json` muda, o
   servidor roda `npm install`, que remove `escpos` e `pm2` do projeto (sem uso; o `pm2` do
   servidor é o global `/bin/pm2`). Ficar de olho: se a versão do `puppeteer` mudar, o
