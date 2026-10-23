@@ -300,9 +300,20 @@ router.get('/editar/:id', async (req, res) => {
     const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
     const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
 
+    // Se o lançamento veio de uma OS, buscar dados da OS (incluindo problema_informado)
+    let os = null;
+    if (lancamento.ordem_servico_id) {
+      const [[osRow]] = await db.query(
+        'SELECT id, numero_os, tipo_servico, problema_informado FROM ordens_servico WHERE id = ?',
+        [lancamento.ordem_servico_id]
+      );
+      os = osRow;
+    }
+
     res.render('financeiro/editar', {
       titulo: 'Editar Lançamento Financeiro',
       lancamento,
+      os,
       pessoas,
       caixas,
       erro: null,
@@ -333,12 +344,20 @@ router.post('/editar/:id', async (req, res) => {
       const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
       const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
       const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
-
+      let os = null;
+      if (lancamento.ordem_servico_id) {
+        const [[osRow]] = await db.query(
+          'SELECT id, numero_os, tipo_servico, problema_informado FROM ordens_servico WHERE id = ?',
+          [lancamento.ordem_servico_id]
+        );
+        os = osRow;
+      }
       return res.render('financeiro/editar', {
         titulo: 'Editar Lançamento Financeiro',
         erro: 'Todos os campos obrigatórios devem ser preenchidos.',
         sucesso: null,
         lancamento,
+        os,
         pessoas,
         caixas
       });
@@ -363,12 +382,20 @@ router.post('/editar/:id', async (req, res) => {
     const [[lancamento]] = await db.query('SELECT * FROM financeiro WHERE id = ?', [id]);
     const [pessoas] = await db.query('SELECT id, nome FROM pessoas');
     const [caixas] = await db.query('SELECT id, nome FROM caixas WHERE ativo = true');
-
+    let os = null;
+    if (lancamento.ordem_servico_id) {
+      const [[osRow]] = await db.query(
+        'SELECT id, numero_os, tipo_servico, problema_informado FROM ordens_servico WHERE id = ?',
+        [lancamento.ordem_servico_id]
+      );
+      os = osRow;
+    }
     res.render('financeiro/editar', {
       titulo: 'Editar Lançamento Financeiro',
       erro: 'Erro ao atualizar lançamento.',
       sucesso: null,
       lancamento,
+      os,
       pessoas,
       caixas
     });
@@ -395,9 +422,20 @@ router.get('/exibir/:id', async (req, res) => {
       return res.redirect('/financeiro?erro=Lançamento não encontrado');
     }
 
+    // Se o lançamento veio de uma OS, buscar dados da OS (incluindo problema_informado)
+    let os = null;
+    if (lancamento.ordem_servico_id) {
+      const [[osRow]] = await db.query(
+        'SELECT id, numero_os, tipo_servico, problema_informado FROM ordens_servico WHERE id = ?',
+        [lancamento.ordem_servico_id]
+      );
+      os = osRow;
+    }
+
     res.render('financeiro/exibir', {
       titulo: 'Detalhes do Lançamento',
-      lancamento
+      lancamento,
+      os
     });
   } catch (erro) {
     console.error('Erro ao exibir lançamento:', erro);

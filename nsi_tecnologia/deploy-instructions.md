@@ -1,165 +1,85 @@
-# 🚀 Instruções de Deploy - NSI Tecnologia
+# 🚀 Deploy — NSI Tecnologia
 
-## 📋 **Checklist de Deploy:**
+## Como funciona
+```
+develop ── trabalho do dia a dia (3 PCs). Cada push roda o teste automático (CI).
+   │
+   ▼  merge quando estiver pronto
+main ───── GitHub Actions: testa → espera SUA aprovação → publica no Integrator
+```
+O deploy (`.github/workflows/deploy.yml` + `scripts/deploy-remote.sh`):
+1. envia **só os arquivos do Git** (nunca `node_modules` nem `.env`);
+2. faz **backup** da versão atual em `~/backups/nsi_tecnologia/` (guarda os 10 últimos);
+3. aplica a nova versão por cima (não apaga arquivos que só existem no servidor);
+4. roda `npm install` **apenas se o `package-lock.json` mudou**;
+5. reinicia o app e confere se `/login` responde;
+6. se algo falhar, **volta sozinho** para o backup.
 
-### 1. **No Servidor de Produção:**
+O banco de dados **não é tocado** pelo deploy. A versão publicada fica em `.versao` na pasta do app.
+
+## Dia a dia
 ```bash
-# 1. Fazer clone do repositório
-git clone [seu-repositorio]
-cd nsi_tecnologia
-
-# 2. Instalar dependências
-npm install
-
-# 3. Criar arquivo .env com credenciais de produção
-cp config.env.example .env
-# Editar .env com credenciais reais de produção
+git pull                 # ao chegar no PC
+npm ci                   # se o package.json mudou (ou 1ª vez no PC)
+# ... trabalha ...
+git add -A
+git commit -m "descrição"
+git push                 # na develop
 ```
+Para publicar: no GitHub, abra um Pull Request de `develop` → `main`, confira e faça o merge.
+Depois, em **Actions → Deploy produção**, clique em **Review deployments → Approve**.
 
-### 2. **Configurar .env de Produção:**
-```env
-# Configurações do Banco de Dados (PRODUÇÃO)
-DB_HOST=seu-servidor-producao.com
-DB_USER=usuario_producao
-DB_PASSWORD=senha_super_segura_producao
-DB_NAME=banco_producao
+## Configuração única (servidor + GitHub)
+Feita uma vez só. Até lá o deploy fica desligado.
 
-# Configurações da Aplicação
-PORT=3000
-NODE_ENV=production
+### 1. Dados do servidor (levantados em 23/10/2026)
+O painel é o **Integrator Node.js** (não o "Setup Node.js App" padrão do cPanel) e roda o app com **PM2 global** (`/bin/pm2`).
+- `APP_DIR`: `/home/rodri6000/applications/nsi_tecnologia`
+- Node **v23.1.0** (o teste usa a mesma)
+- Nome no PM2: **`nsi_tecnologia`** (`pm2 list`) → reinício com `pm2 restart nsi_tecnologia`
+- No mesmo servidor roda **outro app**, `controle_nsitecnologia` — o deploy não mexe nele.
+- `NODEVENV_ACTIVATE`: não existe nesse painel (deixar vazio, se `node`/`npm` funcionarem pelo SSH)
 
-# Segurança (GERAR NOVAS CHAVES)
-SESSION_SECRET=chave_super_secreta_producao_123456789
-JWT_SECRET=jwt_secret_producao_987654321
+### 2. Criar chave SSH só para o GitHub
+No cPanel → **Acesso SSH → Gerenciar chaves SSH → Gerar nova chave** (nome `github_deploy`, sem senha).
+Depois **Gerenciar → Autorizar** a chave pública, e **Exibir/Baixar** a chave **privada**.
 
-# Logs
-LOG_LEVEL=info
-```
+### 3. Cadastrar no GitHub
+Repositório → **Settings → Secrets and variables → Actions**.
 
-### 3. **Comandos de Deploy:**
+**Secrets** (ficam ocultos):
+| Nome | Valor |
+|---|---|
+| `SSH_HOST` | endereço SSH do Integrator |
+| `SSH_PORT` | porta SSH (se não for 22) |
+| `SSH_USER` | `rodri6000` |
+| `SSH_PRIVATE_KEY` | conteúdo da chave privada do passo 2 |
+| `SSH_KNOWN_HOSTS` | saída de `ssh-keyscan -p PORTA HOST` (rodar no PC) |
+
+**Variables**:
+| Nome | Exemplo |
+|---|---|
+| `APP_DIR` | `/home/rodri6000/applications/nsi_tecnologia` |
+| `APP_URL` | `https://sistema.nsitecnologia.com.br` |
+| `RESTART_METHOD` | `pm2` (padrão) |
+| `NODEVENV_ACTIVATE` | não criar (o painel Integrator não usa) |
+| `PM2_NAME` | `nsi_tecnologia` (padrão) |
+| `DEPLOY_ENABLED` | `true` — **criar por último**, liga o deploy |
+
+### 4. Exigir aprovação
+**Settings → Environments → New environment** `production` → marque **Required reviewers** e adicione você.
+
+### 5. Proteger a main
+**Settings → Branches → Add rule** para `main`: exigir Pull Request e o check **CI** passando.
+
+## Voltar uma versão manualmente
+Os backups ficam em `~/backups/nsi_tecnologia/AAAAMMDD-HHMMSS.tar.gz`. Para restaurar o último:
 ```bash
-# Parar servidor atual
-pm2 stop nsi-tecnologia
-
-# Atualizar código
-git pull origin main
-
-# Instalar novas dependências (se houver)
-npm install
-
-# Reiniciar servidor
-pm2 restart nsi-tecnologia
+APP_DIR=/home/rodri6000/applications/nsi_tecnologia RESTART_METHOD=pm2 \
+  bash ~/applications/nsi_tecnologia/scripts/deploy-remote.sh rollback
 ```
 
-## 🔒 **SEGURANÇA:**
-
-### ✅ **O que commitar:**
-- Código fonte
-- config.env.example
-- package.json
-- .gitignore
-
-### ❌ **NUNCA commitar:**
-- .env (arquivo com credenciais)
-- logs/ (pasta de logs)
-- node_modules/
-
-## 📁 **Estrutura Final:**
-```
-projeto/
-├── .env                    ← CRIAR NO SERVIDOR (não commitar)
-├── config.env.example      ← COMMITAR (template)
-├── db.js                   ← COMMITAR (usa variáveis de ambiente)
-├── app.js                  ← COMMITAR
-└── ...
-```
-
-## 🚀 **COMANDOS DE DEPLOY ATUALIZADOS:**
-
-### **1. Instalar PM2 (se não tiver):**
-```bash
-npm install -g pm2
-```
-
-### **2. Deploy com PM2 (RECOMENDADO):**
-```bash
-# Navegue para o projeto
-cd /home/rodri6000/applications/nsi_tecnologia
-
-# Ative o ambiente virtual
-source ~/nodevenv/nsi_tecnologia/bin/activate
-
-# Atualize o código
-git pull
-
-# Instale dependências
-rm -rf node_modules
-npm install
-npm rebuild bcrypt
-
-# Pare o servidor atual (se estiver rodando)
-pm2 stop nsi-tecnologia 2>/dev/null || true
-
-# Inicie com PM2 (fica rodando mesmo fechando SSH)
-pm2 start app.js --name "nsi-tecnologia" --env production
-
-# Salve a configuração do PM2
-pm2 save
-
-# Configure para iniciar automaticamente no boot
-pm2 startup
-```
-
-### **3. Comandos Úteis do PM2:**
-```bash
-# Ver status dos processos
-pm2 status
-
-# Ver logs
-pm2 logs nsi-tecnologia
-
-# Reiniciar
-pm2 restart nsi-tecnologia
-
-# Parar
-pm2 stop nsi-tecnologia
-
-# Deletar processo
-pm2 delete nsi-tecnologia
-```
-
-### **4. Deploy Rápido (após configurar PM2):**
-```bash
-cd /home/rodri6000/applications/nsi_tecnologia
-source ~/nodevenv/nsi_tecnologia/bin/activate
-git pull
-npm install
-pm2 restart nsi-tecnologia
-```
-
-
-
-
-
-# 1. Navegue para o projeto
-cd /home/rodri6000/applications/nsi_tecnologia
-
-# 2. Ative o ambiente virtual
-source ~/nodevenv/nsi_tecnologia/bin/activate
-
-# 3. Instale PM2
-npm install pm2
-
-# 4. Pare o servidor atual
-pkill -f "node app.js"
-
-# 5. Inicie com PM2
-./node_modules/.bin/pm2 start app.js --name "nsi-tecnologia" --env production
-
-# 6. Salve a configuração
-./node_modules/.bin/pm2 save
-
-# 7. Configure para iniciar automaticamente
-./node_modules/.bin/pm2 startup
-
-pm2 restart nsi-tecnologia && pm2 logs nsi-tecnologia --lines 5
+## ⚠️ Nunca
+- enviar `node_modules` para o servidor (o servidor instala as próprias dependências);
+- enviar o `.env` de um PC para o servidor;
+- commitar `.env`.

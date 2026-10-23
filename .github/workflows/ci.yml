@@ -1,0 +1,60 @@
+# Testa a cada push/PR se o sistema instala e sobe (sem banco de dados).
+name: CI
+
+on:
+  push:
+    branches: [develop]  # na main, o teste roda dentro do deploy.yml
+  pull_request:
+  workflow_call:
+
+defaults:
+  run:
+    working-directory: nsi_tecnologia
+
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    env:
+      # Chrome do Puppeteer não é necessário para o teste de subida
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 23.1.0  # mesma versão do servidor (start.json do Integrator)
+          cache: npm
+          cache-dependency-path: nsi_tecnologia/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar sintaxe dos arquivos JS
+        run: |
+          for f in app.js db.js $(git ls-files 'routes/*.js' 'controllers/*.js' 'middleware/*.js' 'utils/*.js'); do
+            node --check "$f"
+          done
+
+      - name: Subir o sistema em modo seguro e testar páginas
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: nao_existe
+          DB_USER: x
+          DB_PASSWORD: x
+          SESSION_SECRET: ci
+          PORT: 3001
+        run: |
+          node app.js > app.log 2>&1 &
+          for i in $(seq 1 20); do curl -s -o /dev/null http://localhost:3001/login && break; sleep 1; done
+          falhou=0
+          for url in /login /css/style.css /img/logo-nsi-login.png; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:3001$url")
+            echo "$url -> $code"
+            [ "$code" = "200" ] || falhou=1
+          done
+          # Sem login, telas internas devem redirecionar para /login
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/dashboard)
+          echo "/dashboard (sem login) -> $code"
+          [ "$code" = "302" ] || falhou=1
+          cat app.log
+          exit $falhou

@@ -1,0 +1,67 @@
+# Publica a branch main no Integrator.
+# Fica desligado até a variável DEPLOY_ENABLED=true ser criada no GitHub.
+# O ambiente "production" deve exigir aprovação manual (ver deploy-instructions.md).
+name: Deploy produção
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: producao
+  cancel-in-progress: false
+
+jobs:
+  teste:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: teste
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    env:
+      SSH: ssh -i ~/.ssh/deploy_key -p ${{ secrets.SSH_PORT || '22' }} -o BatchMode=yes ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+      REMOTE_ENV: >-
+        APP_DIR='${{ vars.APP_DIR }}'
+        RESTART_METHOD='${{ vars.RESTART_METHOD }}'
+        NODEVENV_ACTIVATE='${{ vars.NODEVENV_ACTIVATE }}'
+        PM2_NAME='${{ vars.PM2_NAME }}'
+        DEPLOY_SHA='${{ github.sha }}'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Gerar pacote (só arquivos do Git, sem node_modules e .env)
+        run: git archive --format=tar.gz -o release.tar.gz HEAD:nsi_tecnologia
+
+      - name: Enviar pacote
+        id: envio
+        run: $SSH "mkdir -p ~/deploy_nsi && cat > ~/deploy_nsi/release.tar.gz" < release.tar.gz
+
+      - name: Aplicar no servidor
+        run: $SSH "$REMOTE_ENV bash -s -- deploy" < nsi_tecnologia/scripts/deploy-remote.sh
+
+      - name: Verificar se o sistema respondeu
+        run: |
+          for i in $(seq 1 12); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "${{ vars.APP_URL }}/login" || true)
+            echo "Tentativa $i: HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 5
+          done
+          echo "Sistema não respondeu 200 em /login"
+          exit 1
+
+      - name: Voltar versão anterior (se algo falhou)
+        if: failure() && steps.envio.outcome == 'success'
+        run: $SSH "$REMOTE_ENV bash -s -- rollback" < nsi_tecnologia/scripts/deploy-remote.sh

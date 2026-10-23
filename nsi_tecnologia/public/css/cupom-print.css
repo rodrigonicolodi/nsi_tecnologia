@@ -1,0 +1,344 @@
+/* 🖨️ CSS para Impressão em Cupom/Terminal */
+
+/* Configurações de página para cupom */
+@page {
+  size: 80mm auto;
+  margin: 0;
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Configurações específicas para Chrome */
+@page {
+  size: 80mm auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* Forçar tamanho específico para Chrome */
+@media print and (-webkit-min-device-pixel-ratio: 0) {
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}
+
+/* Reset para impressão em cupom */
+.cupom-print {
+  width: 80mm;
+  margin: 0;
+  padding: 12mm;
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.8;
+  overflow: hidden !important;
+  height: auto !important;
+  box-sizing: border-box;
+  background: white;
+  color: #000 !important;
+  font-weight: bold;
+  page-break-after: avoid;
+  page-break-inside: avoid;
+}
+
+/* Título principal */
+.cupom-titulo {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  margin: 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Número/ID */
+.cupom-numero {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin: 15px 0;
+  background: #f0f0f0;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+/* Linha separadora */
+.cupom-linha {
+  border-top: 2px solid #000;
+  margin: 18px 0;
+  width: 100%;
+}
+
+.cupom-linha-dupla {
+  border-top: 3px solid #000;
+  margin: 20px 0;
+  width: 100%;
+}
+
+/* Informações do cliente */
+.cupom-cliente {
+  font-size: 17px;
+  margin: 10px 0;
+  line-height: 1.8;
+  font-weight: bold;
+  color: #000 !important;
+}
+
+.cupom-cliente strong {
+  font-weight: bold;
+  color: #000 !important;
+}
+
+/* Forçar texto após dois pontos também em negrito */
+.cupom-cliente:not(strong) {
+  font-weight: bold !important;
+}
+
+/* Informações de serviço */
+.cupom-servico {
+  font-size: 16px;
+  margin: 12px 0;
+  background: #f8f8f8;
+  padding: 12px;
+  border-radius: 5px;
+  border-left: 3px solid #007bff;
+  font-weight: bold;
+  color: #000 !important;
+}
+
+.cupom-servico strong {
+  font-weight: bold;
+  color: #000 !important;
+}
+
+/* Valores */
+.cupom-valor {
+  font-size: 17px;
+  margin: 10px 0;
+  padding: 8px 0;
+  font-weight: bold;
+  color: #000 !important;
+}
+
+.cupom-valor strong {
+  font-weight: bold;
+  color: #000 !important;
+}
+
+/* Forçar TODOS os valores monetários em negrito */
+.cupom-valor {
+  font-weight: bold !important;
+  color: #000 !important;
+}
+
+/* Específico para valores após dois pontos */
+.cupom-valor:after {
+  font-weight: bold !important;
+}
+
+/* Total destacado */
+.cupom-total {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  background: transparent;
+  color: #000;
+  padding: 15px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid #000;
+}
+
+/* Rodapé */
+.cupom-rodape {
+  text-align: center;
+  font-size: 15px;
+  margin-top: 20px;
+  font-style: italic;
+  color: #666;
+}
+
+/* Informações adicionais */
+.cupom-info {
+  font-size: 12px;
+  margin: 3px 0;
+  color: #666;
+}
+
+.cupom-info strong {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Lista de itens */
+.cupom-lista {
+  margin: 5px 0;
+}
+
+.cupom-item {
+  font-size: 13px;
+  margin: 3px 0;
+  padding: 2px 0;
+  border-bottom: 1px dotted #ccc;
+}
+
+.cupom-item:last-child {
+  border-bottom: none;
+}
+
+  /* Ajustes específicos para impressão */
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 80mm !important;
+      height: auto !important;
+      background: white !important;
+    }
+    
+    .cupom-print {
+      font-size: 13px;
+      line-height: 1.1;
+      width: 80mm !important;
+      margin: 0 auto !important;
+      padding: 3mm !important;
+      font-weight: bold !important;
+      color: #000 !important;
+      background: white !important;
+      box-sizing: border-box !important;
+    }
+  }
+  
+  /* Regras específicas para Chrome */
+  @media print and (-webkit-min-device-pixel-ratio: 0) {
+    html, body {
+      width: 80mm !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    .cupom-print {
+      width: 80mm !important;
+      margin: 0 auto !important;
+      padding: 3mm !important;
+    }
+  }
+  
+  .cupom-titulo {
+    font-size: 14px;
+    margin: 3px 0;
+  }
+  
+  .cupom-numero {
+    font-size: 13px;
+  }
+  
+  .cupom-cliente {
+    font-size: 12px;
+    margin: 2px 0;
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  .cupom-servico {
+    font-size: 11px;
+    margin: 2px 0;
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  .cupom-valor {
+    font-size: 12px;
+    margin: 2px 0;
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  .cupom-total {
+    font-size: 13px;
+    margin: 4px 0;
+    padding: 3px;
+  }
+  
+  .cupom-rodape {
+    font-size: 9px;
+    margin-top: 6px;
+  }
+  
+  /* Remover cores de fundo na impressão */
+  .cupom-servico {
+    background: transparent;
+    border-left: none;
+  }
+  
+  .cupom-numero {
+    background: transparent;
+  }
+  
+  /* Configurações específicas para impressoras térmicas */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Forçar texto mais escuro */
+  .cupom-print * {
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  /* Forçar valores monetários em negrito */
+  .cupom-valor {
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  /* Específico para texto após dois pontos */
+  .cupom-cliente, .cupom-valor {
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+}
+
+/* Ajustes para diferentes tamanhos de cupom */
+@media print and (max-width: 70mm) {
+  .cupom-print {
+    width: 70mm;
+    padding: 3mm;
+    font-size: 12px;
+  }
+  
+  .cupom-titulo {
+    font-size: 14px;
+  }
+  
+  .cupom-total {
+    font-size: 13px;
+  }
+}
+
+@media print and (min-width: 90mm) {
+  .cupom-print {
+    width: 90mm;
+    padding: 6mm;
+    font-size: 15px;
+  }
+  
+  .cupom-titulo {
+    font-size: 20px;
+  }
+  
+  .cupom-total {
+    font-size: 18px;
+  }
+}

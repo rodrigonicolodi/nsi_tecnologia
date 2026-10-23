@@ -1,8 +1,8 @@
 <% layout = 'layout' %>
-<% titulo = 'Editar Ordem de Serviço' %>
+<% titulo = 'Editar: ' + (os.tipo_servico || 'OS') + ' - Nº ' + (os.numero_os || os.id) %>
 
 <div class="container">
-  <h2>Editar Ordem de Serviço</h2>
+  <h2>Editar: <%= os.tipo_servico || 'Ordem de Serviço' %> <span style="color: #666; font-size: 0.9em;">(Nº <%= os.numero_os || os.id %>)</span></h2>
 
   <% if (erro) { %>
     <p class="erro"><%= erro %></p>

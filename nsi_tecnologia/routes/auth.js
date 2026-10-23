@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs'); // JS puro: não precisa compilar (mesmo formato de hash do bcrypt)
 const db = require('../db');
 const { loginLimiter } = require('../middleware/rateLimit');
 
