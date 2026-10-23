@@ -34,8 +34,10 @@ Atualize este arquivo sempre que uma etapa for concluída.
   que o `.gitignore` antigo escondia (`notifications.js`, `loading.js`, `validation.js`,
   `cupom-print.js/.css`), usados no layout e na impressão do cupom. Revisado e testado.
 - [x] PC de casa: `git log --oneline origin/main..main` e `git stash list` vazios — 100% salvo
-- [ ] PC do escritório: `git status` **antes** de trocar de branch; se houver código
-  modificado, commit + push primeiro
+- [x] PC do escritório (23/10/2026): estava parado em `0a55a62` (29/09/2025), sem commits
+  perdidos. Só tinha `routes/usuarios.js` com `console.log` de depuração (com bug:
+  variável `ativvo`) e uma alteração no `deploy-instructions.md` — descartados após
+  backup em `C:\DivGit\backup-escritorio-alteracoes.txt` (no próprio PC do escritório).
 
 ### 2. Trocar bcrypt por bcryptjs
 - [x] Feito: `routes/auth.js` e `routes/usuarios.js` usam `bcryptjs`; `bcrypt` removido do
@@ -43,8 +45,9 @@ Atualize este arquivo sempre que uma etapa for concluída.
   Não sobrou nenhuma dependência que precise compilar.
 
 ### 3. Atualizar os outros PCs
-- [ ] PC de casa
-- [ ] PC do escritório
+- [x] PC de casa
+- [x] PC do escritório
+- ✅ Os 3 PCs (notebook, casa, escritório) estão na `develop`, iguais ao GitHub.
 
 Em cada um (com o Cursor fechado, para evitar erro EPERM): `git fetch`,
 `git switch develop`, `npm ci`. **Não apagar o `.env`.**
@@ -148,7 +151,8 @@ git stash list                         # alterações guardadas e esquecidas
 
 ❌ Nunca subir `node_modules` nem o `.env` do PC. Nunca subir a pasta inteira.
 
-## 🏢 PC do escritório (1ª vez — ainda está na `main` antiga)
+## 🏢 PC novo ou que estava parado (1ª vez na `develop`)
+_(Usado no PC do escritório em 23/10/2026; serve para qualquer PC que ainda esteja na `main`.)_
 **Primeiro só olhar** (não altera nada) e mandar o print:
 ```bash
 git status
