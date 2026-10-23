@@ -13,9 +13,16 @@
     <p><strong>Status:</strong> <%= lancamento.status || '—' %></p>
     <p><strong>Descrição:</strong> <%= lancamento.descricao || '—' %></p>
 
-    <% if (lancamento.ordem_servico_id) { %>
+    <% if (os) { %>
       <p><strong>Vinculado à OS:</strong>
-        <a href="/ordens/exibir/<%= lancamento.ordem_servico_id %>">OS #<%= lancamento.ordem_servico_id %></a>
+        <a href="/os/exibir/<%= os.id %>">OS Nº <%= os.numero_os %></a>
+      </p>
+      <p><strong>Problema Informado da OS:</strong><br>
+        <span style="display: block; margin-top: 5px; padding: 10px; background: #f8f9fa; border-radius: 4px; white-space: pre-wrap;"><%= os.problema_informado || '—' %></span>
+      </p>
+    <% } else if (lancamento.ordem_servico_id) { %>
+      <p><strong>Vinculado à OS:</strong>
+        <a href="/os/exibir/<%= lancamento.ordem_servico_id %>">OS #<%= lancamento.ordem_servico_id %></a>
       </p>
     <% } %>
   </div>

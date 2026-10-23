@@ -124,15 +124,9 @@ app.use((err, req, res, next) => {
 });
 
 // 🚀 Inicializa servidor
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
-console.log(`✅ Servidor NSI Tecnologia rodando em http://localhost:${PORT}`);
-console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-console.log(`📊 Banco: ${process.env.DB_NAME ? 'Configurado' : '❌ Não configurado'}`);
+  console.log(`✅ Servidor NSI Tecnologia rodando em http://localhost:${PORT}`);
+  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 Banco: ${process.env.DB_NAME ? 'Configurado' : '❌ Não configurado'}`);
 });
-
-// 🚀 Inicializa servidor com porta do integrador
-// const PORT = process.env.PORT || 61910;
-// app.listen(PORT, '0.0.0.0', () => {
-// console.log(`✅ Servidor rodando na porta ${PORT}`);
-// });

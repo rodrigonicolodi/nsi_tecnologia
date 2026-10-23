@@ -71,6 +71,13 @@
       <textarea name="descricao"><%= lancamento.descricao %></textarea>
     </div>
 
+    <% if (os) { %>
+    <div class="campo" style="grid-column: span 2; background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef;">
+      <label style="color: #0077cc;"><strong>Problema Informado da OS</strong> <a href="/os/exibir/<%= os.id %>" style="font-size: 0.9em; margin-left: 8px;">(Ver OS Nº <%= os.numero_os %>)</a></label>
+      <div style="margin-top: 8px; white-space: pre-wrap;"><%= os.problema_informado || '—' %></div>
+    </div>
+    <% } %>
+
     <div class="campo">
       <button type="submit" class="btn btn-azul" id="btn-salvar-edicao">
         <i class="fas fa-save"></i> Salvar Alterações
