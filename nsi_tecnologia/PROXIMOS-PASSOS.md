@@ -53,13 +53,32 @@ Em cada um (com o Cursor fechado, para evitar erro EPERM): `git fetch`,
 `git switch develop`, `npm ci`. **Não apagar o `.env`.**
 
 ### 4. Conferir produção × GitHub (ANTES de ligar o deploy)
-- [ ] Usuário baixa pelo cPanel um `.zip` da pasta do app, **sem `node_modules` e sem `.env`**
-  (só download, não altera nada).
-- [ ] Comparar com a `develop` arquivo por arquivo e trazer para o GitHub o que só
-  existe na produção.
-- Até isso ser feito: publicar pelo cPanel **só os arquivos alterados**, nunca a pasta inteira.
+- [x] Zip da produção baixado em 23/10/2026 (`D:\DevGit\producao-2026-10-23.zip`, no notebook).
+- [x] Comparado com a `develop` (`d725fec`). Resultado:
+  - ✅ **84 arquivos idênticos** — inclusive os 5 de `public/` e as alterações do PC de casa
+    (a produção estava igual ao PC de casa).
+  - ✅ **A produção já usa `bcryptjs` desde 05/10/2025** (nunca tinha ido para o GitHub);
+    a troca de hoje só alinhou o GitHub.
+  - 📦 Mais novo no GitHub (ainda não publicado): `views/financeiro/parcelas.ejs` (botão
+    "Quitar" azul; na produção está verde) e `app.js` (só formatação, sem efeito).
+  - 🗂️ Só na produção, **do servidor — não trazer para o Git e não apagar**: `app.yaml` e
+    `start.json` (configuração do processo no Integrator: Node **23.1.0**, porta **61910**,
+    `NODE_ENV=production`), `stdout.log` (log), `pid-0.pid`.
+  - 🗑️ Só na produção, sobras antigas sem uso: `app.js antigo`, `DEPLOYMENT_GUIDE.md`,
+    `fix_nivel.js` (ajuste de coluna já aplicado), `start-server.bat`, `stop-server.bat`.
+  - ⚠️ `package.json` da produção tem `escpos` e `pm2`, que **não são usados no código**.
+- **Conclusão: não há código da produção faltando no GitHub.**
 
-### 5. Configurar o deploy automático (só depois do passo 4)
+**Decidir antes do 1º deploy automático:** o deploy roda `npm install` quando o
+`package-lock.json` muda (e vai mudar na 1ª vez), o que **remove `escpos` e `pm2`** do
+`node_modules` do servidor. `escpos` não faz falta. Confirmar se o Integrator reinicia o
+app com um `pm2` próprio (global) ou com o do projeto; se for o do projeto, adicionar
+`pm2` ao `package.json` antes.
+
+### 5. Configurar o deploy automático (passo 4 ✅ — pode seguir)
+Já sabido pela comparação: Node **23.1.0** no servidor (o CI testa com a 22 — alinhar),
+porta 61910, processo gerenciado pelo painel do Integrator (`app.yaml`/`start.json`).
+Falta o print da tela **Setup Node.js App** e o acesso ao cPanel (recuperado em 23/10/2026).
 Passo a passo em `deploy-instructions.md`. Primeiro, anotar no painel do
 Integrator (**Setup Node.js App**), só olhando:
 - [ ] pasta do app (Application root)
@@ -145,9 +164,8 @@ git stash list                         # alterações guardadas e esquecidas
 2. cPanel → Gerenciador de Arquivos → subir **só esses arquivos**, na mesma pasta.
 3. Mudou `routes/`, `controllers/` ou `app.js` → **reiniciar o app** no painel
    (Setup Node.js App). Só `views/` ou `public/` → costuma aparecer na hora.
-4. ⚠️ **Na 1ª publicação de `routes/auth.js` ou `routes/usuarios.js`**: antes, rodar
-   **"Run NPM Install"** no painel, para o servidor instalar o `bcryptjs`.
-   Sem isso o login da produção quebra.
+4. Se mudou `package.json`: rodar **"Run NPM Install"** no painel antes de reiniciar.
+   (O `bcryptjs` já está instalado na produção — conferido em 23/10/2026.)
 
 ❌ Nunca subir `node_modules` nem o `.env` do PC. Nunca subir a pasta inteira.
 
