@@ -29,8 +29,11 @@ Atualize este arquivo sempre que uma etapa for concluída.
 ## 🔜 A fazer (em ordem)
 
 ### 1. Salvar no GitHub o que só existe nos PCs
-- [ ] PC de casa: revisar `git diff --stat` dos 6 arquivos; se forem mudanças reais,
-  commit na `develop` + push
+- [x] PC de casa: commit `b6ca899` — 6 arquivos (problema informado da OS no
+  financeiro, títulos das telas de OS, link da OS corrigido) + 5 arquivos de `public/`
+  que o `.gitignore` antigo escondia (`notifications.js`, `loading.js`, `validation.js`,
+  `cupom-print.js/.css`), usados no layout e na impressão do cupom. Revisado e testado.
+- [ ] PC de casa: conferir ainda `git log --oneline origin/main..main` e `git stash list`
 - [ ] PC do escritório: `git status` **antes** de trocar de branch; se houver código
   modificado, commit + push primeiro
 
