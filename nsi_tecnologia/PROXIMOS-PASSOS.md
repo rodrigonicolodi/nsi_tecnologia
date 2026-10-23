@@ -132,12 +132,18 @@ Feito em 23/10/2026 (PC de casa):
   exige PR **sem** "Require approvals" (ninguém aprova o próprio PR); bypass do admin liberado.
 
 **Continuar daqui:**
-- [ ] ⚠️ **O repositório no GitHub é público** (descoberto em 23/10/2026): o código é visível
-  a todos — sem senhas nele, mas o `SESSION_SECRET` padrão do `app.js` também fica visível.
-  Antes de ligar o deploy, conferir no cPanel se o `.env` **da produção** tem a linha
-  `SESSION_SECRET=` com valor próprio (não mostrar o valor a ninguém). Avaliar deixar o
-  repositório privado (atenção: no plano grátis, privado perde a aprovação manual do ambiente e a proteção da `main`).
-- [ ] Por último, variável `DEPLOY_ENABLED` = `true`. A primeira publicação deve ser acompanhada.
+- [x] ⚠️ **O repositório no GitHub é público** (descoberto em 23/10/2026): o código é visível
+  a todos, sem senhas nele. Conferido no cPanel: o `.env` **da produção** tem `SESSION_SECRET`
+  próprio, então o valor padrão do `app.js` não é usado lá. Se um dia for deixar o repositório
+  privado: no plano grátis, privado perde a aprovação manual do ambiente e a proteção da `main`.
+- [x] Variável `DEPLOY_ENABLED` = `true` (23/10/2026, conferida por print). **Deploy ligado.**
+  Sozinha ela não publica nada: o deploy só roda num merge na `main` (ou pelo botão
+  "Run workflow") e ainda espera a aprovação.
+- [ ] **1ª publicação, acompanhada e fora do horário de uso.** O que vai: botão "Quitar" azul
+  (`parcelas.ejs`), formatação do `app.js` e documentação. Como o `package-lock.json` muda, o
+  servidor roda `npm install`, que remove `escpos` e `pm2` do projeto (sem uso; o `pm2` do
+  servidor é o global `/bin/pm2`). Ficar de olho: se a versão do `puppeteer` mudar, o
+  `npm install` baixa um Chrome novo (~170 MB), o que pode demorar e ocupar espaço.
 
 **Como publicar com o deploy ligado:** trabalhar na `develop` → no GitHub, abrir PR
 `develop` → `main` → teste verde → **Merge** → o deploy espera → **Review deployments →
