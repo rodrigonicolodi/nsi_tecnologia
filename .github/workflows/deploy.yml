@@ -20,6 +20,8 @@ jobs:
     needs: teste
     if: vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # para criar a tag da versão no GitHub
     environment:
       name: production
       url: ${{ vars.APP_URL }}
@@ -61,6 +63,19 @@ jobs:
           done
           echo "Sistema não respondeu 200 em /login"
           exit 1
+
+      - name: Marcar a versão no GitHub (tag)
+        # Se falhar, só avisa: não desfaz uma publicação que deu certo
+        continue-on-error: true
+        run: |
+          versao="v$(node -p "require('./nsi_tecnologia/package.json').version")"
+          if git ls-remote --exit-code --tags origin "refs/tags/$versao" >/dev/null; then
+            echo "Tag $versao já existe: a versão não mudou nesta publicação (ver CHANGELOG.md)"
+          else
+            git tag "$versao" "$GITHUB_SHA"
+            git push origin "$versao"
+            echo "Versão publicada: $versao"
+          fi
 
       - name: Voltar versão anterior (se algo falhou)
         if: failure() && steps.envio.outcome == 'success'

@@ -174,6 +174,20 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
 - [ ] Apagar (ou guardar em local seguro) as exportações com dados reais na pasta Downloads.
 
 ### 7. Melhorias no código (sem tocar em produção)
+- [ ] 🔴 **PRIORIDADE: a senha do banco da produção está no histórico público do GitHub**
+  (descoberto em 24/10/2026). Até 27/09/2025 o `db.js` tinha host, usuário e senha do
+  `rodri6000_nsi_tecnologia` escritos no código (commits `9fd85b9`, `3c43d41`, `1783302`);
+  e há uma senha antiga da Locaweb (`bac5d08`). O repositório é público, então qualquer um
+  pode ver. Fazer:
+  1. Conferir se a senha atual do usuário MySQL `rodri6000_nsi_tecnologia` ainda é a mesma
+     daquela época. Se for (ou na dúvida), **trocar a senha** no cPanel (MySQL → usuário →
+     alterar senha) e, logo em seguida, atualizar `DB_PASSWORD` no `.env` **do servidor**
+     e reiniciar o app. ⚠️ O `controle_nsitecnologia` usa o **mesmo usuário MySQL**: o
+     `.env` dele também precisa da senha nova.
+  2. Ver em cPanel → **MySQL Remoto** quais endereços podem conectar de fora (se tiver `%`,
+     qualquer lugar da internet pode tentar).
+  3. Avaliar deixar o repositório privado ou limpar o histórico (trocar a senha resolve o
+     principal; o histórico continua mostrando a senha antiga, já sem valor).
 - [ ] ⚠️ **Trocar o Node 23.1.0 do servidor por uma versão LTS** (Node 22 ≥ 22.23.4 ou
   Node 24 ≥ 24.22.1). O Node 23 está sem suporte desde 2025, então **não recebe correções de
   segurança**, como a da falha do Brotli (CVE-2026-111497, corrigida em 21/10/2026).
@@ -188,6 +202,9 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
     (Integrator Node.js → ✎ do `nsi_tecnologia` → Node.js do Aplicativo → salvar) e conferir.
     Os PCs já usam 22.23.4 sem problemas.
   - O outro app (`controle_nsitecnologia`) também está no Node 23.1.0: tratar à parte.
+- [x] **Versionar o sistema** (24/10/2026): versão **1.1.0** no `package.json`, mostrada no
+  rodapé do menu e na tela de login; histórico em `CHANGELOG.md`; o deploy cria a tag
+  (`v1.1.0`) no GitHub depois de publicar. Regras e "como fechar uma versão" no `CHANGELOG.md`.
 - [ ] Aviso vermelho na tela quando o sistema roda no PC conectado ao banco de produção.
 - [ ] Tratar as 56 vulnerabilidades do `npm audit` (3 críticas), testando com calma.
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.
@@ -252,6 +269,8 @@ git stash list                         # alterações guardadas e esquecidas
 ```
 
 ## 🚀 Publicar na produção (deploy automático, desde 23/10/2026)
+0. Se a publicação traz novidade ou correção: anotar no `CHANGELOG.md` e subir a versão
+   (peça ao Claude: **"vamos fechar a versão 1.2.0"**).
 1. Tudo enviado para a `develop` (commit + push) e com o teste verde no GitHub.
 2. Abrir https://github.com/rodrigonicolodi/nsi_tecnologia/compare/main...develop →
    **Create pull request**.

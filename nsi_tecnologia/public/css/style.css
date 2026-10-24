@@ -452,6 +452,21 @@ body {
   height: auto;
 }
 
+/* 🏷️ Versão do sistema (rodapé do menu e tela de login) */
+.sidebar-versao {
+  margin-top: auto;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.versao-login {
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin-top: 15px;
+}
+
 
 /* ================================
 📁 MENU COLAPSÁVEL
