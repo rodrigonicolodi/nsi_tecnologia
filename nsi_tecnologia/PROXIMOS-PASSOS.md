@@ -169,7 +169,8 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
   (`DB_HOST` não muda). Conferir também `PORT=3000` (havia `PORT=61910`, a porta da
   produção, que o Windows bloqueia).
   - [x] Os 3 PCs no banco de teste (24/10/2026).
-  - [ ] PC NIQUITO: trocar `PORT=61910` por `PORT=3000` no `.env`.
+  - Opcional: se o `npm start` der `EACCES: permission denied ... 61910`, trocar para
+    `PORT=3000` no `.env` (o Windows às vezes reserva essa porta; não afeta o deploy).
 - [ ] Apagar (ou guardar em local seguro) as exportações com dados reais na pasta Downloads.
 
 ### 7. Melhorias no código (sem tocar em produção)
