@@ -181,6 +181,13 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
   e o Express 4 não decodifica Brotli. Mesmo assim, o Node 23 vai acumular falhas sem correção.
   Antes, ver no painel do Integrator quais versões existem; testar no PC e no CI
   (`ci.yml`) antes de trocar na produção.
+  - 24/10/2026: o painel **só oferece versões antigas** (23.1.0, 22.2.0, 20.1.0, 19.9.0, 18.x…),
+    nenhuma com as correções. **Não trocar para a 22.2.0** (faltam ~2 anos de correções).
+  - [ ] Pedir à Integrator (suporte) que instale Node **24.22.1+** ou **22.23.4+** no painel.
+  - [ ] Quando houver: mudar o `node-version` do `ci.yml`, ver o CI passar, trocar no painel
+    (Integrator Node.js → ✎ do `nsi_tecnologia` → Node.js do Aplicativo → salvar) e conferir.
+    Os PCs já usam 22.23.4 sem problemas.
+  - O outro app (`controle_nsitecnologia`) também está no Node 23.1.0: tratar à parte.
 - [ ] Aviso vermelho na tela quando o sistema roda no PC conectado ao banco de produção.
 - [ ] Tratar as 56 vulnerabilidades do `npm audit` (3 críticas), testando com calma.
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.
