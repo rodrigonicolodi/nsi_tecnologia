@@ -4,6 +4,7 @@ const app = express();
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
+const { version: versaoSistema } = require('./package.json');
 
 // 🔗 Rotas
 const osRoutes = require('./routes/os');
@@ -37,6 +38,9 @@ app.use((req, res, next) => {
 // 🖼️ Layout EJS
 app.use(expressLayouts);
 app.set('layout', 'layout');
+
+// 🏷️ Versão do sistema (vem do package.json) disponível em todas as views
+app.locals.versao = versaoSistema;
 
 // 🧠 Sessão
 // Configuração de cookie: por padrão usa secure=false para funcionar em HTTP/proxy
@@ -126,7 +130,7 @@ app.use((err, req, res, next) => {
 // 🚀 Inicializa servidor
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor NSI Tecnologia rodando em http://localhost:${PORT}`);
+  console.log(`✅ Servidor NSI Tecnologia v${versaoSistema} rodando em http://localhost:${PORT}`);
   console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📊 Banco: ${process.env.DB_NAME ? 'Configurado' : '❌ Não configurado'}`);
 });

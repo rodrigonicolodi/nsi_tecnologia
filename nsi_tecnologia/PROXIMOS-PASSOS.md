@@ -75,7 +75,7 @@ Em cada um (com o Cursor fechado, para evitar erro EPERM): `git fetch`,
 app com um `pm2` próprio (global) ou com o do projeto; se for o do projeto, adicionar
 `pm2` ao `package.json` antes.
 
-### 5. Configurar o deploy automático (passo 4 ✅ — pode seguir)
+### 5. Configurar o deploy automático ✅ (concluído e 1ª publicação feita em 23/10/2026)
 Já sabido pela comparação: Node **23.1.0** no servidor (CI alinhado para 23.1.0 em 23/10/2026),
 porta 61910, processo gerenciado pelo painel do Integrator (`app.yaml`/`start.json`).
 Falta o print da tela **Setup Node.js App** e o acesso ao cPanel (recuperado em 23/10/2026).
@@ -83,9 +83,9 @@ Passo a passo em `deploy-instructions.md`. Primeiro, anotar no painel do
 Integrator (**Setup Node.js App**), só olhando:
 - [x] pasta do app: `applications/nsi_tecnologia` (provável `/home/rodri6000/applications/nsi_tecnologia`)
 - [x] versão do Node do servidor: **v23.1.0** (igual ao CI) — conferido no painel em 23/10/2026
-- [ ] caminho do `node`/`npm` no servidor (o painel **não é** o "Setup Node.js App" do
+- [x] caminho do `node`/`npm` no servidor (o painel **não é** o "Setup Node.js App" do
   cPanel, e sim o **"Integrator Node.js"**, próprio da Integrator; talvez não exista `activate`)
-- [ ] como o app é reiniciado hoje (chave liga/desliga do painel? aba **Deploy** do painel?)
+- [x] como o app é reiniciado hoje (chave liga/desliga do painel? aba **Deploy** do painel?)
   Suporte da Integrator (23/10/2026): o painel **opera com PM2** (e lê o `app.yaml`) —
   o `tmp/restart.txt` do script **não serve**. Via PuTTY (SSH `rodri6000@sistema.nsitecnologia.com.br`):
   `which pm2` → `/bin/pm2` (**global** — tirar `pm2` do `package.json` não quebra nada);
@@ -139,8 +139,10 @@ Feito em 23/10/2026 (PC de casa):
 - [x] Variável `DEPLOY_ENABLED` = `true` (23/10/2026, conferida por print). **Deploy ligado.**
   Sozinha ela não publica nada: o deploy só roda num merge na `main` (ou pelo botão
   "Run workflow") e ainda espera a aprovação.
-- [ ] **1ª publicação, acompanhada** (o sistema só é usado pelo Rodrigo, então qualquer horário
-  serve; o app fica alguns segundos fora do ar ao reiniciar). O que vai: botão "Quitar" azul
+- [x] **1ª publicação pelo deploy automático (23/10/2026)** — PR #1 `develop` → `main`
+  (merge `054974f`), aprovada no ambiente `production`. Run 40029909215: todas as etapas ok,
+  deploy em 7 s, volta automática não acionada, `/login` respondendo 200.
+  (O sistema só é usado pelo Rodrigo, então qualquer horário serve para publicar.) O que vai: botão "Quitar" azul
   (`parcelas.ejs`), formatação do `app.js` e documentação. Como o `package-lock.json` muda, o
   servidor roda `npm install`, que remove `escpos` e `pm2` do projeto (sem uso; o `pm2` do
   servidor é o global `/bin/pm2`). Ficar de olho: se a versão do `puppeteer` mudar, o
@@ -150,15 +152,42 @@ Feito em 23/10/2026 (PC de casa):
 `develop` → `main` → teste verde → **Merge** → o deploy espera → **Review deployments →
 Approve and deploy**.
 
-### 6. Banco de desenvolvimento
-Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dados reais).
-- [ ] Confirmar qual banco a produção usa: o do Integrator ou o antigo da Locaweb
-  (houve migração; pode haver dois).
-- [ ] Usuário cria, pelo painel, um banco `rodri6000_nsi_dev` com a mesma estrutura.
-- [ ] Trocar o `.env` dos 3 PCs para o banco novo.
-- [ ] Versionar a estrutura do banco (arquivo `.sql` só com o schema, sem dados).
+### 6. Banco de desenvolvimento (banco de teste online, 24/10/2026)
+Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada para instalar).
+- [x] A produção usa `rodri6000_nsi_tecnologia` no Integrator (conferido no `.env` do servidor).
+- [x] Banco `rodri6000_nsi_dev` + usuário `rodri6000_nsi_dev` com acesso **só** a ele
+  (o usuário de teste não acessa o banco da produção). Senha guardada pelo Rodrigo.
+- [x] Estrutura versionada em `database/schema.sql` (só tabelas, sem dados) e importada no teste.
+- [x] Dados da produção copiados para o teste (exportação de 24/10/2026 00:12) com
+  `scripts/copiar-dados-para-dev.js`. No teste, o login é o mesmo da produção.
+  O sistema não envia e-mail/WhatsApp/SMS, então testar com contatos reais não manda nada.
+- Scripts com trava (só rodam se o `DB_NAME` do `.env` terminar em `_dev`):
+  `scripts/copiar-dados-para-dev.js <arquivo.sql>` (atualiza o teste com uma exportação nova,
+  com dados) e `scripts/criar-usuario-dev.js` (cria um admin no teste).
+- Trocar o `.env` de cada PC (o Git não leva o `.env`): comentar com `#` as linhas
+  `DB_USER`, `DB_PASSWORD`, `DB_NAME` da produção e colocar as do `rodri6000_nsi_dev`
+  (`DB_HOST` não muda). Conferir também `PORT=3000` (havia `PORT=61910`, a porta da
+  produção, que o Windows bloqueia).
+  - [x] Os 3 PCs no banco de teste (24/10/2026).
+  - Opcional: se o `npm start` der `EACCES: permission denied ... 61910`, trocar para
+    `PORT=3000` no `.env` (o Windows às vezes reserva essa porta; não afeta o deploy).
+- [ ] Apagar (ou guardar em local seguro) as exportações com dados reais na pasta Downloads.
 
 ### 7. Melhorias no código (sem tocar em produção)
+- [ ] 🔴 **PRIORIDADE: a senha do banco da produção está no histórico público do GitHub**
+  (descoberto em 24/10/2026). Até 27/09/2025 o `db.js` tinha host, usuário e senha do
+  `rodri6000_nsi_tecnologia` escritos no código (commits `9fd85b9`, `3c43d41`, `1783302`);
+  e há uma senha antiga da Locaweb (`bac5d08`). O repositório é público, então qualquer um
+  pode ver. Fazer:
+  1. Conferir se a senha atual do usuário MySQL `rodri6000_nsi_tecnologia` ainda é a mesma
+     daquela época. Se for (ou na dúvida), **trocar a senha** no cPanel (MySQL → usuário →
+     alterar senha) e, logo em seguida, atualizar `DB_PASSWORD` no `.env` **do servidor**
+     e reiniciar o app. ⚠️ O `controle_nsitecnologia` usa o **mesmo usuário MySQL**: o
+     `.env` dele também precisa da senha nova.
+  2. Ver em cPanel → **MySQL Remoto** quais endereços podem conectar de fora (se tiver `%`,
+     qualquer lugar da internet pode tentar).
+  3. Avaliar deixar o repositório privado ou limpar o histórico (trocar a senha resolve o
+     principal; o histórico continua mostrando a senha antiga, já sem valor).
 - [ ] ⚠️ **Trocar o Node 23.1.0 do servidor por uma versão LTS** (Node 22 ≥ 22.23.4 ou
   Node 24 ≥ 24.22.1). O Node 23 está sem suporte desde 2025, então **não recebe correções de
   segurança**, como a da falha do Brotli (CVE-2026-111497, corrigida em 21/10/2026).
@@ -166,6 +195,16 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
   e o Express 4 não decodifica Brotli. Mesmo assim, o Node 23 vai acumular falhas sem correção.
   Antes, ver no painel do Integrator quais versões existem; testar no PC e no CI
   (`ci.yml`) antes de trocar na produção.
+  - 24/10/2026: o painel **só oferece versões antigas** (23.1.0, 22.2.0, 20.1.0, 19.9.0, 18.x…),
+    nenhuma com as correções. **Não trocar para a 22.2.0** (faltam ~2 anos de correções).
+  - [ ] Pedir à Integrator (suporte) que instale Node **24.22.1+** ou **22.23.4+** no painel.
+  - [ ] Quando houver: mudar o `node-version` do `ci.yml`, ver o CI passar, trocar no painel
+    (Integrator Node.js → ✎ do `nsi_tecnologia` → Node.js do Aplicativo → salvar) e conferir.
+    Os PCs já usam 22.23.4 sem problemas.
+  - O outro app (`controle_nsitecnologia`) também está no Node 23.1.0: tratar à parte.
+- [x] **Versionar o sistema** (24/10/2026): versão **1.1.0** no `package.json`, mostrada no
+  rodapé do menu e na tela de login; histórico em `CHANGELOG.md`; o deploy cria a tag
+  (`v1.1.0`) no GitHub depois de publicar. Regras e "como fechar uma versão" no `CHANGELOG.md`.
 - [ ] Aviso vermelho na tela quando o sistema roda no PC conectado ao banco de produção.
 - [ ] Tratar as 56 vulnerabilidades do `npm audit` (3 críticas), testando com calma.
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.
@@ -176,8 +215,7 @@ Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dad
   (o Puppeteer/Chrome do PDF consome muito) e erros não tratados ou queda da conexão com o banco.
 
 ## ⚠️ Lembretes
-- Publicação ainda é manual pelo cPanel até o deploy automático ser ligado:
-  nunca enviar `node_modules` nem o `.env` do PC.
+- Publicar só pelo deploy automático (PR `develop` → `main`), nunca pelo cPanel.
 - Nada de mexer em banco ou servidor de produção sem decisão explícita do usuário.
 
 ---
@@ -199,8 +237,9 @@ npm ci            # SÓ se o pull trouxe package.json ou package-lock.json
 ```bash
 npm start         # abre em http://localhost:3000 — parar com Ctrl+C
 ```
-⚠️ **O `.env` aponta para o BANCO DE PRODUÇÃO**: olhar à vontade, mas não cadastrar,
-editar ou excluir dados de teste.
+Com o `.env` no banco de teste (`DB_NAME=rodri6000_nsi_dev`), pode cadastrar, editar e excluir
+à vontade. ⚠️ Num PC que ainda não foi trocado (ver passo 6), o `.env` aponta para o
+**BANCO DE PRODUÇÃO**: só olhar.
 
 ## 🔴 Ao terminar (nunca sair sem isso)
 ```bash
@@ -229,15 +268,21 @@ git log --oneline origin/main..main    # commits nunca enviados
 git stash list                         # alterações guardadas e esquecidas
 ```
 
-## 🚀 Publicar na produção (manual, até ligar o deploy automático)
-1. Pergunte ao Claude: **"quais arquivos mudaram desde a última publicação?"**
-2. cPanel → Gerenciador de Arquivos → subir **só esses arquivos**, na mesma pasta.
-3. Mudou `routes/`, `controllers/` ou `app.js` → **reiniciar o app** no painel
-   (Setup Node.js App). Só `views/` ou `public/` → costuma aparecer na hora.
-4. Se mudou `package.json`: rodar **"Run NPM Install"** no painel antes de reiniciar.
-   (O `bcryptjs` já está instalado na produção — conferido em 23/10/2026.)
+## 🚀 Publicar na produção (deploy automático, desde 23/10/2026)
+0. Se a publicação traz novidade ou correção: anotar no `CHANGELOG.md` e subir a versão
+   (peça ao Claude: **"vamos fechar a versão 1.2.0"**).
+1. Tudo enviado para a `develop` (commit + push) e com o teste verde no GitHub.
+2. Abrir https://github.com/rodrigonicolodi/nsi_tecnologia/compare/main...develop →
+   **Create pull request**.
+3. Com os checks verdes → **Merge pull request** (o normal, sem a setinha) → **Confirm merge**.
+   ⚠️ **Nunca clicar em "Delete branch"** (apagaria a `develop`).
+4. Aba **Actions** → "Deploy produção" → **Review deployments** → marcar `production` →
+   **Approve and deploy**. Leva de 1 a 3 minutos; se falhar, volta sozinho ao backup.
+5. Entrar no sistema e conferir.
+6. No PC, alinhar a `develop` com a `main`: `git pull origin main` e depois `git push`.
 
-❌ Nunca subir `node_modules` nem o `.env` do PC. Nunca subir a pasta inteira.
+❌ Não publicar mais pelo cPanel: o que for alterado à mão no servidor é sobrescrito na próxima publicação.
+Os backups de cada deploy ficam no servidor em `~/backups/nsi_tecnologia` (os 10 últimos).
 
 ## 🏢 PC novo ou que estava parado (1ª vez na `develop`)
 _(Usado no PC do escritório em 23/10/2026; serve para qualquer PC que ainda esteja na `main`.)_
