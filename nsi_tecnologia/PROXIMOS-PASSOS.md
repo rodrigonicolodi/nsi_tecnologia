@@ -168,9 +168,8 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
   `DB_USER`, `DB_PASSWORD`, `DB_NAME` da produção e colocar as do `rodri6000_nsi_dev`
   (`DB_HOST` não muda). Conferir também `PORT=3000` (havia `PORT=61910`, a porta da
   produção, que o Windows bloqueia).
-  - [x] PC NIQUITO (24/10/2026) — falta só trocar `PORT=61910` por `PORT=3000`.
-  - [ ] Outro PC
-  - [ ] Outro PC
+  - [x] Os 3 PCs no banco de teste (24/10/2026).
+  - [ ] PC NIQUITO: trocar `PORT=61910` por `PORT=3000` no `.env`.
 - [ ] Apagar (ou guardar em local seguro) as exportações com dados reais na pasta Downloads.
 
 ### 7. Melhorias no código (sem tocar em produção)
