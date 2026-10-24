@@ -5,7 +5,7 @@
 #
 # deploy:   faz backup da pasta do app, extrai ~/deploy_nsi/release.tar.gz por cima
 #           (nunca toca em .env nem node_modules), reinstala dependências só se o
-#           package-lock.json mudou e reinicia o app.
+#           package-lock.json mudou e reinicia o app (conferindo que o pm2 reiniciou).
 # rollback: restaura o último backup e reinicia.
 set -euo pipefail
 
@@ -21,18 +21,11 @@ MANTER_BACKUPS=10
 
 log() { echo "[deploy $(date '+%F %T')] $*"; }
 
-# Caminho do node que o PM2 usa para este app (a versão escolhida no painel Integrator)
-node_do_pm2() {
-  command -v pm2 >/dev/null && command -v node >/dev/null || return 0
-  pm2 jlist 2>/dev/null | node -e '
-    let s = "";
-    process.stdin.on("data", d => s += d).on("end", () => {
-      try {
-        const app = JSON.parse(s).find(a => a.name === process.argv[1]);
-        if (app) console.log(app.pm2_env.exec_interpreter || "");
-      } catch (e) {}
-    });' "$PM2_NAME" || true
-}
+# No Integrator, "npm" e "pm2" do sistema são atalhos do painel que só acham o app
+# quando rodam DENTRO da pasta dele; fora dela respondem "Project Node.js not found"
+# e saem sem erro. Por isso tudo roda a partir do APP_DIR.
+[ -d "$APP_DIR" ] || { log "ERRO: pasta do app não existe: $APP_DIR"; exit 1; }
+cd "$APP_DIR"
 
 ativar_node() {
   if [ -n "${NODEVENV_ACTIVATE:-}" ]; then
@@ -42,20 +35,52 @@ ativar_node() {
       log "AVISO: NODEVENV_ACTIVATE não encontrado: $NODEVENV_ACTIVATE"
     fi
   fi
+  # O Node que o app usa é o "interpreter" do app.yaml (o node solto do servidor é antigo)
   local interp
-  interp="$(node_do_pm2)"
-  if [ "${interp#/}" != "$interp" ] && [ -x "$(dirname "$interp")/npm" ]; then
+  interp="$(sed -n 's/^[[:space:]]*interpreter:[[:space:]]*//p' "$APP_DIR/app.yaml" 2>/dev/null | head -n1 | tr -d "\"' ")"
+  if [ -n "$interp" ] && [ -x "$interp" ]; then
     export PATH="$(dirname "$interp"):$PATH"
+  else
+    log "AVISO: interpreter do app.yaml não encontrado; usando o node do sistema"
   fi
   command -v npm >/dev/null || { log "ERRO: npm não encontrado no servidor"; exit 1; }
-  log "Node $(node -v), npm $(npm -v)"
+  log "Node $(node -v) ($(command -v node)), npm $(npm -v)"
+}
+
+# Roda um comando e falha se ele der erro OU se for um atalho do painel dizendo que
+# não achou o projeto (esses saem com sucesso mesmo sem fazer nada)
+rodar() {
+  local saida
+  if ! saida="$("$@" 2>&1)"; then
+    echo "$saida"
+    log "ERRO: falhou: $*"
+    exit 1
+  fi
+  echo "$saida"
+  if echo "$saida" | grep -qiE 'Project Node\.js not found|NodeJS Selector demands'; then
+    log "ERRO: o comando não encontrou o projeto: $*"
+    exit 1
+  fi
 }
 
 instalar_dependencias() {
   ativar_node
   log "Instalando dependências (npm install --omit=dev)..."
   # --no-save: não reescreve o package-lock.json (ele deve continuar igual ao do Git)
-  ( cd "$APP_DIR" && npm install --omit=dev --no-save --no-audit --no-fund )
+  rodar npm install --omit=dev --no-save --no-audit --no-fund
+}
+
+# Momento em que o PM2 (re)iniciou o app; muda a cada reinício
+inicio_pm2() {
+  pm2 jlist 2>/dev/null | node -e '
+    let s = "";
+    process.stdin.on("data", d => s += d).on("end", () => {
+      try {
+        // o atalho do painel pode escrever avisos antes do JSON: pegar só a lista
+        const app = JSON.parse(s.slice(s.indexOf("[{"))).find(a => a.name === process.argv[1]);
+        if (app) console.log(app.pm2_env.pm_uptime);
+      } catch (e) {}
+    });' "$PM2_NAME" || true
 }
 
 reiniciar() {
@@ -67,8 +92,17 @@ reiniciar() {
       ;;
     pm2)
       ativar_node
-      if command -v pm2 >/dev/null; then pm2 restart "$PM2_NAME"
-      else "$APP_DIR/node_modules/.bin/pm2" restart "$PM2_NAME"; fi
+      command -v pm2 >/dev/null || { log "ERRO: pm2 não encontrado no servidor"; exit 1; }
+      local antes depois
+      antes="$(inicio_pm2)"
+      [ -n "$antes" ] || { log "ERRO: processo \"$PM2_NAME\" não aparece no pm2"; exit 1; }
+      rodar pm2 restart "$PM2_NAME"
+      depois="$(inicio_pm2)"
+      if [ -z "$depois" ] || [ "$depois" = "$antes" ]; then
+        log "ERRO: o pm2 não reiniciou o app \"$PM2_NAME\""
+        exit 1
+      fi
+      log "App reiniciado pelo pm2"
       ;;
     none)
       log "AVISO: RESTART_METHOD=none — reinicie o app manualmente no painel"

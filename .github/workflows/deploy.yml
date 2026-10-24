@@ -53,15 +53,20 @@ jobs:
       - name: Aplicar no servidor
         run: $SSH "$REMOTE_ENV bash -s -- deploy" < nsi_tecnologia/scripts/deploy-remote.sh
 
-      - name: Verificar se o sistema respondeu
+      - name: Verificar se o sistema respondeu (com a versão nova)
         run: |
+          versao="v$(node -p "require('./nsi_tecnologia/package.json').version")"
           for i in $(seq 1 12); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "${{ vars.APP_URL }}/login" || true)
+            pagina=$(curl -s -w '\n%{http_code}' "${{ vars.APP_URL }}/login?v=$GITHUB_SHA" || true)
+            code=$(echo "$pagina" | tail -n1)
             echo "Tentativa $i: HTTP $code"
-            [ "$code" = "200" ] && exit 0
+            if [ "$code" = "200" ] && echo "$pagina" | grep -q "versao-login\">$versao<"; then
+              echo "Sistema no ar com a versão $versao"
+              exit 0
+            fi
             sleep 5
           done
-          echo "Sistema não respondeu 200 em /login"
+          echo "Sistema não respondeu 200 com a versão $versao em /login"
           exit 1
 
       - name: Marcar a versão no GitHub (tag)

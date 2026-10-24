@@ -205,6 +205,18 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
 - [x] **Versionar o sistema** (24/10/2026): versão **1.1.0** no `package.json`, mostrada no
   rodapé do menu e na tela de login; histórico em `CHANGELOG.md`; o deploy cria a tag
   (`v1.1.0`) no GitHub depois de publicar. Regras e "como fechar uma versão" no `CHANGELOG.md`.
+  **v1.1.0 publicada em 24/10/2026** (PR #2, tag `v1.1.0`).
+- [ ] ⚠️ **Deploy não reiniciava o app** (descoberto na publicação da v1.1.0): no Integrator,
+  `npm` e `pm2` do servidor são atalhos do painel que só acham o app **dentro da pasta dele**;
+  fora dela respondem "Project Node.js not found" e saem sem erro. O deploy copiou os
+  arquivos, mas não reiniciou (foi preciso `pm2 restart nsi_tecnologia` à mão pelo PuTTY,
+  de dentro de `~/applications/nsi_tecnologia`). O `node` solto do servidor é o v10; o do app
+  é o `interpreter` do `app.yaml` (`/usr/nodejs/node-v23.1.0/bin/node`).
+  Corrigido no `deploy-remote.sh` (roda de dentro do `APP_DIR`, usa o Node do `app.yaml`,
+  falha se o painel disser que não achou o projeto e confere que o pm2 reiniciou) e no
+  `deploy.yml` (o teste final exige a versão nova na tela de login).
+  - [ ] Confirmar na próxima publicação (o log de "Aplicar no servidor" deve mostrar
+    `Node v23.1.0 (/usr/nodejs/...)` e `App reiniciado pelo pm2`).
 - [ ] Aviso vermelho na tela quando o sistema roda no PC conectado ao banco de produção.
 - [ ] Tratar as 56 vulnerabilidades do `npm audit` (3 críticas), testando com calma.
 - [ ] Scripts `backup*` do `package.json` apontam para `backup_database.js`, que não existe.

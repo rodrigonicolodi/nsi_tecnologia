@@ -13,7 +13,8 @@ Como publicar uma versão nova:
    `v1.2.0` no GitHub.
 
 ## Próxima versão
-- (nada ainda)
+- Publicação automática corrigida: agora reinicia o sistema de verdade (na 1.1.0 foi
+  preciso reiniciar à mão) e confere que a versão nova está no ar.
 
 ## 1.1.0 — 24/10/2026
 - Número da versão aparece no rodapé do menu e na tela de login.
