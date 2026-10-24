@@ -152,13 +152,26 @@ Feito em 23/10/2026 (PC de casa):
 `develop` → `main` → teste verde → **Merge** → o deploy espera → **Review deployments →
 Approve and deploy**.
 
-### 6. Banco de desenvolvimento
-Hoje o `.env` dos PCs aponta para o **banco de produção** (testes mexem em dados reais).
-- [ ] Confirmar qual banco a produção usa: o do Integrator ou o antigo da Locaweb
-  (houve migração; pode haver dois).
-- [ ] Usuário cria, pelo painel, um banco `rodri6000_nsi_dev` com a mesma estrutura.
-- [ ] Trocar o `.env` dos 3 PCs para o banco novo.
-- [ ] Versionar a estrutura do banco (arquivo `.sql` só com o schema, sem dados).
+### 6. Banco de desenvolvimento (banco de teste online, 24/10/2026)
+Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada para instalar).
+- [x] A produção usa `rodri6000_nsi_tecnologia` no Integrator (conferido no `.env` do servidor).
+- [x] Banco `rodri6000_nsi_dev` + usuário `rodri6000_nsi_dev` com acesso **só** a ele
+  (o usuário de teste não acessa o banco da produção). Senha guardada pelo Rodrigo.
+- [x] Estrutura versionada em `database/schema.sql` (só tabelas, sem dados) e importada no teste.
+- [x] Dados da produção copiados para o teste (exportação de 24/10/2026 00:12) com
+  `scripts/copiar-dados-para-dev.js`. No teste, o login é o mesmo da produção.
+  O sistema não envia e-mail/WhatsApp/SMS, então testar com contatos reais não manda nada.
+- Scripts com trava (só rodam se o `DB_NAME` do `.env` terminar em `_dev`):
+  `scripts/copiar-dados-para-dev.js <arquivo.sql>` (atualiza o teste com uma exportação nova,
+  com dados) e `scripts/criar-usuario-dev.js` (cria um admin no teste).
+- Trocar o `.env` de cada PC (o Git não leva o `.env`): comentar com `#` as linhas
+  `DB_USER`, `DB_PASSWORD`, `DB_NAME` da produção e colocar as do `rodri6000_nsi_dev`
+  (`DB_HOST` não muda). Conferir também `PORT=3000` (havia `PORT=61910`, a porta da
+  produção, que o Windows bloqueia).
+  - [x] PC NIQUITO (24/10/2026) — falta só trocar `PORT=61910` por `PORT=3000`.
+  - [ ] Outro PC
+  - [ ] Outro PC
+- [ ] Apagar (ou guardar em local seguro) as exportações com dados reais na pasta Downloads.
 
 ### 7. Melhorias no código (sem tocar em produção)
 - [ ] ⚠️ **Trocar o Node 23.1.0 do servidor por uma versão LTS** (Node 22 ≥ 22.23.4 ou
@@ -200,8 +213,9 @@ npm ci            # SÓ se o pull trouxe package.json ou package-lock.json
 ```bash
 npm start         # abre em http://localhost:3000 — parar com Ctrl+C
 ```
-⚠️ **O `.env` aponta para o BANCO DE PRODUÇÃO**: olhar à vontade, mas não cadastrar,
-editar ou excluir dados de teste.
+Com o `.env` no banco de teste (`DB_NAME=rodri6000_nsi_dev`), pode cadastrar, editar e excluir
+à vontade. ⚠️ Num PC que ainda não foi trocado (ver passo 6), o `.env` aponta para o
+**BANCO DE PRODUÇÃO**: só olhar.
 
 ## 🔴 Ao terminar (nunca sair sem isso)
 ```bash
