@@ -83,9 +83,9 @@ Passo a passo em `deploy-instructions.md`. Primeiro, anotar no painel do
 Integrator (**Setup Node.js App**), só olhando:
 - [x] pasta do app: `applications/nsi_tecnologia` (provável `/home/rodri6000/applications/nsi_tecnologia`)
 - [x] versão do Node do servidor: **v23.1.0** (igual ao CI) — conferido no painel em 23/10/2026
-- [ ] caminho do `node`/`npm` no servidor (o painel **não é** o "Setup Node.js App" do
+- [x] caminho do `node`/`npm` no servidor (o painel **não é** o "Setup Node.js App" do
   cPanel, e sim o **"Integrator Node.js"**, próprio da Integrator; talvez não exista `activate`)
-- [ ] como o app é reiniciado hoje (chave liga/desliga do painel? aba **Deploy** do painel?)
+- [x] como o app é reiniciado hoje (chave liga/desliga do painel? aba **Deploy** do painel?)
   Suporte da Integrator (23/10/2026): o painel **opera com PM2** (e lê o `app.yaml`) —
   o `tmp/restart.txt` do script **não serve**. Via PuTTY (SSH `rodri6000@sistema.nsitecnologia.com.br`):
   `which pm2` → `/bin/pm2` (**global** — tirar `pm2` do `package.json` não quebra nada);
