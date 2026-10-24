@@ -174,7 +174,15 @@ Decidido: banco de teste **online no Integrator** (um só para os 3 PCs, nada pa
 - [ ] Apagar (ou guardar em local seguro) as exportações com dados reais na pasta Downloads.
 
 ### 7. Melhorias no código (sem tocar em produção)
-- [ ] 🔴 **PRIORIDADE: a senha do banco da produção está no histórico público do GitHub**
+- [x] **Senha do banco da produção trocada (24/10/2026)**: nova senha do usuário MySQL
+  `rodri6000_nsi_tecnologia` no cPanel e nos `.env` do servidor de **nsi_tecnologia** e
+  **controle_nsitecnologia** (os dois usam esse usuário); os dois apps reiniciados e testados.
+  A senha que aparece no histórico do GitHub não vale mais.
+  - [ ] Apagar dos dois `.env` do servidor a linha `# DB_PASSWORD=` com a senha antiga
+    (ficou como reserva para voltar atrás).
+  - [ ] Ver em cPanel → **MySQL Remoto** quais endereços podem conectar de fora.
+  - Opcional, no futuro: um usuário MySQL próprio para o `controle_nsitecnologia`.
+- [x] ~~🔴 PRIORIDADE: a senha do banco da produção está no histórico público do GitHub~~
   (descoberto em 24/10/2026). Até 27/09/2025 o `db.js` tinha host, usuário e senha do
   `rodri6000_nsi_tecnologia` escritos no código (commits `9fd85b9`, `3c43d41`, `1783302`);
   e há uma senha antiga da Locaweb (`bac5d08`). O repositório é público, então qualquer um
